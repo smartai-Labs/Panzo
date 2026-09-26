@@ -1,0 +1,15 @@
+﻿{
+    "caseId":  "F02-queued-3",
+    "command":  "preview-queued-playback-smoke",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  9081,
+    "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 238\n  Rendered frames: 234\n  Paint calls: 232\n  Average render: 1062 us\n  Maximum render: 50137 us\n  Background decodes: 0\n  Source texture uploads: 231\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 234\n  CPU readbacks: 0\n  Last project tick: 358693967\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 28992 us\n  Scrub presented frames: 0\n  Scrub maximum presentation gap: 0 us\n  Scrub release settled exactly: false\n  Scrub distinct source frames: 0\n  Scrub maximum source time error tick: 0\n  Media errors: 0\n",
+    "error":  "",
+    "stdoutFile":  "F02-queued-3.stdout.txt",
+    "stderrFile":  "F02-queued-3.stderr.txt",
+    "metricKind":  "internal-queued-playback-state",
+    "latencyMs":  28.992,
+    "cacheState":  "fresh-process-os-cache-uncontrolled"
+}

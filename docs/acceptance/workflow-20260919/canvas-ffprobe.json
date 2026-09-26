@@ -1,0 +1,58 @@
+[
+  {
+    "name": "release-portrait",
+    "sourceFile": ".tmp\\workflow-canvas-final.mp4",
+    "stream": {
+      "width": 1080,
+      "height": 1920,
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "duration": "0.500000",
+      "nb_read_frames": "30"
+    }
+  },
+  {
+    "name": "portrait-native",
+    "sourceFile": "docs\\acceptance\\workflow-20260919\\portrait-native-5e8ebdd4-43e4-4374-baf3-f1a6d7a8abcb.mp4",
+    "stream": {
+      "width": 1440,
+      "height": 2560,
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "duration": "0.500000",
+      "nb_read_frames": "30"
+    }
+  },
+  {
+    "name": "portrait-hd",
+    "sourceFile": "docs\\acceptance\\workflow-20260919\\portrait-hd-b556bc3a-3f6b-4641-8aad-bfe6cb306671.mp4",
+    "stream": {
+      "width": 1080,
+      "height": 1920,
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "duration": "0.500000",
+      "nb_read_frames": "30"
+    }
+  },
+  {
+    "name": "custom-square",
+    "sourceFile": "docs\\acceptance\\workflow-20260919\\custom-square-8409a783-07bd-4e19-a1c6-47d9c3a2fd6d.mp4",
+    "stream": {
+      "width": 640,
+      "height": 640,
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709",
+      "duration": "0.500000",
+      "nb_read_frames": "30"
+    }
+  }
+]

@@ -1,0 +1,1077 @@
+{
+  "canvasSize": [
+    2099.2000000000003,
+    1180.8000000000002
+  ],
+  "coordinateMappingMismatches": 0,
+  "project": "camera-focus-review.panzo",
+  "removedAutoMicroPans": 1,
+  "segments": [
+    {
+      "click": "click-7",
+      "clickScreenFrom": [
+        0.03867187500000002,
+        0.9729166666666668
+      ],
+      "clickScreenTo": [
+        0.06187500000000001,
+        0.9566666666666669
+      ],
+      "clickSeconds": 7.5213585,
+      "cursorAtPeak": {
+        "outputX": 0.042067206770315224,
+        "outputY": 0.9462081620416424,
+        "sizePx": 32,
+        "sourceX": 0.042067206770315224,
+        "sourceY": 0.9462081620416424,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0005",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.038671875,
+        0.9729166666666668
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        2.8849105
+      ],
+      "projectSeconds": [
+        [
+          2.8849105,
+          3.2349105
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        7.2213585,
+        7.5713585
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-7",
+      "clickScreenFrom": [
+        0.06187500000000001,
+        0.9566666666666669
+      ],
+      "clickScreenTo": [
+        0.03867187500000002,
+        0.9729166666666668
+      ],
+      "clickSeconds": 7.5213585,
+      "cursorAtPeak": {
+        "outputX": 0.06248581041579617,
+        "outputY": -0.5822222222222223,
+        "sizePx": 32,
+        "sourceX": 0.039053631509872636,
+        "sourceY": 0.011111111111111112,
+        "visible": false
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0006",
+      "kind": "zoom-out",
+      "mouseSource": [
+        0.038671875,
+        0.9729166666666668
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        4.3849105
+      ],
+      "projectSeconds": [
+        [
+          4.3849105,
+          4.8349105
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        8.7213585,
+        9.1713585
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-9",
+      "clickScreenFrom": [
+        0.09921875000000002,
+        0.012500000000000011
+      ],
+      "clickScreenTo": [
+        0.15874999999999997,
+        0.01999999999999999
+      ],
+      "clickSeconds": 10.50139,
+      "cursorAtPeak": {
+        "outputX": 0.10324667204554289,
+        "outputY": 0.012500000000000011,
+        "sizePx": 32,
+        "sourceX": 0.1032466720455429,
+        "sourceY": 0.0125,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0007",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.09921875,
+        0.0125
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        5.864942
+      ],
+      "projectSeconds": [
+        [
+          5.864942,
+          6.214942
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        10.20139,
+        10.55139
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-11",
+      "clickScreenFrom": [
+        0.07062499999999995,
+        1.56
+      ],
+      "clickScreenTo": [
+        0.04414062499999999,
+        0.975
+      ],
+      "clickSeconds": 12.1863924,
+      "cursorAtPeak": {
+        "outputX": 0.04562499999999996,
+        "outputY": 0.3139407349659115,
+        "sizePx": 32,
+        "sourceX": 0.028515625,
+        "sourceY": 0.1962129593536947,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 277,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0008",
+      "kind": "reframe-out",
+      "mouseSource": [
+        0.044140625,
+        0.975
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        7.0499444
+      ],
+      "projectSeconds": [
+        [
+          7.0499444,
+          7.4999444
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        11.3863924,
+        11.8363924
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-11",
+      "clickScreenFrom": [
+        0.04414062499999999,
+        0.975
+      ],
+      "clickScreenTo": [
+        0.07062499999999995,
+        0.96
+      ],
+      "clickSeconds": 12.1863924,
+      "cursorAtPeak": {
+        "outputX": 0.03749999999999998,
+        "outputY": 0.8805084525738196,
+        "sizePx": 32,
+        "sourceX": 0.0375,
+        "sourceY": 0.8805084525738196,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0009",
+      "kind": "reframe-in",
+      "mouseSource": [
+        0.044140625,
+        0.975
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        7.4999444
+      ],
+      "projectSeconds": [
+        [
+          7.4999444,
+          7.8499444
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        11.8363924,
+        12.1863924
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-13",
+      "clickScreenFrom": [
+        0.390625,
+        0.16666666666666669
+      ],
+      "clickScreenTo": [
+        0.390625,
+        0.5
+      ],
+      "clickSeconds": 12.886385,
+      "cursorAtPeak": {
+        "outputX": 0.08568236701218816,
+        "outputY": 0.9287189125564794,
+        "sizePx": 32,
+        "sourceX": 0.05355147938261761,
+        "sourceY": 0.9554493203477996,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0010",
+      "kind": "pan",
+      "mouseSource": [
+        0.244140625,
+        0.4791666666666667
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        8.282612
+      ],
+      "projectSeconds": [
+        [
+          8.282612,
+          8.5353989
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        12.61906,
+        13.1537101
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.4791666666666667,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-15",
+      "clickScreenFrom": [
+        0.02734375,
+        0.9666666666666668
+      ],
+      "clickScreenTo": [
+        0.043749999999999976,
+        0.9466666666666669
+      ],
+      "clickSeconds": 19.4455374,
+      "cursorAtPeak": {
+        "outputX": 0.05660695546182326,
+        "outputY": 0.9648596361130056,
+        "sizePx": 32,
+        "sourceX": 0.05660695546182326,
+        "sourceY": 0.9648596361130056,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0012",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.02734375,
+        0.9666666666666668
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        10.1164675
+      ],
+      "projectSeconds": [
+        [
+          10.1164675,
+          10.4664675
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        19.1455374,
+        19.4955374
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-19",
+      "clickScreenFrom": [
+        0.06374999999999999,
+        -0.5244444444444444
+      ],
+      "clickScreenTo": [
+        0.03984375000000001,
+        0.04722222222222222
+      ],
+      "clickSeconds": 21.1094569,
+      "cursorAtPeak": {
+        "outputX": 0.057499999999999996,
+        "outputY": -0.44120526554608586,
+        "sizePx": 32,
+        "sourceX": 0.0359375,
+        "sourceY": 0.09924670903369634,
+        "visible": false
+      },
+      "fixedClickOutsideSamples": 256,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0013",
+      "kind": "reframe-out",
+      "mouseSource": [
+        0.03984375,
+        0.04722222222222222
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        11.280387
+      ],
+      "projectSeconds": [
+        [
+          11.280387,
+          11.730387
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        20.3094569,
+        20.7594569
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-19",
+      "clickScreenFrom": [
+        0.03984375000000001,
+        0.04722222222222222
+      ],
+      "clickScreenTo": [
+        0.06374999999999999,
+        0.07555555555555553
+      ],
+      "clickSeconds": 21.1094569,
+      "cursorAtPeak": {
+        "outputX": 0.03984375000000001,
+        "outputY": 0.04722222222222222,
+        "sizePx": 32,
+        "sourceX": 0.03984375,
+        "sourceY": 0.04722222222222222,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0014",
+      "kind": "reframe-in",
+      "mouseSource": [
+        0.03984375,
+        0.04722222222222222
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        11.730387
+      ],
+      "projectSeconds": [
+        [
+          11.730387,
+          12.080387
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        20.7594569,
+        21.1094569
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-19",
+      "clickScreenFrom": [
+        0.06374999999999999,
+        0.07555555555555553
+      ],
+      "clickScreenTo": [
+        0.03984375000000001,
+        0.04722222222222222
+      ],
+      "clickSeconds": 21.1094569,
+      "cursorAtPeak": {
+        "outputX": 0.5778160300903691,
+        "outputY": 1.598888888888889,
+        "sizePx": 32,
+        "sourceX": 0.3611350188064807,
+        "sourceY": 0.9993055555555556,
+        "visible": false
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0015",
+      "kind": "zoom-out",
+      "mouseSource": [
+        0.03984375,
+        0.04722222222222222
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        13.280387
+      ],
+      "projectSeconds": [
+        [
+          13.280387,
+          13.730387
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        22.3094569,
+        22.7594569
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-21",
+      "clickScreenFrom": [
+        0.51328125,
+        0.013888888888888895
+      ],
+      "clickScreenTo": [
+        0.5,
+        0.022222222222222206
+      ],
+      "clickSeconds": 23.5355948,
+      "cursorAtPeak": {
+        "outputX": 0.6196453876577211,
+        "outputY": 0.0,
+        "sizePx": 32,
+        "sourceX": 0.6196453876577211,
+        "sourceY": 0.0,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0016",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.51328125,
+        0.013888888888888888
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        14.2065249
+      ],
+      "projectSeconds": [
+        [
+          14.2065249,
+          14.5565249
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        23.2355948,
+        23.5855948
+      ],
+      "to": {
+        "centerX": 0.51328125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-21",
+      "clickScreenFrom": [
+        0.5,
+        0.022222222222222206
+      ],
+      "clickScreenTo": [
+        0.51328125,
+        0.013888888888888895
+      ],
+      "clickSeconds": 23.5355948,
+      "cursorAtPeak": {
+        "outputX": 0.3570929142493278,
+        "outputY": 1.0679069121477498,
+        "sizePx": 32,
+        "sourceX": 0.4239643214058299,
+        "sourceY": 0.6674418200923437,
+        "visible": false
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.51328125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0017",
+      "kind": "zoom-out",
+      "mouseSource": [
+        0.51328125,
+        0.013888888888888888
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        15.7065249
+      ],
+      "projectSeconds": [
+        [
+          15.7065249,
+          16.1565249
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        24.7355948,
+        25.1855948
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-23",
+      "clickScreenFrom": [
+        0.5640625,
+        0.017361111111111105
+      ],
+      "clickScreenTo": [
+        0.5,
+        0.02777777777777774
+      ],
+      "clickSeconds": 26.7723913,
+      "cursorAtPeak": {
+        "outputX": 0.5610489502553709,
+        "outputY": 0.016864800453992856,
+        "sizePx": 32,
+        "sourceX": 0.5610489502553709,
+        "sourceY": 0.016864800453992874,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0018",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.5640625,
+        0.017361111111111112
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        17.4433214
+      ],
+      "projectSeconds": [
+        [
+          17.4433214,
+          17.7933214
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        26.4723913,
+        26.8223913
+      ],
+      "to": {
+        "centerX": 0.5640625,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-23",
+      "clickScreenFrom": [
+        0.5,
+        0.02777777777777774
+      ],
+      "clickScreenTo": [
+        0.5640625,
+        0.017361111111111105
+      ],
+      "clickSeconds": 26.7723913,
+      "cursorAtPeak": {
+        "outputX": 0.03374999999999992,
+        "outputY": 1.5778371939203744,
+        "sizePx": 32,
+        "sourceX": 0.27265625,
+        "sourceY": 0.986148246200234,
+        "visible": false
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5640625,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0019",
+      "kind": "zoom-out",
+      "mouseSource": [
+        0.5640625,
+        0.017361111111111112
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        18.9433214
+      ],
+      "projectSeconds": [
+        [
+          18.9433214,
+          19.3933214
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        27.9723913,
+        28.4223913
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-25",
+      "clickScreenFrom": [
+        0.03749999999999998,
+        0.98125
+      ],
+      "clickScreenTo": [
+        0.05999999999999994,
+        0.97
+      ],
+      "clickSeconds": 29.8752743,
+      "cursorAtPeak": {
+        "outputX": 0.030277815593332758,
+        "outputY": 0.9993055555555556,
+        "sizePx": 32,
+        "sourceX": 0.030277815593332785,
+        "sourceY": 0.9993055555555556,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0020",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.0375,
+        0.98125
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        20.5462044
+      ],
+      "projectSeconds": [
+        [
+          20.5462044,
+          20.8962044
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        29.5752743,
+        29.9252743
+      ],
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-27",
+      "clickScreenFrom": [
+        0.708125,
+        0.8011111111111111
+      ],
+      "clickScreenTo": [
+        0.5,
+        0.8011111111111111
+      ],
+      "clickSeconds": 30.6804429,
+      "cursorAtPeak": {
+        "outputX": 0.5249142139980344,
+        "outputY": 0.8841128897689479,
+        "sizePx": 32,
+        "sourceX": 0.3280777693688608,
+        "sourceY": 0.9275705561055924,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0021",
+      "kind": "pan",
+      "mouseSource": [
+        0.442578125,
+        0.8756944444444444
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        1.310951347477385e-13
+      ],
+      "peakProjectSeconds": [
+        21.4492465
+      ],
+      "projectSeconds": [
+        [
+          21.4420705,
+          21.8606756
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        30.4711404,
+        30.8897455
+      ],
+      "to": {
+        "centerX": 0.442578125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        1.310951347477385e-13
+      ]
+    },
+    {
+      "click": "click-29",
+      "clickScreenFrom": [
+        0.476875,
+        0.9855555555555559
+      ],
+      "clickScreenTo": [
+        0.428125,
+        0.9909722222222224
+      ],
+      "clickSeconds": 31.599427,
+      "cursorAtPeak": {
+        "outputX": 0.611875,
+        "outputY": 0.2410741063799092,
+        "sizePx": 32,
+        "sourceX": 0.5125,
+        "sourceY": 0.5256713164874433,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.442578125,
+        "centerY": 0.6875,
+        "scale": 1.6
+      },
+      "id": "camera-segment-0023",
+      "kind": "zoom-out",
+      "mouseSource": [
+        0.428125,
+        0.9909722222222224
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        23.7703571
+      ],
+      "projectSeconds": [
+        [
+          23.7703571,
+          24.2203571
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        32.799427,
+        33.249427
+      ],
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "click": "click-31",
+      "clickScreenFrom": [
+        0.427734375,
+        0.5347222222222222
+      ],
+      "clickScreenTo": [
+        0.5,
+        0.5
+      ],
+      "clickSeconds": 34.5088129,
+      "cursorAtPeak": {
+        "outputX": 0.4184380959247575,
+        "outputY": 0.5140288371995688,
+        "sizePx": 32,
+        "sourceX": 0.4184380959247575,
+        "sourceY": 0.5140288371995688,
+        "visible": true
+      },
+      "fixedClickOutsideSamples": 0,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "id": "camera-segment-0024",
+      "kind": "zoom-in",
+      "mouseSource": [
+        0.427734375,
+        0.5347222222222222
+      ],
+      "overshootOutputPixels": [
+        0.0,
+        0.0
+      ],
+      "peakProjectSeconds": [
+        25.179743
+      ],
+      "projectSeconds": [
+        [
+          25.179743,
+          25.529743
+        ]
+      ],
+      "sampleCount": 351,
+      "sourceSeconds": [
+        34.2088129,
+        34.5588129
+      ],
+      "to": {
+        "centerX": 0.427734375,
+        "centerY": 0.5347222222222222,
+        "scale": 1.6
+      },
+      "viewportInterpolationOvershootPixels": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "sourceSize": [
+    2560.0,
+    1440.0
+  ]
+}

@@ -1,0 +1,12 @@
+Panzo preview error: stage=scrub-decode tick=12392342811 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12419698976 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12460733223 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12515445554 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12542801719 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12583835967 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12638548297 message=proxy timestamp is not in its source mapping
+Panzo preview error: stage=scrub-decode tick=12665904462 message=proxy timestamp is not in its source mapping
+Scrub slow presentation: gapUs=766825 first=false requestAgeUs=5824 presentUs=166 projectTick=13240383930
+Scrub slow presentation: gapUs=151765 first=false requestAgeUs=4765 presentUs=311 projectTick=12966822279
+Scrub slow presentation: gapUs=324488 first=false requestAgeUs=5098 presentUs=165 projectTick=12378664728
+Error: continuous scrub did not present frames and settle exactly without errors

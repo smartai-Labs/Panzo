@@ -1,0 +1,3 @@
+   Compiling camera-focus-probe v0.0.0 (D:\ChatGPT\Panzo\.tmp\camera-focus-probe)
+    Finished `release` profile [optimized] target(s) in 2.45s
+     Running `target\release\camera-focus-probe.exe C:\Users\Administrator\Videos\Panzo\panzo-1789755774754-000.panzo`

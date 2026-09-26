@@ -1,0 +1,7 @@
+{
+  "recordingDurationTick": 20000000,
+  "parameterSet": "default-v1",
+  "clicks": [
+    { "id": "click-1", "timeTick": 18500000, "button": "left", "action": "down", "normalizedX": 0.65, "normalizedY": 0.4, "insideCapture": true }
+  ]
+}

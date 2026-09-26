@@ -1,0 +1,23 @@
+Scrub slow presentation: gapUs=185417 first=true requestAgeUs=185164 presentUs=12319 projectTick=150045875
+Scrub slow presentation: gapUs=152159 first=false requestAgeUs=167175 presentUs=13607 projectTick=160018712
+Scrub slow presentation: gapUs=160299 first=false requestAgeUs=162342 presentUs=1177 projectTick=349955938
+Scrub slow presentation: gapUs=158321 first=false requestAgeUs=167885 presentUs=1318 projectTick=359475464
+Scrub slow presentation: gapUs=154814 first=false requestAgeUs=156508 presentUs=1156 projectTick=429738638
+Scrub slow presentation: gapUs=213445 first=false requestAgeUs=157189 presentUs=1165 projectTick=449231003
+Scrub slow presentation: gapUs=151744 first=false requestAgeUs=156692 presentUs=1132 projectTick=439258165
+Scrub slow presentation: gapUs=157192 first=false requestAgeUs=164224 presentUs=1197 projectTick=428832017
+Scrub slow presentation: gapUs=171031 first=false requestAgeUs=179058 presentUs=1212 projectTick=419312490
+Scrub slow presentation: gapUs=163254 first=false requestAgeUs=166554 presentUs=1546 projectTick=399820126
+Scrub slow presentation: gapUs=165602 first=false requestAgeUs=179734 presentUs=1113 projectTick=389393977
+Scrub slow presentation: gapUs=155404 first=false requestAgeUs=158083 presentUs=1160 projectTick=369448302
+Scrub slow presentation: gapUs=151122 first=false requestAgeUs=157954 presentUs=1150 projectTick=359475464
+Scrub slow presentation: gapUs=155670 first=false requestAgeUs=158246 presentUs=1168 projectTick=339529789
+Scrub slow presentation: gapUs=154839 first=false requestAgeUs=162406 presentUs=1261 projectTick=329556952
+Scrub slow presentation: gapUs=172940 first=false requestAgeUs=181212 presentUs=1355 projectTick=320037425
+Scrub slow presentation: gapUs=159225 first=false requestAgeUs=169700 presentUs=1153 projectTick=309611276
+Scrub slow presentation: gapUs=152119 first=false requestAgeUs=156149 presentUs=1076 projectTick=269266615
+Scrub slow presentation: gapUs=153591 first=false requestAgeUs=159818 presentUs=1152 projectTick=199910063
+Scrub slow presentation: gapUs=153642 first=false requestAgeUs=164506 presentUs=1156 projectTick=189483914
+Scrub slow presentation: gapUs=155202 first=false requestAgeUs=158938 presentUs=1134 projectTick=169991550
+Scrub slow presentation: gapUs=151174 first=false requestAgeUs=165968 presentUs=1201 projectTick=159565401
+Error: continuous scrub did not present frames and settle exactly without errors

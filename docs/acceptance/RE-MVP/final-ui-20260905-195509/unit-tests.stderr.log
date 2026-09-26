@@ -1,0 +1,13 @@
+﻿   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+   Compiling panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.21s
+     Running unittests src\lib.rs (target\debug\deps\panzo_app-e64b83f315c8cd50.exe)
+     Running unittests src\gui.rs (target\debug\deps\panzo-09fb7c0ab07e5763.exe)
+     Running unittests src\main.rs (target\debug\deps\panzo_cli-2cff382b0b6624d5.exe)
+     Running unittests src\lib.rs (target\debug\deps\panzo_core-184bb09b3648e765.exe)
+     Running tests\golden.rs (target\debug\deps\golden-30cac3dec5b11864.exe)
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-ae6d7eb3f33b5458.exe)
+   Doc-tests panzo_app
+   Doc-tests panzo_core
+   Doc-tests panzo_windows
+

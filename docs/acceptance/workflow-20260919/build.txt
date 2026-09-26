@@ -1,0 +1,9 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:2 字符: 99
++ ... STEXITCODE; cargo build --release --workspace > .tmp/workflow-build.t ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   Compiling panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
+    Finished `release` profile [optimized] target(s) in 11.31s

@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-tail-seek",
+    "command":  "preview-session-probe",
+    "project":  ".tmp/ui-polish-20260919.panzo",
+    "extra":  "594013276",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "199A2FBA0759C7318BDABD4415399858B626453A345159A749A7BC943773E656"
+}

@@ -1,0 +1,20 @@
+﻿    Checking panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+error: used `assert!` with an equality comparison
+   --> crates\panzo-windows\src\platform\editor_layout.rs:414:13
+    |
+414 |             assert!(preset.background_file.right == preset.background_file.left);
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.97.0/index.html#manual_assert_eq
+    = note: `-D clippy::manual-assert-eq` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_assert_eq)]`
+help: replace it with `assert_eq!(..)`
+    |
+414 -             assert!(preset.background_file.right == preset.background_file.left);
+414 +             assert_eq!(preset.background_file.right, preset.background_file.left);
+    |
+
+    Checking panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
+error: could not compile `panzo-windows` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+

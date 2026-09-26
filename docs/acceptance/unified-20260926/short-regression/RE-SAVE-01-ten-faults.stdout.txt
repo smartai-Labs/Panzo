@@ -1,0 +1,12 @@
+ED-ATOMIC-001 passed: auto-draft-staged -> revision 0
+ED-ATOMIC-001 passed: camera-staged -> revision 0
+ED-ATOMIC-001 passed: workbench-staged -> revision 0
+ED-ATOMIC-001 passed: history-staged -> revision 0
+ED-ATOMIC-001 passed: commit-marker-published -> revision 1
+ED-ATOMIC-001 passed: auto-draft-materialized -> revision 1
+ED-ATOMIC-001 passed: camera-materialized -> revision 1
+ED-ATOMIC-001 passed: workbench-materialized -> revision 1
+ED-ATOMIC-001 passed: history-materialized -> revision 1
+ED-ATOMIC-001 passed: commit-marker-removed -> revision 1
+Editor atomic transaction acceptance passed: 10/10
+Evidence: D:\ChatGPT\Panzo\.tmp\unified-candidate-20260926\editor-atomic-16db515f970242959c95887b9708400f\editor-atomic-acceptance.json

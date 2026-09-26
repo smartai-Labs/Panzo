@@ -1,0 +1,10 @@
+Panzo M3 1080p60 export
+  Project: D:\ChatGPT\Panzo\.tmp\re-mvp-20260905-144822-911cb06d\F01.panzo
+  Output: D:\ChatGPT\Panzo\.tmp\re-mvp-20260905-144822-911cb06d\F01-export.mp4
+  Frames: 120
+  Duration tick: 20000000
+  Output bytes: 147639
+  fMP4 fragments: 7
+  Trailing bytes: 0
+  Encoder: NVIDIA H.264 Encoder MFT (hardware)
+  Elapsed: 2563 ms

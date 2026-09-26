@@ -1,0 +1,387 @@
+﻿{
+    "runId":  "unified-20260926-152800-d7d11bc2",
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\release\\panzo-cli.exe",
+    "executableSha256":  "F6391399158EE48768E14D445F58CDC8BC33EFB2C2494D89261D4086CE01240D",
+    "capturedAtUtc":  "2026-09-26T07:30:52.8768281Z",
+    "scope":  "Automated regression only. Not physical input-to-photon, full DPI screenshots, or human GUI workflow acceptance.",
+    "fixtures":  "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926",
+    "results":  [
+                    {
+                        "caseId":  "F01-end-seek",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-session-probe",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "9223372036854775807"
+                                    ],
+                        "elapsedMs":  604,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-end-seek.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-end-seek.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-scrub-1",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12390,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-queued-play-1",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2404,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-scrub-2",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12396,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-queued-play-2",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2399,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-scrub-3",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12410,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-scrub-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-queued-play-3",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2375,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-queued-play-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F01-paused",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-paused-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "5000"
+                                    ],
+                        "elapsedMs":  5352,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-paused.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F01-paused.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-end-seek",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-session-probe",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "9223372036854775807"
+                                    ],
+                        "elapsedMs":  492,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-end-seek.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-end-seek.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-scrub-1",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12461,
+                        "watchdogExpired":  false,
+                        "exitCode":  1,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-queued-play-1",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2409,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-scrub-2",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12515,
+                        "watchdogExpired":  false,
+                        "exitCode":  1,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-queued-play-2",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2444,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-scrub-3",
+                        "status":  "Fail",
+                        "command":  [
+                                        "preview-scrub-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "12000"
+                                    ],
+                        "elapsedMs":  12458,
+                        "watchdogExpired":  false,
+                        "exitCode":  1,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-scrub-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-queued-play-3",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-queued-playback-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "2000"
+                                    ],
+                        "elapsedMs":  2459,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-queued-play-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F02-paused",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-paused-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F02.panzo",
+                                        "5000"
+                                    ],
+                        "elapsedMs":  5455,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-paused.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F02-paused.stderr.txt"
+                    },
+                    {
+                        "caseId":  "RE-LIFE-01-20-cycles",
+                        "status":  "Pass",
+                        "command":  [
+                                        "preview-lifecycle-smoke",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "20"
+                                    ],
+                        "elapsedMs":  10084,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-LIFE-01-20-cycles.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-LIFE-01-20-cycles.stderr.txt"
+                    },
+                    {
+                        "caseId":  "RE-CUT-EXPORT-RENDER",
+                        "status":  "Pass",
+                        "command":  [
+                                        "recording-editing-probe",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F01.panzo",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926"
+                                    ],
+                        "elapsedMs":  44164,
+                        "watchdogExpired":  false,
+                        "exitCode":  0,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-CUT-EXPORT-RENDER.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-CUT-EXPORT-RENDER.stderr.txt"
+                    },
+                    {
+                        "caseId":  "RE-SAVE-01-ten-faults",
+                        "status":  "Pass",
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-SAVE-01-ten-faults.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-SAVE-01-ten-faults.stderr.txt",
+                        "exitCode":  0,
+                        "error":  null,
+                        "elapsedMs":  2322,
+                        "watchdogExpired":  false
+                    },
+                    {
+                        "caseId":  "F06-window-recording",
+                        "status":  "Fail",
+                        "command":  [
+                                        "window-record-probe",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F06.panzo",
+                                        "Panzo M4 60 Hz Stability Stimulus",
+                                        "5"
+                                    ],
+                        "elapsedMs":  292,
+                        "watchdogExpired":  false,
+                        "exitCode":  1,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F06-window-recording.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F06-window-recording.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F06-CUT-EXPORT-RENDER",
+                        "status":  "Fail",
+                        "command":  [
+                                        "recording-editing-probe",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926\\F06.panzo",
+                                        "D:\\ChatGPT\\Panzo\\.tmp\\unified-candidate-20260926"
+                                    ],
+                        "elapsedMs":  27,
+                        "watchdogExpired":  false,
+                        "exitCode":  1,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F06-CUT-EXPORT-RENDER.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\F06-CUT-EXPORT-RENDER.stderr.txt"
+                    },
+                    {
+                        "caseId":  "RE-REC-native-controller",
+                        "status":  "Fail",
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-REC-native-controller.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\unified-20260926\\short-regression\\RE-REC-native-controller.stderr.txt",
+                        "exitCode":  1,
+                        "error":  "Child script failed with exit 1; timeout=False",
+                        "elapsedMs":  1787,
+                        "watchdogExpired":  false
+                    }
+                ],
+    "environment":  {
+                        "error":  "拒绝访问 "
+                    },
+    "manualAcceptance":  "NotRun",
+    "releaseAccepted":  false,
+    "deferred":  [
+                     "audio",
+                     "cross-GPU machines",
+                     "automatic camera naturalness"
+                 ],
+    "reportType":  "unified-regression",
+    "extended":  false,
+    "schemaVersion":  2,
+    "requiredCases":  [
+                          "F01-end-seek",
+                          "F01-scrub-1",
+                          "F01-queued-play-1",
+                          "F01-scrub-2",
+                          "F01-queued-play-2",
+                          "F01-scrub-3",
+                          "F01-queued-play-3",
+                          "F01-paused",
+                          "F02-end-seek",
+                          "F02-scrub-1",
+                          "F02-queued-play-1",
+                          "F02-scrub-2",
+                          "F02-queued-play-2",
+                          "F02-scrub-3",
+                          "F02-queued-play-3",
+                          "F02-paused",
+                          "RE-LIFE-01-20-cycles",
+                          "RE-CUT-EXPORT-RENDER",
+                          "RE-SAVE-01-ten-faults",
+                          "F06-window-recording",
+                          "F06-CUT-EXPORT-RENDER",
+                          "RE-REC-native-controller"
+                      ],
+    "build":  {
+                  "directory":  "D:\\ChatGPT\\Panzo\\target\\release",
+                  "sourceSha256":  "3108112B83603781DD2B3DB46A3A3D3A2C1E4127D22952924FA8FDC56BBD1CC8",
+                  "binaries":  [
+                                   {
+                                       "name":  "panzo.exe",
+                                       "sha256":  "76D09024CEAE4D2E0754D0DE0417255488088FC19EF90E80DA86D2FC540098B2",
+                                       "bytes":  3929088
+                                   },
+                                   {
+                                       "name":  "panzo-cli.exe",
+                                       "sha256":  "F6391399158EE48768E14D445F58CDC8BC33EFB2C2494D89261D4086CE01240D",
+                                       "bytes":  5111808
+                                   }
+                               ],
+                  "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\release\\candidate-build.json"
+              },
+    "buildUnchanged":  true,
+    "failures":  [
+                     "Required case did not pass: F01-scrub-1 (Fail)",
+                     "Required case did not pass: F01-scrub-2 (Fail)",
+                     "Required case did not pass: F01-scrub-3 (Fail)",
+                     "Required case did not pass: F02-scrub-1 (Fail)",
+                     "Required case did not pass: F02-scrub-2 (Fail)",
+                     "Required case did not pass: F02-scrub-3 (Fail)",
+                     "Required case did not pass: F06-window-recording (Fail)",
+                     "Required case did not pass: F06-CUT-EXPORT-RENDER (Fail)",
+                     "Required case did not pass: RE-REC-native-controller (Fail)",
+                     "Case failed: F01-scrub-1 (Fail)",
+                     "Case failed: F01-scrub-2 (Fail)",
+                     "Case failed: F01-scrub-3 (Fail)",
+                     "Case failed: F02-scrub-1 (Fail)",
+                     "Case failed: F02-scrub-2 (Fail)",
+                     "Case failed: F02-scrub-3 (Fail)",
+                     "Case failed: F06-window-recording (Fail)",
+                     "Case failed: F06-CUT-EXPORT-RENDER (Fail)",
+                     "Case failed: RE-REC-native-controller (Fail)"
+                 ],
+    "status":  "Fail"
+}

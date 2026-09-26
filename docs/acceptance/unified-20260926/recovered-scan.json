@@ -1,0 +1,14 @@
+{
+  "libraryRoot": "D:\\ChatGPT\\Panzo\\.tmp\\unified-recovery-candidate-20260926",
+  "projects": [
+    {
+      "projectRoot": "D:\\ChatGPT\\Panzo\\.tmp\\unified-recovery-candidate-20260926\\processing.panzo",
+      "processId": 0,
+      "disposition": "recovered",
+      "fragmentCount": 20,
+      "lastVideoEndTick": 60696666,
+      "cursorRecordsRemoved": 0,
+      "clickRecordsRemoved": 0
+    }
+  ]
+}

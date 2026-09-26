@@ -1,0 +1,9 @@
+﻿{
+    "name":  "release-edit-compat",
+    "command":  "recording-editing-probe",
+    "project":  ".tmp/video-speed-compat.panzo",
+    "extra":  ".tmp/workflow-compat-output",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "1DAD3FAFC90A6567858A7017843C4896F2FD76564F4A8509D5DBAC3C31314526"
+}

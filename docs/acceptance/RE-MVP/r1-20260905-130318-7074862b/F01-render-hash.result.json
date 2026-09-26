@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F01-render-hash",
+    "command":  "render-hash-probe",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  2066,
+    "output":  "Panzo M3 shared compositor hash probe\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-130318-7074862b\\F01.panzo\n  Project tick: 30340000\n  Selected source PTS: 30215332\n  Output: 1920x1080 BGRA8\n  Preview hash: 36656442e9b8df466df623a1f77b12a4bbe86787383e29c4858e88a0c9789745\n  Export hash:  36656442e9b8df466df623a1f77b12a4bbe86787383e29c4858e88a0c9789745\n  Hashes match: true\n",
+    "error":  "",
+    "stdoutFile":  "F01-render-hash.stdout.txt",
+    "stderrFile":  "F01-render-hash.stderr.txt"
+}

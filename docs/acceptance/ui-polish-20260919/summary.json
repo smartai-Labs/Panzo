@@ -1,0 +1,118 @@
+{
+  "sourceFilesChanged": [
+    "crates\\panzo-windows\\src\\platform\\compositor.rs",
+    "crates\\panzo-windows\\src\\platform\\decode_worker.rs",
+    "crates\\panzo-windows\\src\\platform\\editor_chrome.rs",
+    "crates\\panzo-windows\\src\\platform\\editor_layout.rs",
+    "crates\\panzo-windows\\src\\platform\\editor_ui.rs",
+    "crates\\panzo-windows\\src\\platform\\editor_widgets.rs",
+    "crates\\panzo-windows\\src\\platform\\edit_gestures.rs",
+    "crates\\panzo-windows\\src\\platform\\preview_proxy.rs",
+    "crates\\panzo-windows\\src\\platform\\preview_window.rs",
+    "crates\\panzo-windows\\src\\platform\\recorder_window.rs",
+    "crates\\panzo-windows\\src\\platform\\scrub_preview.rs",
+    "crates\\panzo-windows\\src\\platform\\workbench_actions.rs",
+    "crates\\panzo-app\\src\\main.rs"
+  ],
+  "tests": {
+    "passed": 161,
+    "ignored": 3,
+    "explicitOffscreenChecksPassed": 2
+  },
+  "fmt": "pass",
+  "clippyWarningsDenied": "pass",
+  "finalProbes": [
+    {
+      "name": "final-export",
+      "command": "export-probe",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "\"D:\\ChatGPT\\Panzo\\.tmp\\ui-polish-export-20260919.mp4\" 2",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-proxy-decode",
+      "command": "decode-probe",
+      "project": ".tmp/ui-polish-20260919.panzo/cache/scrub-v2-native/501bd9-18d26167f9cc713c.mp4",
+      "extra": "3",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-queued-playback",
+      "command": "preview-queued-playback-smoke",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "3000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-render-hash",
+      "command": "render-hash-probe",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "5000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-scrub-cold",
+      "command": "preview-scrub-smoke",
+      "project": ".tmp/ui-polish-cold-final.panzo",
+      "extra": "12000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-scrub-long",
+      "command": "preview-scrub-smoke",
+      "project": ".tmp/ui-polish-long.panzo",
+      "extra": "12000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-scrub-warm-1",
+      "command": "preview-scrub-smoke",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "12000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-scrub-warm-2",
+      "command": "preview-scrub-smoke",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "12000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-trim-with-camera",
+      "command": "preview-trim-smoke",
+      "project": ".tmp/ui-polish-trim.panzo",
+      "extra": "3000",
+      "exitCode": 0,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    },
+    {
+      "name": "final-trim",
+      "command": "preview-trim-smoke",
+      "project": ".tmp/ui-polish-20260919.panzo",
+      "extra": "3000",
+      "exitCode": 1,
+      "timedOut": false,
+      "sha256": "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+    }
+  ],
+  "failedFixtureExplanation": "final-trim used a project with no camera segment; final-trim-with-camera uses an isolated valid camera fixture",
+  "nativeGuiReview": "offscreen only; desktop tool app-server unavailable"
+}

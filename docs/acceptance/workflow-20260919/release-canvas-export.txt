@@ -1,0 +1,10 @@
+Panzo MP4 export — 1080×1920 / 60 fps
+  Project: D:\ChatGPT\Panzo\.tmp\workflow-canvas.panzo
+  Output: .tmp/workflow-canvas-final.mp4
+  Frames: 30
+  Duration tick: 5000000
+  Output bytes: 46985
+  fMP4 fragments: 2
+  Trailing bytes: 0
+  Encoder: NVIDIA H.264 Encoder MFT (hardware)
+  Elapsed: 987 ms

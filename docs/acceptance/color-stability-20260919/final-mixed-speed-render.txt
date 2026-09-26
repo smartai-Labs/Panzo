@@ -1,0 +1,8 @@
+Panzo M3 shared compositor hash probe
+  Project: D:\ChatGPT\Panzo\.tmp\video-speed-release.panzo
+  Project tick: 60000000
+  Selected source PTS: 52428661
+  Output: 1920x1080 BGRA8
+  Preview hash: c098ffd29c162ce02a8b3424717dbed2932b01bc7e8a9f40f2e4244467a7e296
+  Export hash:  c098ffd29c162ce02a8b3424717dbed2932b01bc7e8a9f40f2e4244467a7e296
+  Hashes match: true

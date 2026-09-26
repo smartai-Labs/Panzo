@@ -1,0 +1,14 @@
+cargo :     Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+所在位置 行:2 字符: 339
++ ... 919').Path; cargo test -p panzo-windows mixed_speed_export_ui_review  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Finished `t...get(s) in 0.07s:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+test platform::export::tests::mixed_speed_export_ui_review ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 125 filtered out; finished in 18.82s
+

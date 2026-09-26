@@ -1,0 +1,9 @@
+Panzo M4 60 Hz stability stimulus
+  Surface: 1201x901
+  Requested duration: 12000 ms
+  Active duration: 12005 ms
+  Timer wakeups: 768
+  Timer ticks: 697
+  Paint calls: 698
+  Effective timer rate: 58.059 Hz
+  Graceful close: true

@@ -1,0 +1,8 @@
+Error: V0.1 preflight failed:
+Panzo V0.1 preflight
+  QPC frequency: 10000000
+  Windows Graphics Capture: not supported (GraphicsCaptureSession::IsSupported failed: 内存资源不足，无法完成此操作。 (0x8007000E))
+  D3D11 hardware: supported (D3D feature level 0xB000)
+  BGRA to NV12: supported (1920x1080 VideoProcessorBlt completed)
+  Hardware H.264: supported (NVIDIA H.264 Encoder MFT)
+  Overall: not supported

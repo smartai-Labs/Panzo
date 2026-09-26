@@ -1,0 +1,41 @@
+Panzo recorder: platform preflight passed
+Panzo recorder [0 ms]: project-created
+Panzo recorder [6 ms]: media-writer-create-begin
+Panzo recorder [85 ms]: media-writer-create-complete (NVIDIA H.264 Encoder MFT 1200x900 20000000bps)
+Panzo recorder [94 ms]: input-capture-start-begin
+Panzo recorder [101 ms]: input-capture-start-complete
+Panzo recorder [108 ms]: wgc-start-begin
+Panzo recorder [116 ms]: wgc-start-complete
+Panzo recorder [123 ms]: first-frame-wait-begin
+Panzo recorder [133 ms]: epoch-established
+Panzo recorder [140 ms]: recording-loop-entered
+Panzo recorder [148 ms]: first-frame-processing-acquire-begin
+Panzo recorder [148 ms]: first-frame-convert-begin
+Panzo recorder [149 ms]: first-frame-convert-stage (processing-device-submit-begin)
+Panzo recorder [150 ms]: first-frame-convert-stage (input-texture-validated)
+Panzo recorder [150 ms]: first-frame-convert-stage (input-view-create-begin)
+Panzo recorder [151 ms]: first-frame-convert-stage (input-view-create-complete)
+Panzo recorder [152 ms]: first-frame-convert-stage (stream-rectangles-set)
+Panzo recorder [153 ms]: first-frame-convert-stage (video-processor-blit-begin)
+Panzo recorder [153 ms]: first-frame-convert-stage (video-processor-blit-complete)
+Panzo recorder [154 ms]: first-frame-convert-stage (staging-copy-begin)
+Panzo recorder [154 ms]: first-frame-convert-stage (staging-copy-issued)
+Panzo recorder [154 ms]: first-frame-convert-stage (gpu-flush-begin)
+Panzo recorder [164 ms]: first-frame-convert-stage (gpu-flush-complete)
+Panzo recorder [165 ms]: first-frame-convert-stage (processing-device-submit-complete)
+Panzo recorder [165 ms]: first-frame-convert-stage (gpu-map-begin)
+Panzo recorder [166 ms]: first-frame-convert-stage (gpu-map-complete)
+Panzo recorder [167 ms]: first-frame-convert-stage (cpu-copy-begin)
+Panzo recorder [168 ms]: first-frame-convert-stage (cpu-copy-complete)
+Panzo recorder [168 ms]: first-frame-convert-complete
+Panzo recorder [169 ms]: first-frame-write-begin
+Panzo recorder [169 ms]: first-frame-write-complete
+Panzo recorder [1142 ms]: recording-heartbeat (tick=10050416 framesReceived=102 framesEncoded=60 frameRateDrops=41 captureQueue=0)
+Panzo recorder [2149 ms]: recording-heartbeat (tick=20015899 framesReceived=203 framesEncoded=120 frameRateDrops=81 captureQueue=1)
+Panzo recorder [3151 ms]: recording-heartbeat (tick=30144277 framesReceived=304 framesEncoded=181 frameRateDrops=122 captureQueue=0)
+Panzo recorder [4154 ms]: recording-heartbeat (tick=40174590 framesReceived=404 framesEncoded=241 frameRateDrops=161 captureQueue=1)
+Panzo recorder [5138 ms]: recording-deadline-reached
+Panzo recorder [5151 ms]: capture-stopped
+Panzo recorder [5161 ms]: media-writer-finalize-begin
+Panzo recorder [5184 ms]: media-writer-finalize-complete (frames=301 fragments=16 durationTick=50194166)
+Panzo recorder [5198 ms]: project-ready

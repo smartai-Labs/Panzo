@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "path": "media\\screen.mp4",
+      "sha256": "80e79eb3ce50e9874e5a962973acd39719f7120fce7f9434da611234e481a7c9"
+    },
+    {
+      "path": "events\\clicks.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "events\\cursor.jsonl",
+      "sha256": "d9589404c021ed24c3d01507f51b282226e972da0a4aee4d921aa8da1aaf38c4"
+    },
+    {
+      "path": "tracks\\camera.json",
+      "sha256": "ecd1cfd2e30371dd544f83099a8f8c1ba6f8f3c629ec9712706d14688b3d44cf"
+    }
+  ],
+  "allUnchanged": true
+}

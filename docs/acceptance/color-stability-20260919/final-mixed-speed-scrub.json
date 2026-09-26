@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-mixed-speed-scrub",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/video-speed-release.panzo",
+    "extra":  "12000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "DF6657241391B161CD515A1EBEC55B768E2CAC72C9B215AE36B8E8179DBEDCC2"
+}

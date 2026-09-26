@@ -1,0 +1,4 @@
+Scrub slow presentation: gapUs=340072 first=false requestAgeUs=4344 presentUs=201 projectTick=12966822279
+Scrub slow presentation: gapUs=426686 first=false requestAgeUs=5590 presentUs=202 projectTick=13240383930
+Scrub slow presentation: gapUs=328909 first=false requestAgeUs=5548 presentUs=167 projectTick=12378664728
+Error: continuous scrub did not present frames and settle exactly without errors

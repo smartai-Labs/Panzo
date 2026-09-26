@@ -1,0 +1,43 @@
+{
+  "recordedAtUtc": "2026-09-05T12:10:13.606Z",
+  "executable": "D:\\ChatGPT\\Panzo\\target\\re-mvp-accessibility\\release\\panzo.exe",
+  "sha256": "F30A256D7BDDCB9ECCFA3DC6F749BB265F8AD68FACC09A14D0F7F5F5B41EAB79",
+  "method": "computer-use sky keyboard and UIA text; no screenshot or pointer input",
+  "filtered": true,
+  "filterReason": "Omit unrelated Shell entries and previous-project paths; retain Panzo controls, dialog presence and focus.",
+  "steps": [
+    {
+      "action": "initial",
+      "focusedElement": "0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0",
+      "tree": "\t0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6\nThe focused UI element is 0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0."
+    },
+    {
+      "action": "Tab -> source",
+      "focusedElement": "7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1",
+      "tree": "\t0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6\nThe focused UI element is 7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1."
+    },
+    {
+      "action": "Tab -> record",
+      "focusedElement": "9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2",
+      "tree": "\t0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6\nThe focused UI element is 9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2."
+    },
+    {
+      "action": "Tab -> open project",
+      "focusedElement": "10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3",
+      "tree": "\t0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6\nThe focused UI element is 10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3."
+    },
+    {
+      "action": "Enter -> project picker",
+      "focusedElement": "129 编辑 搜索框 Description: 在 下载 中搜索 ID: SearchEditBox",
+      "tree": "\t0 窗格 (disabled) Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t14 对话框 选择 .panzo 文件夹中的 project.json Secondary Actions: Raise\n\t\t7 按钮 (disabled) 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 (disabled) 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 (disabled) 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 (disabled) 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 (disabled) 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 (disabled) 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6"
+    },
+    {
+      "action": "Escape -> cancel picker",
+      "focusedElement": "0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0",
+      "tree": "\t0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0\n\t\t7 按钮 选择显示器或应用窗口 Description: 当前录制尺寸 2560×1440；本版本不录制音频 ID: panzo-1\n\t\t9 按钮 开始录制（无音频） Description: 开始/停止录制（Enter 或 Space） ID: panzo-2\n\t\t10 按钮 打开已有工程 Description: 选择 .panzo 工程文件夹中的 project.json ID: panzo-3\n\t\t11 按钮 打开视频编辑器 Description: 在编辑器中调整镜头和画布 ID: panzo-4\n\t\t12 按钮 打开项目文件夹 Description: 在资源管理器中打开项目 ID: panzo-5\n\t\t13 按钮 打开诊断日志 Description: 在记事本中打开会话日志 ID: panzo-6\nThe focused UI element is 0 窗格 Panzo 录制器 Description: 录制与基础视频编辑 Secondary Actions: Raise ID: panzo-0."
+    }
+  ],
+  "closedWindowAbsent": true,
+  "visualAcceptance": "NotRun",
+  "fullWorkflowAcceptance": "NotRun"
+}

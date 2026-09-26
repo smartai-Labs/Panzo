@@ -1,0 +1,12 @@
+Panzo M3 project preview session probe
+  Project: D:\ChatGPT\Panzo\.tmp\my-recording.panzo
+  Source frames: 3601
+  Duration tick: 600384666
+  Scrub project/source tick: 23713331/23713331
+  Scrub poll count: 35
+  Seek project/source tick: 23759628/23713331
+  Play+advance project tick: 24759628
+  Start hash: 17222874f73a71843f142e180da5b31e70d52f5b0c6c67fd12aca1a2bb191566
+  Returned start hash: 17222874f73a71843f142e180da5b31e70d52f5b0c6c67fd12aca1a2bb191566
+  Deterministic start frame: true
+  Camera diagnostics visible: true

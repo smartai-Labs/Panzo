@@ -1,0 +1,30 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:2 字符: 174
++ ... 919').Path; cargo test -p panzo-windows video_speed_ui_review -- --ig ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.75s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+test platform::preview_window::tests::video_speed_ui_review ... FAILED
+
+failures:
+
+---- platform::preview_window::tests::video_speed_ui_review stdout ----
+
+thread 'platform::preview_window::tests::video_speed_ui_review' (44464) panicked at crates\panzo-windows\src\platform\preview_window.rs:5664:17:
+assertion `left == right` failed: undoing a split must not leave video properties bound to a deleted clip
+  left: None
+ right: Some(1.0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    platform::preview_window::tests::video_speed_ui_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 128 filtered out; finished in 3.20s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

@@ -1,0 +1,12 @@
+﻿{
+    "fmt":  "Pass",
+    "clippy":  "Pass",
+    "existingUiTestsPassed":  27,
+    "offscreenRender":  "Pass",
+    "nativeTitlebar":  "Pass",
+    "releaseRecorderOpen":  "Pass",
+    "releasePreview":  "Pass",
+    "releaseAccepted":  false,
+    "scope":  "Spacing, border styling, related layout and hit testing only",
+    "executable":  "target/ui-spacing/release/panzo.exe"
+}

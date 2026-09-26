@@ -1,0 +1,28 @@
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.31s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-9914fa80a83c7a93.exe)
+
+running 7 tests
+test platform::preview_window::editor_layout::tests::background_tabs_never_leave_invisible_swatch_hit_targets ... ok
+test platform::preview_window::editor_layout::tests::editor_has_separate_transport_and_timeline_context ... ok
+test platform::preview_window::editor_layout::tests::inspector_width_changes_layout_without_overlapping_properties_or_transport ... ok
+test platform::preview_window::editor_layout::tests::short_physical_windows_keep_all_properties_reachable_at_high_dpi ... ok
+test platform::preview_window::editor_layout::tests::taller_timeline_expands_both_tracks_and_keeps_the_bottom_gap_constant ... ok
+test platform::preview_window::editor_layout::tests::visible_controls_fit_and_never_overlap_across_dpi_and_collapsed_layouts ... ok
+test platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes ... FAILED
+
+failures:
+
+---- platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes stdout ----
+
+thread 'platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes' (32904) panicked at crates\panzo-windows\src\platform\preview_window.rs:5461:17:
+assertion failed: layout.shadow.bottom < layout.panel.bottom
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 103 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

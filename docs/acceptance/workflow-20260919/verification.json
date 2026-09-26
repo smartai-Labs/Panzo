@@ -1,0 +1,14 @@
+{
+  "regularTests": 201,
+  "uiMediaTestsPassed": 15,
+  "settingsTestPassed": 1,
+  "uiMediaRuns": "Initial full run: 14 passed; small-canvas H264 tolerance corrected to 1.5/255 and export case rerun passed. Final crop-navigation UI test also passed.",
+  "clippy": "pass",
+  "fmt": "pass",
+  "releaseBuild": "pass",
+  "binaries": {
+    "panzo.exe": "B189C3BCFDFE259B68D841224A9D5C56A9E838B786E14D03693CE09483F4A558",
+    "panzo-cli.exe": "1DAD3FAFC90A6567858A7017843C4896F2FD76564F4A8509D5DBAC3C31314526"
+  },
+  "wholeReleaseAccepted": false
+}

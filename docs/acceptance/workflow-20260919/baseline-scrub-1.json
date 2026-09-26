@@ -1,0 +1,9 @@
+﻿{
+    "name":  "baseline-scrub-1",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/crop-release.panzo",
+    "extra":  "12000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "CEDBE3E2EE080A9390DFF71FC068C125D5B20793F44164DB90BC353A4851B947"
+}

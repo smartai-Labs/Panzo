@@ -1,0 +1,7 @@
+{
+  "runId": "r0-prototype-2026-09-05T04-16-47-411Z",
+  "status": "Fail",
+  "checks": [],
+  "error": "Error: CDP timeout: Runtime.enable\n    at Timeout._onTimeout (D:\\ChatGPT\\Panzo\\scripts\\test-r0-prototype.cjs:34:84)\n    at listOnTimeout (node:internal/timers:605:17)\n    at process.processTimers (node:internal/timers:541:7)",
+  "javascriptErrors": []
+}

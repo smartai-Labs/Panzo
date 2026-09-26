@@ -1,0 +1,60 @@
+{
+  "comparisons": [
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.045525407294096015,
+      "frame": 30,
+      "previewToEncodedMeanRgbError": 0.2863492740176041,
+      "projectTick": 5000000,
+      "sourceTick": 10000000
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.04465815716662069,
+      "frame": 59,
+      "previewToEncodedMeanRgbError": 0.2592555441315378,
+      "projectTick": 9833333,
+      "sourceTick": 19666666
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.019046066654964014,
+      "frame": 60,
+      "previewToEncodedMeanRgbError": 0.2388385953473598,
+      "projectTick": 10000000,
+      "sourceTick": 20000000
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.01074972206200734,
+      "frame": 150,
+      "previewToEncodedMeanRgbError": 0.24706806764133044,
+      "projectTick": 25000000,
+      "sourceTick": 27500000
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.013533281507301619,
+      "frame": 298,
+      "previewToEncodedMeanRgbError": 0.2592848007623442,
+      "projectTick": 49666666,
+      "sourceTick": 39833333
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.0,
+      "frame": 300,
+      "previewToEncodedMeanRgbError": 0.2490303516647023,
+      "projectTick": 50000000,
+      "sourceTick": 40000000
+    },
+    {
+      "encodedNormalSpeedReferenceMeanRgbError": 0.0072640034773595475,
+      "frame": 384,
+      "previewToEncodedMeanRgbError": 0.2685507936905986,
+      "projectTick": 64000000,
+      "sourceTick": 57500000
+    }
+  ],
+  "durationTick": 66000000,
+  "frames": 396,
+  "report": "Panzo MP4 export — 1920×1080 / 60 fps\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\ui-background-review.panzo\n  Output: D:\\ChatGPT\\Panzo\\docs\\acceptance\\color-stability-20260919\\mixed-speed-4b36965b-8f2b-46ce-8e0e-6c6919848f0e.mp4\n  Frames: 396\n  Duration tick: 66000000\n  Output bytes: 545451\n  fMP4 fragments: 22\n  Trailing bytes: 0\n  Encoder: NVIDIA H.264 Encoder MFT (hardware)\n  Elapsed: 6425 ms",
+  "size": [
+    1920,
+    1080
+  ]
+}

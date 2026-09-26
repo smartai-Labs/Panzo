@@ -1,0 +1,13 @@
+﻿{
+    "caseId":  "F02-end-seek",
+    "command":  "preview-session-probe",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  3058,
+    "output":  "Panzo M3 project preview session probe\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-131735-5532df9b\\F02.panzo\n  Source frames: 3601\n  Duration tick: 600185333\n  Scrub project/source tick: 600018600/600018600\n  Scrub poll count: 36\n  Seek project/source tick: 600185333/600018600\n  Play+advance project tick: 1000000\n  Start hash: 180dfadfac26811494827a13450549e514e56954c859272b4e5ddc226fd6f7ec\n  Returned start hash: 180dfadfac26811494827a13450549e514e56954c859272b4e5ddc226fd6f7ec\n  Deterministic start frame: true\n  Camera diagnostics visible: true\n",
+    "error":  "",
+    "stdoutFile":  "F02-end-seek.stdout.txt",
+    "stderrFile":  "F02-end-seek.stderr.txt",
+    "metricKind":  "end-seek-correctness"
+}

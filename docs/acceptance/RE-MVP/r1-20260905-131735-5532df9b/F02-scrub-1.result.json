@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F02-scrub-1",
+    "command":  "preview-scrub-smoke",
+    "status":  "Fail",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  8092,
+    "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 198\n  Rendered frames: 107\n  Paint calls: 206\n  Average render: 1175 us\n  Maximum render: 48967 us\n  Background decodes: 0\n  Source texture uploads: 92\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 107\n  CPU readbacks: 0\n  Last project tick: 167863776\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 97472 us\n  Scrub presented frames: 33\n  Scrub maximum presentation gap: 213176 us\n  Scrub release settled exactly: true\n  Scrub distinct source frames: 33\n  Scrub maximum source time error tick: 187293\n  Media errors: 0\n",
+    "error":  "Scrub slow presentation: gapUs=213176 first=false requestAgeUs=109246 presentUs=284 projectTick=438831160\n",
+    "stdoutFile":  "F02-scrub-1.stdout.txt",
+    "stderrFile":  "F02-scrub-1.stderr.txt"
+}

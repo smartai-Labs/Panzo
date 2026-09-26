@@ -1,0 +1,9 @@
+Panzo Media Foundation random-seek probe
+  Input: D:\ChatGPT\Panzo\.tmp\r1-20260905-130318-7074862b\F02.panzo\media\screen.mp4
+  Indexed frames: 3601
+  Requested tick: 600200000
+  Selected frame: 3600 @ 600018600
+  First PTS after seek: 579508603
+  Frames decoded after seek: 121
+  Selected BGRA frame bytes: 8294400
+  Pixels match sequential decode: true

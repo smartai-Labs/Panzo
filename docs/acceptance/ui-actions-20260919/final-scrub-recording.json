@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-scrub-recording",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/ui-actions-recording.panzo",
+    "extra":  "12000",
+    "exitCode":  1,
+    "timedOut":  false,
+    "sha256":  "E4510D3E5EA266C36AB006A985F0061DED1CD32FD50752B4838E5E5C087E7919"
+}

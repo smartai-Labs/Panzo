@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "rule-planner",
+    "version": "0.1.0",
+    "parameterSet": "default-v1"
+  },
+  "sourceRevision": {
+    "clickTrackHash": "sha256:fixture:repeated-near-clicks:clicks",
+    "captureGeometryHash": "sha256:fixture:1920x1080"
+  },
+  "baseState": {
+    "centerX": 0.5,
+    "centerY": 0.5,
+    "scale": 1.0
+  },
+  "segments": [
+    {
+      "id": "camera-segment-0001",
+      "kind": "zoom-in",
+      "startTick": 7000000,
+      "endTick": 10500000,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "to": {
+        "centerX": 0.45,
+        "centerY": 0.45,
+        "scale": 1.6
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-1"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0002",
+      "kind": "pan",
+      "startTick": 18250000,
+      "endTick": 21750000,
+      "from": {
+        "centerX": 0.45,
+        "centerY": 0.45,
+        "scale": 1.6
+      },
+      "to": {
+        "centerX": 0.56,
+        "centerY": 0.52,
+        "scale": 1.6
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-2"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0003",
+      "kind": "zoom-out",
+      "startTick": 32000000,
+      "endTick": 36500000,
+      "from": {
+        "centerX": 0.56,
+        "centerY": 0.52,
+        "scale": 1.6
+      },
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-2"
+      ],
+      "locked": false,
+      "userModified": false
+    }
+  ]
+}

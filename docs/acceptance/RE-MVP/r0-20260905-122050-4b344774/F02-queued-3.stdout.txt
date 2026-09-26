@@ -1,0 +1,21 @@
+Panzo Editor Workbench smoke
+  Window created: true
+  Output: 1920x1080 (source native)
+  Timer ticks: 146
+  Rendered frames: 147
+  Paint calls: 31
+  Average render: 7670 us
+  Maximum render: 51976 us
+  Background decodes: 0
+  Source texture uploads: 143
+  Background texture uploads: 0
+  Output texture allocations: 0
+  GPU direct preview: true
+  GPU presentations: 147
+  CPU readbacks: 0
+  Last project tick: 336053646
+  Graceful close: true
+  Trim action elapsed: 0 us
+  Trim smoke status: not-requested
+  Queued playback completed: true
+  Queued playback latency: 2337880 us

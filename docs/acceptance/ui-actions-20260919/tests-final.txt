@@ -1,0 +1,209 @@
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+   Compiling panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.37s
+     Running unittests src\lib.rs (target\debug\deps\panzo_app-1c855b0328c6bbc8.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\gui.rs (target\debug\deps\panzo-7a668913faca3fca.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\panzo_cli-a30f401d7f510ed3.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\panzo_core-184bb09b3648e765.exe)
+
+running 59 tests
+test camera::tests::evaluates_before_during_and_after_segment ... ok
+test camera::tests::rejects_unclamped_edge_focus ... ok
+test camera::tests::smootherstep_has_stable_endpoints ... ok
+test camera::tests::validates_and_hashes_deterministically ... ok
+test diagnostics::tests::accepts_metrics_at_the_v01_stability_limits ... ok
+test diagnostics::tests::does_not_round_a_threshold_breach_down_to_a_pass ... ok
+test diagnostics::tests::reports_each_breached_stability_limit ... ok
+test editor::tests::add_delete_undo_and_redo_preserve_a_valid_track ... ok
+test editor::tests::default_workbench_is_valid_and_identity_layout ... ok
+test editor::tests::malformed_unicode_color_is_rejected_without_slicing_panic ... ok
+test editor::tests::rejects_external_background_asset ... ok
+test editor::tests::rejects_overlap_without_mutating_track ... ok
+test editor::tests::updates_target_and_repairs_successor_continuity ... ok
+test events::tests::moving_capture_window_updates_coordinates_and_geometry_revision ... ok
+test events::tests::normalizer_discards_pre_epoch_and_anchors_clicks ... ok
+test events::tests::normalizer_keeps_outside_click_but_hides_cursor ... ok
+test events::tests::only_inside_left_or_right_down_triggers_camera ... ok
+test geometry::tests::clamps_camera_at_bottom_right ... ok
+test geometry::tests::rejects_empty_geometry ... ok
+test geometry::tests::transforms_negative_desktop_origin ... ok
+test planner::tests::dense_clicks_merge_to_last_focus ... ok
+test planner::tests::edge_clicks_are_clamped ... ok
+test planner::tests::far_clicks_reframe_when_time_allows ... ok
+test planner::tests::near_clicks_pan_without_breathing ... ok
+test planner::tests::output_is_hash_stable ... ok
+test planner::tests::single_click_generates_zoom_hold_and_zoom_out ... ok
+test preview::tests::play_pause_seek_and_end_are_deterministic ... ok
+test preview::tests::seek_clamps_and_diagnostics_toggle_without_changing_time ... ok
+test project::tests::enforces_state_machine ... ok
+test project::tests::rejects_parent_traversal ... ok
+test project::tests::round_trip_preserves_manifest ... ok
+test project::tests::validates_v01_manifest ... ok
+test project::tests::window_capture_accepts_non_widescreen_content ... ok
+test project_io::tests::creates_and_opens_project_layout ... ok
+test project_io::tests::rejects_invalid_complete_jsonl_record_without_modifying_file ... ok
+test project_io::tests::trims_only_records_after_maximum_tick ... ok
+test project_io::tests::truncates_only_incomplete_jsonl_tail ... ok
+test project_writer::tests::rejects_time_regression_per_track ... ok
+test project_writer::tests::writes_tracks_and_services_flush_and_checkpoint_deadlines ... ok
+test render::tests::camera_transform_round_trips_and_never_exposes_outside_source ... ok
+test render::tests::cursor_interpolates_position_without_leaking_future_visibility ... ok
+test render::tests::deleted_source_interval_moves_camera_and_cursor_together ... ok
+test render::tests::selects_nearest_vfr_frame_not_later_than_source_time ... ok
+test render::tests::shared_frame_evaluator_combines_time_camera_cursor_and_output ... ok
+test time::tests::converts_qpc_without_floating_point ... ok
+test time::tests::identity_mapping_is_exact ... ok
+test time::tests::recording_tick_waits_at_zero_for_future_wgc_epoch ... ok
+test time::tests::rejects_events_before_epoch ... ok
+test time::tests::session_clock_uses_first_frame_as_shared_epoch ... ok
+test time::tests::system_relative_tick_round_trip_is_bounded ... ok
+test time::tests::video_frame_rate_limiter_keeps_real_60_fps_ticks ... ok
+test time::tests::video_frame_rate_limiter_preserves_vfr_ticks_and_does_not_burst_after_a_gap ... ok
+test time::tests::video_frame_rate_limiter_reduces_high_refresh_sources_to_60_fps ... ok
+test time::tests::video_frame_rate_limiter_rejects_invalid_input ... ok
+test time::tests::video_timestamp_normalizer_replaces_duplicates_and_rejects_regression ... ok
+test video_edit::tests::deletion_ripples_and_deleted_time_has_no_inverse ... ok
+test video_edit::tests::invalid_operations_are_atomic ... ok
+test video_edit::tests::split_preserves_every_tick_and_stable_left_id ... ok
+test video_edit::tests::trim_round_trip_and_large_integer_duration ... ok
+
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests\golden.rs (target\debug\deps\golden-30cac3dec5b11864.exe)
+
+running 2 tests
+test all_v01_camera_golden_fixtures_match ... ok
+test update_golden_fixtures_after_review ... ignored, requires explicit human-reviewed Golden update
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-9914fa80a83c7a93.exe)
+
+running 109 tests
+test platform::accessibility::tests::abi_matches_windows_interfaces_and_null_outputs_are_initialized ... ok
+test platform::accessibility::tests::chinese_properties_patterns_navigation_and_screen_coordinates ... ok
+test platform::accessibility::tests::close_and_removed_nodes_invalidate_all_retained_client_references ... ok
+test platform::accessibility::tests::concurrent_client_reads_do_not_borrow_owner_state ... ok
+test platform::accessibility::tests::discrete_command_queue_is_bounded_and_does_not_silently_drop ... ok
+test platform::accessibility::tests::property_notifications_track_names_enabled_values_and_selection ... ok
+test platform::accessibility::tests::range_requests_coalesce_without_reordering_discrete_edit_commands ... ok
+test platform::accessibility::tests::runtime_ids_are_stable_and_differ_across_window_generations ... ok
+test platform::accessibility::tests::selection_returns_owned_interfaces_and_stable_object_ids ... ok
+test platform::background_image::tests::decodes_png_to_bgra ... ok
+test platform::background_image::tests::oversized_bmp_header_is_rejected_before_pixel_allocation ... ok
+test platform::background_image::tests::rejects_unknown_extension ... ok
+test platform::camera_regeneration::tests::regeneration_keeps_protected_segment_and_repairs_following_auto_transition ... ok
+test platform::compositor::tests::compositor_reuses_textures_for_repeated_interactive_render ... ok
+test platform::compositor::tests::cursor_has_a_stem_border_and_antialiased_edges_at_multiple_sizes ... ok
+test platform::compositor::tests::focus_overlay_is_scaled_into_output_pixels_and_clamped ... ok
+test platform::compositor::tests::four_corner_camera_states_never_expose_black_border ... ok
+test platform::compositor::tests::non_widescreen_and_small_sources_are_contained_without_upscaling ... ok
+test platform::compositor::tests::rounded_video_corners_blend_edges_without_softening_the_center ... ok
+test platform::compositor::tests::workbench_image_background_is_sampled_behind_inset_canvas ... ok
+test platform::compositor::tests::workbench_inset_reveals_solid_background_and_keeps_source_center ... ok
+test platform::decode_worker::tests::cache_is_byte_bounded_lru_and_oversized_frames_are_not_retained ... ok
+test platform::decode_worker::tests::closing_does_not_join_an_in_flight_decoder ... ok
+test platform::decode_worker::tests::newer_exact_request_cancels_work_but_scrub_can_make_progress ... ok
+test platform::decode_worker::tests::ten_thousand_requests_use_one_pending_slot ... ok
+test platform::edit_gestures::tests::move_clamps_without_shortening_and_trim_never_collapses ... ok
+test platform::edit_gestures::tests::snapping_stays_inside_neighbor_bounds ... ok
+test platform::editor::tests::acknowledging_save_does_not_discard_edits_made_during_save ... ok
+test platform::editor::tests::background_import_is_project_owned_and_round_trips_through_history ... ok
+test platform::editor::tests::cancelled_draft_preserves_redo_and_saved_content_identity ... ok
+test platform::editor::tests::edit_group_coalesces_many_updates_into_one_undo_state ... ok
+test platform::editor::tests::every_transaction_crash_stage_recovers_one_complete_revision ... ok
+test platform::editor::tests::first_save_preserves_auto_draft_and_reopens_edits ... ok
+test platform::editor::tests::later_saves_never_replace_auto_draft ... ok
+test platform::editor::tests::legacy_schema_upgrades_only_on_save_and_unknown_schema_is_rejected ... ok
+test platform::editor::tests::stale_editor_cannot_overwrite_another_saved_revision ... ok
+test platform::editor::tests::twenty_mixed_commands_round_trip_and_gesture_is_one_command ... ok
+test platform::editor::tests::undo_and_redo_cover_camera_and_style_edits_in_order ... ok
+test platform::editor_timeline::tests::anchored_zoom_keeps_tick_under_pointer ... ok
+test platform::editor_timeline::tests::fit_mapping_round_trips_pixels ... ok
+test platform::editor_timeline::tests::pan_and_follow_stay_inside_project ... ok
+test platform::editor_timeline::tests::repeated_zoom_reaches_sub_millisecond_per_pixel ... ok
+test platform::editor_ui::tests::curved_controls_have_transparent_and_partial_coverage_at_all_dpi_sizes ... ok
+test platform::editor_ui::tests::disabled_button_uses_muted_text ... ok
+test platform::editor_ui::tests::every_svg_icon_rasterizes_to_a_non_empty_alpha_mask ... ok
+test platform::editor_ui::tests::keyboard_focus_skips_disabled_controls_and_wraps_both_directions ... ok
+test platform::editor_ui::tests::macos_dark_palette_has_distinct_interaction_states ... ok
+test platform::editor_ui::tests::pointer_activation_requires_release_over_the_original_button ... ok
+test platform::editor_ui::tests::pointer_press_is_transient_and_only_visible_over_its_button ... ok
+test platform::editor_ui::tests::theme_metrics_scale_with_per_monitor_dpi ... ok
+test platform::export::tests::cfr_frame_ticks_are_exact_at_one_second ... ok
+test platform::fmp4_writer::tests::frame_time_accumulation_is_exact_at_one_second ... ok
+test platform::fmp4_writer::tests::media_foundation_pairs_use_high_low_layout ... ok
+test platform::fmp4_writer::tests::native_screen_config_scales_bitrate_and_frame_size ... ok
+test platform::fmp4_writer::tests::rejects_non_mp4_box_data ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_five_seconds_of_rate_limited_100_hz_vfr_samples ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_native_1440p_samples ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_timestamped_nv12_samples ... ok
+test platform::input_capture::tests::samples_cursor_and_stops_cleanly ... ok
+test platform::manifest_store::tests::atomic_create_never_replaces_an_existing_file_or_leaves_a_temporary ... ok
+test platform::manifest_store::tests::atomically_replaces_existing_manifest ... ok
+test platform::manifest_store::tests::atomically_updates_and_removes_recording_lock ... ok
+test platform::media_decoder::preview_geometry_tests::only_explicit_scrub_proxy_reduces_dimensions ... ok
+test platform::presentation_metrics::tests::duplicate_presents_do_not_hide_a_video_stall ... ok
+test platform::presentation_metrics::tests::pause_is_excluded_and_budget_is_bounded ... ok
+test platform::presentation_metrics::tests::scrub_counts_changed_frames_and_includes_release_stalls ... ok
+test platform::preview::tests::camera_diagnostics_follow_source_mapping_and_effect_bypass ... ok
+test platform::preview::tests::expanded_preroll_can_reach_stream_start ... ok
+test platform::preview::tests::playback_deadline_uses_vfr_pts_and_wakes_at_deleted_cut ... ok
+test platform::preview::tests::random_seek_starts_from_bounded_preroll ... ok
+test platform::preview::tests::retained_preview_survives_seek_ui_review ... ignored, requires PANZO_UI_REVIEW_PROJECT and a Windows GPU
+test platform::preview_proxy::tests::container_quantization_maps_back_to_source_without_changing_native_geometry ... ok
+test platform::preview_proxy::tests::paused_preparation_resumes_and_cancel_wakes_without_gpu_work ... ok
+test platform::preview_scheduler::tests::moving_target_still_accepts_recent_completed_frame ... ok
+test platform::preview_scheduler::tests::old_gesture_and_expired_result_are_rejected ... ok
+test platform::preview_scheduler::tests::reversal_invalidates_previous_direction ... ok
+test platform::preview_window::editor_layout::tests::background_tabs_never_leave_invisible_swatch_hit_targets ... ok
+test platform::preview_window::editor_layout::tests::editor_has_separate_transport_and_context_only_in_inspector ... ok
+test platform::preview_window::editor_layout::tests::inspector_width_changes_layout_without_overlapping_properties_or_transport ... ok
+test platform::preview_window::editor_layout::tests::short_physical_windows_keep_all_properties_reachable_at_high_dpi ... ok
+test platform::preview_window::editor_layout::tests::taller_timeline_expands_both_tracks_and_keeps_the_bottom_gap_constant ... ok
+test platform::preview_window::editor_layout::tests::visible_controls_fit_and_never_overlap_across_dpi_and_collapsed_layouts ... ok
+test platform::preview_window::editor_widgets::tests::background_presets_match_approved_prototype ... ok
+test platform::preview_window::editor_widgets::tests::inline_time_rejects_nonfinite_and_negative ... ok
+test platform::preview_window::tests::deferred_playback_can_be_requested_cancelled_and_consumed ... ok
+test platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes ... ok
+test platform::preview_window::tests::every_editor_control_has_a_unique_accessible_name_and_tooltip ... ok
+test platform::preview_window::tests::every_visual_button_maps_back_to_its_control_id ... ok
+test platform::preview_window::tests::exercise_layout_ui_review ... ignored, explicit local fixture and native window required
+test platform::preview_window::tests::long_scrub_probe_repeats_full_gestures_instead_of_slowing_the_pointer ... ok
+test platform::preview_window::tests::macos_workbench_regions_do_not_overlap_at_default_size ... ok
+test platform::preview_window::tests::narrow_clips_choose_the_nearest_trim_edge_at_every_dpi ... ok
+test platform::preview_window::tests::paused_timer_does_not_request_a_frame_render ... ok
+test platform::preview_window::tests::render_ui_review ... ignored, explicit local fixture and UI review output directory required
+test platform::preview_window::tests::scrub_requests_coalesce_to_the_latest_pointer_position ... ok
+test platform::preview_window::tests::status_summary_keeps_technical_details_out_of_the_timeline ... ok
+test platform::qpc::tests::qpc_is_monotonic_and_has_positive_frequency ... ok
+test platform::recorder::tests::keyed_shared_texture_is_stable_across_isolated_capture_and_processing_devices ... ok
+test platform::recorder::tests::recording_control_shares_a_monotonic_stop_request ... ok
+test platform::recorder_window::tests::every_recorder_control_has_a_unique_accessible_name_and_tooltip ... ok
+test platform::recorder_window::tests::formats_recorder_duration_without_fractional_drift ... ok
+test platform::recorder_window::tests::recorder_controls_have_distinct_hit_targets ... ok
+test platform::recorder_window::tests::recorder_controls_scale_without_overlap_across_supported_dpi ... ok
+test platform::recorder_window::tests::render_ui_review ... ignored, explicit local UI review output directory required
+test platform::recovery::tests::leaves_project_owned_by_live_process_untouched ... ok
+test platform::recovery::tests::recovers_dead_recording_and_trims_events_after_video ... ok
+test platform::video_processor::tests::processor_preserves_native_1440p_when_requested ... ok
+test platform::video_processor::tests::reusable_processor_converts_five_seconds_of_1440p_source_frames ... ok
+test platform::video_processor::tests::reusable_processor_returns_packed_1080p_nv12 ... ok
+
+test result: ok. 105 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 6.78s
+

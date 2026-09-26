@@ -1,0 +1,18 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:2 字符: 85
++ ... nzo').Path; cargo test -p panzo-windows diagnose_indexed_timestamp -- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.14s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+native [TimeTick(97052324), TimeTick(97252491), TimeTick(97352491), TimeTick(97552657), TimeTick(97752657), TimeTick(97852824), TimeTick(98052824), TimeTick(98252991), TimeTick(98352991), TimeTick(98553157), TimeTick(98753157), TimeTick(98853324)]
+sequential [TimeTick(97052324), TimeTick(97252491), TimeTick(97352491), TimeTick(97552657), TimeTick(97752657), TimeTick(97852824), TimeTick(98052824), TimeTick(98252991), TimeTick(98352991), TimeTick(98553157), TimeTick(98753157), TimeTick(98853324), TimeTick(99053324)]
+seek [TimeTick(97052324), TimeTick(97252491), TimeTick(97352491), TimeTick(97552657), TimeTick(97752657), TimeTick(97852824), TimeTick(98052824), TimeTick(98252991), TimeTick(98352991), TimeTick(98553157), TimeTick(98753157), TimeTick(98853324), TimeTick(99053324)]
+test platform::preview::speed_stability_tests::diagnose_indexed_timestamp ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 129 filtered out; finished in 0.96s
+

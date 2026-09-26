@@ -1,0 +1,202 @@
+﻿{
+    "runId":  "final-ui-20260905-180455",
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\re-mvp-ready\\release\\panzo-cli.exe",
+    "sha256":  "EB716013F4A3D18C99040A5618F78129B8D60DA60808D50F3BAD18CED05E5B2F",
+    "unchanged":  true,
+    "results":  [
+                    {
+                        "caseId":  "F03-cold-60s-play",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo",
+                                          "60000"
+                                      ],
+                        "elapsedMs":  60595,
+                        "peakWorkingSetBytes":  552275968,
+                        "peakPrivateBytes":  667860992,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-cold-60s-play.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-cold-60s-play.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F03-first-proxy-preparation",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-proxy-probe",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo\\media\\screen.mp4"
+                                      ],
+                        "elapsedMs":  9938,
+                        "peakWorkingSetBytes":  406126592,
+                        "peakPrivateBytes":  471740416,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-first-proxy-preparation.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-first-proxy-preparation.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F03-warm-60s-play",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo",
+                                          "60000"
+                                      ],
+                        "elapsedMs":  60556,
+                        "peakWorkingSetBytes":  530071552,
+                        "peakPrivateBytes":  597569536,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-warm-60s-play.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-warm-60s-play.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F03-scrub-1",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  12638,
+                        "peakWorkingSetBytes":  754352128,
+                        "peakPrivateBytes":  857239552,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F03-scrub-2",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  12604,
+                        "peakWorkingSetBytes":  750292992,
+                        "peakPrivateBytes":  865845248,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F03-scrub-3",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F03-cold.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  12619,
+                        "peakWorkingSetBytes":  749080576,
+                        "peakPrivateBytes":  857153536,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F03-scrub-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-cached-end-seek",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-session-probe",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo",
+                                          "9223372036854775807"
+                                      ],
+                        "elapsedMs":  2683,
+                        "peakWorkingSetBytes":  444579840,
+                        "peakPrivateBytes":  511246336,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-cached-end-seek.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-cached-end-seek.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-existing-proxy-open",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-proxy-probe",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo\\media\\screen.mp4"
+                                      ],
+                        "elapsedMs":  278,
+                        "peakWorkingSetBytes":  0,
+                        "peakPrivateBytes":  0,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-existing-proxy-open.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-existing-proxy-open.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-scrub-1",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  14155,
+                        "peakWorkingSetBytes":  662790144,
+                        "peakPrivateBytes":  766734336,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-1.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-scrub-2",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  14248,
+                        "peakWorkingSetBytes":  664039424,
+                        "peakPrivateBytes":  751026176,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-2.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-scrub-3",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo",
+                                          "12000"
+                                      ],
+                        "elapsedMs":  14339,
+                        "peakWorkingSetBytes":  668762112,
+                        "peakPrivateBytes":  772255744,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-scrub-3.stderr.txt"
+                    },
+                    {
+                        "caseId":  "F05-five-minute-scrub-resources",
+                        "status":  "Pass",
+                        "arguments":  [
+                                          "preview-scrub-smoke",
+                                          "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455\\F05.panzo",
+                                          "302000"
+                                      ],
+                        "elapsedMs":  304336,
+                        "peakWorkingSetBytes":  714678272,
+                        "peakPrivateBytes":  819109888,
+                        "watchdogExpired":  false,
+                        "exitCode":  null,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-five-minute-scrub-resources.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\final-ui-20260905-180455\\F05-five-minute-scrub-resources.stderr.txt"
+                    }
+                ],
+    "fixtures":  "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260905-180455",
+    "manualAcceptance":  "NotRun",
+    "releaseAccepted":  false,
+    "scope":  "CLI/native-handler regression, not physical input-to-photon or user visual acceptance"
+}

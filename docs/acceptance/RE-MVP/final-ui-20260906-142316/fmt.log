@@ -1,0 +1,35 @@
+﻿Diff in \\?\D:\ChatGPT\Panzo\crates\panzo-windows\src\platform\preview_window.rs:3245:
+             .store(self.frame.snapshot.project_tick.as_i64(), Ordering::Relaxed);
+     }
+ 
+-    fn log_media_error(&self, stage:&str, message:&str) {
+-        let index=self.telemetry.media_errors.fetch_add(1,Ordering::Relaxed);
++    fn log_media_error(&self, stage: &str, message: &str) {
++        let index = self.telemetry.media_errors.fetch_add(1, Ordering::Relaxed);
+         // Bounded diagnostics: retain the actual cause of a failed probe, not only a count.
+-        if index<8 {eprintln!("Panzo preview error: stage={stage} tick={} message={message}",self.session.snapshot().project_tick.as_i64());}
++        if index < 8 {
++            eprintln!(
++                "Panzo preview error: stage={stage} tick={} message={message}",
++                self.session.snapshot().project_tick.as_i64()
++            );
++        }
+     }
+ 
+     fn record_session_result(&mut self, result: Result<(), PreviewSessionError>) {
+Diff in \\?\D:\ChatGPT\Panzo\crates\panzo-windows\src\platform\preview_window.rs:3255:
+-        if let Err(error)=&result {
++        if let Err(error) = &result {
+             self.log_media_error("session", &error.to_string());
+         }
+         match result {
+Diff in \\?\D:\ChatGPT\Panzo\crates\panzo-windows\src\platform\preview_window.rs:3266:
+     }
+ 
+     fn record_result(&mut self, result: Result<(), PreviewWindowError>) {
+-        if let Err(error)=&result {
++        if let Err(error) = &result {
+             self.log_media_error("window", &error.to_string());
+         }
+         if let Err(error) = result {
+

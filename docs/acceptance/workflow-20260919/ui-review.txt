@@ -1,0 +1,42 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:2 字符: 1195
++ ...  fmt --all; cargo test -p panzo-windows ui_review -- --ignored --test ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.15s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 15 tests
+test platform::export::tests::canvas_output_export_ui_review ... FAILED
+test platform::export::tests::cropped_clips_export_ui_review ... ok
+test platform::export::tests::mixed_speed_export_ui_review ... ok
+test platform::preview::speed_stability_tests::mixed_speed_seek_stability_ui_review ... ok
+test platform::preview::tests::retained_preview_survives_seek_ui_review ... ok
+test platform::preview_window::crop_review::video_crop_ui_review ... ok
+test platform::preview_window::editor_titlebar::tests::native_titlebar_ui_review ... ok
+test platform::preview_window::tests::background_and_low_resolution_filmstrip_ui_review ... ok
+test platform::preview_window::tests::exercise_layout_ui_review ... ok
+test platform::preview_window::tests::focus_drag_reaches_frame_edges_ui_review ... ok
+test platform::preview_window::tests::render_ui_review ... ok
+test platform::preview_window::tests::video_speed_ui_review ... ok
+test platform::preview_window::workflow_review::workflow_ui_review ... ok
+test platform::recorder_window::tests::render_ui_review ... ok
+test platform::video_processor::color_tests::color_roundtrip_ui_review ... ok
+
+failures:
+
+---- platform::export::tests::canvas_output_export_ui_review stdout ----
+
+thread 'platform::export::tests::canvas_output_export_ui_review' (22168) panicked at crates\panzo-windows\src\platform\export.rs:601:21:
+custom-square frame 29: 1.064629088908637
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    platform::export::tests::canvas_output_export_ui_review
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 125 filtered out; finished in 71.78s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

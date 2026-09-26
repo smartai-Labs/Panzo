@@ -1,0 +1,1747 @@
+﻿{
+    "date":  "2026-09-27",
+    "workspace":  "D:\\ChatGPT\\Panzo",
+    "applied":  true,
+    "candidate":  {
+                      "directory":  "D:\\ChatGPT\\Panzo\\target\\editor-feedback\\release",
+                      "sourceSha256":  "11C1E48A97F50BBBAB490BAD5AA0D925CAC5296640309DFD0ECE945587BCCE4D",
+                      "binaries":  [
+                                       {
+                                           "name":  "panzo.exe",
+                                           "sha256":  "BA6D8B0A2A785407BFA6D2AB96FD61E237277783C597374CAA001151C3CDBE36",
+                                           "bytes":  3980800
+                                       },
+                                       {
+                                           "name":  "panzo-cli.exe",
+                                           "sha256":  "E1620F1B7CDC3187CD6F0D1CB94A29F553023F1C8EB0D6B28010BDF026DE5C4D",
+                                           "bytes":  5162496
+                                       }
+                                   ],
+                      "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\editor-feedback\\release\\candidate-build.json"
+                  },
+    "activeExecutables":  [
+                              "D:\\ChatGPT\\Panzo\\target\\editor-feedback\\release\\panzo.exe"
+                          ],
+    "plannedBytes":  38946292508,
+    "plannedFiles":  78595,
+    "targets":  [
+                    {
+                        "path":  "target-editor",
+                        "reason":  "superseded build cache",
+                        "files":  2845,
+                        "bytes":  1581651332,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-macos",
+                        "reason":  "superseded build cache",
+                        "files":  3072,
+                        "bytes":  1605416805,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-scrub",
+                        "reason":  "superseded build cache",
+                        "files":  2801,
+                        "bytes":  1501509324,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-seek",
+                        "reason":  "superseded build cache",
+                        "files":  3128,
+                        "bytes":  1676181649,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-split",
+                        "reason":  "superseded build cache",
+                        "files":  1994,
+                        "bytes":  1133106598,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-split-acceptance",
+                        "reason":  "superseded build cache",
+                        "files":  1233,
+                        "bytes":  887714481,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-split-release",
+                        "reason":  "superseded build cache",
+                        "files":  650,
+                        "bytes":  359413399,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-trim",
+                        "reason":  "superseded build cache",
+                        "files":  3120,
+                        "bytes":  1655749690,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-ui",
+                        "reason":  "superseded build cache",
+                        "files":  3104,
+                        "bytes":  1602566868,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-ui-a11y",
+                        "reason":  "superseded build cache",
+                        "files":  2767,
+                        "bytes":  1470974118,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target-upgrade",
+                        "reason":  "superseded build cache",
+                        "files":  2586,
+                        "bytes":  1558724513,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/caption-color",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472905345,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/debug",
+                        "reason":  "superseded build cache",
+                        "files":  21315,
+                        "bytes":  12534408927,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/fixed-caption",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472892624,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/main-menu",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472760364,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/menu-style",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472788643,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/r1",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  392155276,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  397584754,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-accessibility",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  433281297,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-final",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  397761606,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-prototype-ui",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  467561588,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-prototype-ui-candidate",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  467664441,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-prototype-ui-diagnostic",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  467593168,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-prototype-ui-final",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  467496617,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-prototype-ui-repair",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  467645372,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/re-mvp-ready",
+                        "reason":  "superseded build cache",
+                        "files":  790,
+                        "bytes":  397651934,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/release",
+                        "reason":  "superseded build cache",
+                        "files":  921,
+                        "bytes":  844932807,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/tmp",
+                        "reason":  "superseded build cache",
+                        "files":  0,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/typography-settings",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472946889,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "target/ui-spacing",
+                        "reason":  "superseded build cache",
+                        "files":  792,
+                        "bytes":  472526675,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-accessibility-20260905",
+                        "reason":  "superseded distribution package",
+                        "files":  192,
+                        "bytes":  9368234,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-camera-crosshair-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  566,
+                        "bytes":  24893571,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-camera-focus-fix-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  523,
+                        "bytes":  22161191,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-candidate-20260905",
+                        "reason":  "superseded distribution package",
+                        "files":  182,
+                        "bytes":  9027291,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-color-stability-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  819,
+                        "bytes":  40987209,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-crop-titlebar-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  890,
+                        "bytes":  46128637,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-editor-cards-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  601,
+                        "bytes":  27481547,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-prototype-ui-20260906",
+                        "reason":  "superseded distribution package",
+                        "files":  206,
+                        "bytes":  9578333,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-timeline-clean-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  676,
+                        "bytes":  32707173,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-timeline-labels-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  697,
+                        "bytes":  34141224,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-titlebar-actions-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  640,
+                        "bytes":  30134104,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-actions-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  348,
+                        "bytes":  12036278,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-background-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  434,
+                        "bytes":  16800317,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-detail-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  298,
+                        "bytes":  11144080,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-polish-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  260,
+                        "bytes":  10194865,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-theme-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  388,
+                        "bytes":  13714346,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-thumbnails-low-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  470,
+                        "bytes":  19448685,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-video-speed-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  751,
+                        "bytes":  37534261,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-workflow-20260919",
+                        "reason":  "superseded distribution package",
+                        "files":  1020,
+                        "bytes":  52770693,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-accessibility-20260905.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  3828724,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-camera-crosshair-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  11750403,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-camera-focus-fix-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  10412045,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-candidate-20260905.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  3724708,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-color-stability-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  19770968,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-crop-titlebar-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  22355892,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-editor-cards-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  13019392,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-prototype-ui-20260906.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  3897442,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-timeline-clean-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  15543896,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-timeline-labels-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  16389796,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-titlebar-actions-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  14315585,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-actions-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  5308617,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-background-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  7768512,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-detail-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  4793301,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-polish-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  4239495,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-theme-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  6330957,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-ui-thumbnails-low-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  9081588,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-video-speed-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  18080146,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  "dist/Panzo-RE-MVP-workflow-20260919.zip",
+                        "reason":  "superseded distribution package",
+                        "files":  1,
+                        "bytes":  25756227,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/app-shell-target",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  989,
+                        "bytes":  508820643,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/before-main-menu",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  7,
+                        "bytes":  545140,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/before-unified-ui",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  7,
+                        "bytes":  422903,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/button-state-target",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  796,
+                        "bytes":  403321640,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/camera-crosshair-backup-20260919-060038",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1352696,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/camera-focus-fix-backup-20260919-053829",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1341194,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-stability-backup-20260919-103235",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  73,
+                        "bytes":  1439058,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-titlebar-backup-20260919-111217",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  75,
+                        "bytes":  1459484,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/editor-atomic-release",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  650,
+                        "bytes":  361601869,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/editor-cards-backup-20260919-062621",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1368356,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-target",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  1374,
+                        "bytes":  600874961,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-fix-target",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  796,
+                        "bytes":  404195255,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/timeline-clean-backup-20260919-082418",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  2,
+                        "bytes":  58940,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-actions-backup-20260919-073841",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1371198,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-actions-backup-20260919-032152",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  70,
+                        "bytes":  1302072,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-background-backup-20260919-044224",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1325707,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-detail-backup-20260919-023505",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  70,
+                        "bytes":  1280552,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-polish-backup-20260919-012053",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  70,
+                        "bytes":  1257796,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-theme-backup-20260919-034524",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  70,
+                        "bytes":  1306177,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-thumbnails-low-backup-20260919-051239",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  71,
+                        "bytes":  1345394,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/video-speed-backup-20260919-092906",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  72,
+                        "bytes":  1386155,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/window-capture-release",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  650,
+                        "bytes":  362277651,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-backup-20260919-122237",
+                        "reason":  "temporary build or pre-edit source snapshot",
+                        "files":  76,
+                        "bytes":  1498534,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/async_host.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  4870,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/async_navigation.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  6477,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/button-state-after-fit-click.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  185373,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/cleanup_root.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3060,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-after.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1786,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-baseline.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2692,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-build.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1104,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-clippy.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1120,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-final.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1564,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-fmt.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  740,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-roundtrip-before.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2384,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-seek-diagnosis.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3148,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  41508,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/color-ui-review.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2982,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/compact-card-toolbar.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  220,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-build.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1242,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-check.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1092,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-clippy.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1258,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-ffprobe.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  840,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-fmt.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  740,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  42716,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-titlebar-initial.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1586,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-titlebar.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1724,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/crop-ui-review.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3414,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/feedback-review-current.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  72,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/feedback-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  52196,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/fix-theme-icon.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1230,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/fix_editor_feedback.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3445,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/initialize-camera-focus.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  346,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-093c2af58ccc4ba6848da42c278c393f.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  260346,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-093c2af58ccc4ba6848da42c278c393f.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-0e4f107337d44536b64b9c4a1d496eba.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2857,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-0e4f107337d44536b64b9c4a1d496eba.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-3e6bdc308b674531821b29c85229792f.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2856,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-3e6bdc308b674531821b29c85229792f.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-4aefff0e52bb445c9a43823248cd2c1e.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2857,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-4aefff0e52bb445c9a43823248cd2c1e.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-58ec810eec994ecfba997970c2c90c9a.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2857,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-58ec810eec994ecfba997970c2c90c9a.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-81d9750582534a829b966f97dd52ce5b.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  260201,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-81d9750582534a829b966f97dd52ce5b.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-c962118bd5e04c5bb26d2326c8d578f8.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3526,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-c962118bd5e04c5bb26d2326c8d578f8.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-d5c02c42cde94bea8b1ca67a923e3490.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  10407,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-d5c02c42cde94bea8b1ca67a923e3490.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-dee876307aab4faea49b6fc0b2ee6173.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  260203,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stability-dee876307aab4faea49b6fc0b2ee6173.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-093c2af58ccc4ba6848da42c278c393f.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-093c2af58ccc4ba6848da42c278c393f.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  153,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-0e4f107337d44536b64b9c4a1d496eba.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-0e4f107337d44536b64b9c4a1d496eba.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  147,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-81d9750582534a829b966f97dd52ce5b.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-81d9750582534a829b966f97dd52ce5b.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  153,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-d5c02c42cde94bea8b1ca67a923e3490.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-d5c02c42cde94bea8b1ca67a923e3490.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  233,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-dee876307aab4faea49b6fc0b2ee6173.stderr.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/m4-stimulus-dee876307aab4faea49b6fc0b2ee6173.stdout.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  243,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/main_menu_migration.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  10764,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/migrate_host.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  6714,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/migrate_recorder.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  9467,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/mixed-color.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1394,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/polish_chrome.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  6705,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/polish_interaction.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  10390,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/polish_layout.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  10433,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/polish_recorder.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  8254,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/prepare-crosshair-review.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1054,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/project-review-current.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  69,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/restore-low-thumbnail-review.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2206,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-camera-crosshair-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1413,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-camera-focus-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1411,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-color-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1439,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-crop-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1442,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-editor-cards-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1411,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-speed-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1438,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-titlebar-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1443,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-actions-baseline.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1425,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-actions-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1401,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-background-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1403,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-detail-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1395,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1395,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-ui-theme-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1401,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/run-workflow-probe.ps1",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1452,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-final-no-trail.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  82891,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-final-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  66227,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-final-three-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  82891,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-final-verified.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  82937,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-fixed-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  66235,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-fixed-three-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  82907,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  98449,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/scrub-three-quarter.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  98561,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-all-ui-final.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2634,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-all-ui.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3950,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-build.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1198,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-camera-fixed.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1544,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-camera-repeat.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2626,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-check.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1122,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-clippy.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1122,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-compat-probe.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  5952,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-core-first.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  12416,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-core-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  12910,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-export-test.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1394,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-fmt.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-full-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  40626,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-selection-after.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2776,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-selection-before.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2740,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-stability.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1594,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-timing-test.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1670,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/speed-ui-test.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1394,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/timeline-clean-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1028,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/timeline-labels-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1032,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-clippy-first.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  12388,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-debug.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3078,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-final-probe.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3072,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-first-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  26990,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-native-first.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1586,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/titlebar-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1036,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/typed_status.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2151,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-direction-syntax-check.js",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  5500,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-refactor-minimum-window-final.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  122708,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-refactor-minimum-window.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  127163,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-refactor-release-final.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  184871,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/ui-refactor-release.png",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  179076,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/unified-check.log",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  17416,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/update-inspector-layout.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  8981,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/update-theme.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  10569,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/update-ui-actions-docs.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  3998,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/update-ui-actions.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  7841,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/update-ui-theme-docs.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  4651,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/verify-color-stability.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2637,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/verify-workflow-package.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  2270,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-build.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1102,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-canvas-export.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1546,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-check.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1252,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-chrome.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  6184,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-clippy-fix.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  18362,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-clippy.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1120,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-crop-hooks.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  7764,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-docs.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  8458,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-evidence.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  5230,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-final-probes.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  20994,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-fixture.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  609,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-fmt.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  0,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-layout.py",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  6137,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-package.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  740,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-perf-progress.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  14218,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-progress.md",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1415,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-refined-perf.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  5950,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-settings-review.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1450,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-tests-initial.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  44550,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-tests.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  45018,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-ui-review.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  4694,
+                        "status":  "deleted"
+                    },
+                    {
+                        "path":  ".tmp/workflow-ui-targeted.txt",
+                        "reason":  "one-off script, scratch log or temporary screenshot",
+                        "files":  1,
+                        "bytes":  1408,
+                        "status":  "deleted"
+                    }
+                ],
+    "candidateVerifiedAfterCleanup":  true,
+    "deletedBytes":  38946292508,
+    "deletedFiles":  78595
+}

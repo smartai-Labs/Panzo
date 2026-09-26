@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F02-trim",
+    "command":  "preview-trim-smoke",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  9218,
+    "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 68\n  Rendered frames: 2\n  Paint calls: 2\n  Average render: 30772 us\n  Maximum render: 53805 us\n  Background decodes: 0\n  Source texture uploads: 2\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 2\n  CPU readbacks: 0\n  Last project tick: 449716400\n  Graceful close: true\n  Trim action elapsed: 4722 us\n  Trim smoke status: passed-incrementally\n  Queued playback completed: false\n  Queued playback latency: 0 us\n",
+    "error":  "",
+    "stdoutFile":  "F02-trim.stdout.txt",
+    "stderrFile":  "F02-trim.stderr.txt"
+}

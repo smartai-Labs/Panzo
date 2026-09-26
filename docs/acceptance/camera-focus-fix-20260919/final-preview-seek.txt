@@ -1,0 +1,12 @@
+Panzo M3 project preview session probe
+  Project: D:\ChatGPT\Panzo\.tmp\camera-focus-review.panzo
+  Source frames: 2078
+  Duration tick: 256061967
+  Scrub project/source tick: 102713284/193003983
+  Scrub poll count: 27
+  Seek project/source tick: 102774675/193003983
+  Play+advance project tick: 103774675
+  Start hash: 343186b8d6dbb38dc336aa8d586bf18066450ac238777f9ac62c7f40cff06eb2
+  Returned start hash: 343186b8d6dbb38dc336aa8d586bf18066450ac238777f9ac62c7f40cff06eb2
+  Deterministic start frame: true
+  Camera diagnostics visible: true

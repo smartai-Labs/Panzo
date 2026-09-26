@@ -1,0 +1,27 @@
+[package]
+name = "panzo-windows"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+crossbeam-queue.workspace = true
+image.workspace = true
+panzo-core = { path = "../panzo-core" }
+resvg.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tiny-skia.workspace = true
+uuid.workspace = true
+windows.workspace = true
+windows-core = "0.62.2"
+
+[dev-dependencies]
+uuid.workspace = true
+windows = { workspace = true, features = ["Win32_Storage_Xps"] }
+
+[lints]
+workspace = true

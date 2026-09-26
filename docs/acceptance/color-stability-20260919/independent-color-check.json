@@ -1,0 +1,345 @@
+[
+  {
+    "phase": "before",
+    "mp4": "D:\\ChatGPT\\Panzo\\docs\\acceptance\\color-stability-20260919\\color-chart-916cd5f7-7f64-4dc5-80b8-93933ae14d3b.mp4",
+    "metadata": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {}
+      ]
+    },
+    "patches": [
+      {
+        "expectedRgb": [
+          0,
+          0,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          255,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          255.0,
+          255.0,
+          255.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          128,
+          128,
+          128
+        ],
+        "ffmpegDecodedRgb": [
+          130.0,
+          130.0,
+          130.0
+        ],
+        "maxChannelError": 2.0
+      },
+      {
+        "expectedRgb": [
+          32,
+          32,
+          32
+        ],
+        "ffmpegDecodedRgb": [
+          18.0,
+          18.0,
+          18.0
+        ],
+        "maxChannelError": 14.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          0,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          246.0,
+          0.0,
+          0.0
+        ],
+        "maxChannelError": 9.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          255,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          7.0,
+          255.0,
+          0.0
+        ],
+        "maxChannelError": 7.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          0,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          0.0,
+          255.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          255,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          255.0,
+          255.0,
+          0.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          255,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          10.0,
+          255.0,
+          255.0
+        ],
+        "maxChannelError": 10.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          0,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          251.0,
+          0.0,
+          255.0
+        ],
+        "maxChannelError": 4.0
+      },
+      {
+        "expectedRgb": [
+          38,
+          103,
+          181
+        ],
+        "ffmpegDecodedRgb": [
+          33.0,
+          101.0,
+          183.0
+        ],
+        "maxChannelError": 5.0
+      },
+      {
+        "expectedRgb": [
+          221,
+          137,
+          75
+        ],
+        "ffmpegDecodedRgb": [
+          227.0,
+          135.0,
+          73.0
+        ],
+        "maxChannelError": 6.0
+      }
+    ]
+  },
+  {
+    "phase": "after",
+    "mp4": "D:\\ChatGPT\\Panzo\\docs\\acceptance\\color-stability-20260919\\color-chart-3f99620a-18ba-4972-8f87-be89c581f743.mp4",
+    "metadata": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "color_range": "tv",
+          "color_space": "bt709",
+          "color_transfer": "bt709",
+          "color_primaries": "bt709"
+        }
+      ]
+    },
+    "patches": [
+      {
+        "expectedRgb": [
+          0,
+          0,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          255,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          255.0,
+          255.0,
+          255.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          128,
+          128,
+          128
+        ],
+        "ffmpegDecodedRgb": [
+          128.0,
+          128.0,
+          128.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          32,
+          32,
+          32
+        ],
+        "ffmpegDecodedRgb": [
+          32.0,
+          32.0,
+          32.0
+        ],
+        "maxChannelError": 0.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          0,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          254.0,
+          0.0,
+          0.0
+        ],
+        "maxChannelError": 1.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          255,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          254.0,
+          0.0
+        ],
+        "maxChannelError": 1.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          0,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          0.0,
+          254.0
+        ],
+        "maxChannelError": 1.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          255,
+          0
+        ],
+        "ffmpegDecodedRgb": [
+          253.0,
+          253.0,
+          0.0
+        ],
+        "maxChannelError": 2.0
+      },
+      {
+        "expectedRgb": [
+          0,
+          255,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          0.0,
+          253.0,
+          254.0
+        ],
+        "maxChannelError": 2.0
+      },
+      {
+        "expectedRgb": [
+          255,
+          0,
+          255
+        ],
+        "ffmpegDecodedRgb": [
+          255.0,
+          0.0,
+          254.0
+        ],
+        "maxChannelError": 1.0
+      },
+      {
+        "expectedRgb": [
+          38,
+          103,
+          181
+        ],
+        "ffmpegDecodedRgb": [
+          36.0,
+          102.0,
+          180.0
+        ],
+        "maxChannelError": 2.0
+      },
+      {
+        "expectedRgb": [
+          221,
+          137,
+          75
+        ],
+        "ffmpegDecodedRgb": [
+          219.0,
+          136.0,
+          73.0
+        ],
+        "maxChannelError": 2.0
+      }
+    ]
+  }
+]

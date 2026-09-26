@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "rule-planner",
+    "version": "0.1.0",
+    "parameterSet": "default-v1"
+  },
+  "sourceRevision": {
+    "clickTrackHash": "sha256:fixture:far-left-right-clicks:clicks",
+    "captureGeometryHash": "sha256:fixture:1920x1080"
+  },
+  "baseState": {
+    "centerX": 0.5,
+    "centerY": 0.5,
+    "scale": 1.0
+  },
+  "segments": [
+    {
+      "id": "camera-segment-0001",
+      "kind": "zoom-in",
+      "startTick": 5000000,
+      "endTick": 8500000,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.5,
+        "scale": 1.6
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-1"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0002",
+      "kind": "reframe-out",
+      "startTick": 14000000,
+      "endTick": 18500000,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.5,
+        "scale": 1.6
+      },
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-2"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0003",
+      "kind": "reframe-in",
+      "startTick": 18500000,
+      "endTick": 22000000,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "to": {
+        "centerX": 0.6875,
+        "centerY": 0.5,
+        "scale": 1.6
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-2"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0004",
+      "kind": "zoom-out",
+      "startTick": 34000000,
+      "endTick": 38500000,
+      "from": {
+        "centerX": 0.6875,
+        "centerY": 0.5,
+        "scale": 1.6
+      },
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-2"
+      ],
+      "locked": false,
+      "userModified": false
+    }
+  ]
+}

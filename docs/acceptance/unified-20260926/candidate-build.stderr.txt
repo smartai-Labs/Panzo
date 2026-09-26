@@ -1,0 +1,4 @@
+   Compiling panzo-core v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-core)
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+   Compiling panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
+    Finished `release` profile [optimized] target(s) in 13.16s

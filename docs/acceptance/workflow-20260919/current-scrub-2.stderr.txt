@@ -1,0 +1,6 @@
+Scrub slow presentation: gapUs=207238 first=false requestAgeUs=189902 presentUs=1939 projectTick=29986526
+Scrub slow presentation: gapUs=163438 first=false requestAgeUs=180264 presentUs=2380 projectTick=28850299
+Scrub slow presentation: gapUs=165060 first=false requestAgeUs=172777 presentUs=2165 projectTick=27714071
+Scrub slow presentation: gapUs=166264 first=false requestAgeUs=171601 presentUs=2211 projectTick=26577844
+Scrub slow presentation: gapUs=154578 first=false requestAgeUs=172093 presentUs=2228 projectTick=25540419
+Scrub slow presentation: gapUs=150145 first=false requestAgeUs=158563 presentUs=2277 projectTick=23514970

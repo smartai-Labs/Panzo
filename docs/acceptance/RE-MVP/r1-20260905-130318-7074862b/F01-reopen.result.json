@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F01-reopen",
+    "command":  "preview-reopen-smoke",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  2192,
+    "output":  "First open:\nPanzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 11\n  Rendered frames: 1\n  Paint calls: 1\n  Average render: 43802 us\n  Maximum render: 43802 us\n  Background decodes: 0\n  Source texture uploads: 1\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 1\n  CPU readbacks: 0\n  Last project tick: 0\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: false\n  Queued playback latency: 0 us\n  Scrub presented frames: 0\n  Scrub maximum presentation gap: 0 us\n  Scrub release settled exactly: false\n  Media errors: 0\nSecond open:\nPanzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 11\n  Rendered frames: 1\n  Paint calls: 1\n  Average render: 34802 us\n  Maximum render: 34802 us\n  Background decodes: 0\n  Source texture uploads: 1\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 1\n  CPU readbacks: 0\n  Last project tick: 0\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: false\n  Queued playback latency: 0 us\n  Scrub presented frames: 0\n  Scrub maximum presentation gap: 0 us\n  Scrub release settled exactly: false\n  Media errors: 0\n",
+    "error":  "",
+    "stdoutFile":  "F01-reopen.stdout.txt",
+    "stderrFile":  "F01-reopen.stderr.txt"
+}

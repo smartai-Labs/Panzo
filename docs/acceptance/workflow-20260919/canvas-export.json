@@ -1,0 +1,32 @@
+[
+  {
+    "decodedFrames": 30,
+    "height": 2560,
+    "meanRgbErrors": [
+      0.5399207720609843,
+      0.572049229467151
+    ],
+    "name": "portrait-native",
+    "width": 1440
+  },
+  {
+    "decodedFrames": 30,
+    "height": 1920,
+    "meanRgbErrors": [
+      0.5051199103911194,
+      0.499387700512409
+    ],
+    "name": "portrait-hd",
+    "width": 1080
+  },
+  {
+    "decodedFrames": 30,
+    "height": 640,
+    "meanRgbErrors": [
+      0.8110109601794253,
+      1.064629088908637
+    ],
+    "name": "custom-square",
+    "width": 640
+  }
+]

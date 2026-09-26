@@ -1,0 +1,36 @@
+Panzo Editor Workbench smoke
+  Scrub request-to-Present samples: 580
+  Scrub request-to-Present P50/P95/P99/max us: 5185/6315/8297/71714
+  Scrub source time error P95 tick: 337929
+  Scrub minimum distinct updates per 2 seconds: Some(115)
+  Window created: true
+  Output: 2560x1440 (source native)
+  Timer ticks: 701
+  Rendered frames: 697
+  Paint calls: 1276
+  Average render: 597 us
+  Maximum render: 50521 us
+  Scripted OS input interruptions: 1
+  Playback cadence samples: 114
+  Playback Present P95: 20913 us
+  Playback Present P99: 28695 us
+  Playback Present maximum: 41790 us
+  Background decodes: 0
+  Source texture uploads: 696
+  Background texture uploads: 0
+  Output texture allocations: 0
+  GPU direct preview: true
+  GPU presentations: 698
+  CPU readbacks: 0
+  Last project tick: 4519193626
+  Graceful close: true
+  Trim action elapsed: 0 us
+  Trim smoke status: not-requested
+  Queued playback completed: true
+  Queued playback latency: 72909 us
+  Scrub presented frames: 580
+  Scrub maximum presentation gap: 71765 us
+  Scrub release settled exactly: true
+  Scrub distinct source frames: 580
+  Scrub maximum source time error tick: 399387
+  Media errors: 0

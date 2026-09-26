@@ -1,0 +1,9 @@
+﻿{
+    "name":  "before-native-seek",
+    "command":  "preview-session-probe",
+    "project":  ".tmp/native-quality-review.panzo",
+    "extra":  "23759628",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "1FD7C8C5C6DBC0D40FA739A16D940608BEC887C28E905946D4EEA4C95337C704"
+}

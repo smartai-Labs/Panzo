@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-export",
+    "command":  "export-probe",
+    "project":  ".tmp/camera-crosshair-review.panzo",
+    "extra":  "D:\\ChatGPT\\Panzo\\.tmp\\camera-crosshair-review.mp4 2",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "2FCC4C772ECFCA0A71EC149931750D75214132D1B0B84F31CC9357F51867A4FF"
+}

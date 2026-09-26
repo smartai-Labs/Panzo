@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "rule-planner",
+    "version": "0.1.0",
+    "parameterSet": "default-v1"
+  },
+  "sourceRevision": {
+    "clickTrackHash": "sha256:fixture:click-outside-capture:clicks",
+    "captureGeometryHash": "sha256:fixture:1920x1080"
+  },
+  "baseState": {
+    "centerX": 0.5,
+    "centerY": 0.5,
+    "scale": 1.0
+  },
+  "segments": []
+}

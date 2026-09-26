@@ -1,0 +1,6 @@
+Original source: 2560x1440
+Visible filmstrip frames: 21
+Exact source PTS: pass
+Native pixels at 300/600 px: identical to independent source decode + Lanczos3
+Background: PNG import, replacement, portrait alpha, undo/redo, light/dark rendered
+Timeline height at 2560x1417: 311

@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-06",
+  "candidate": "target/re-mvp-prototype-ui-diagnostic/release/panzo.exe",
+  "sha256": "7FF3C2171FED2FF6C241D623FDDEC12C43953E1CF588B51EEFC4A3B8135CCEAE",
+  "scope": "Partial external desktop-tool check, not visual acceptance or a complete editing task. The final packaged candidate is a later build.",
+  "observed": [
+    "Recorder launched as a native GUI window",
+    "External UIA tree includes Chinese Open Project, Entire Screen, Application Window, source, record, editor, project folder and diagnostics controls",
+    "Source description reports 2560x1440 and no audio",
+    "Tab focused Open Project; Return opened the project.json selector",
+    "Recorder controls were disabled while the selector was open",
+    "Escape dismissed the selector and restored the recorder",
+    "Alt+F4 closed the diagnostic recorder; its window disappeared from the window inventory"
+  ],
+  "toolFailures": [
+    {"operation": "screenshot", "error": "SetIsBorderRequired failed / interface not supported / 0x80004002", "attempts": 2},
+    {"operation": "element click", "error": "coordinate input geometry is unavailable"},
+    {"operation": "set filename edit value", "error": "read UIA value read-only state: required property not in CacheRequest / 0x80070057"}
+  ],
+  "notVerified": [
+    "Actual screenshot fidelity, typography, clipping and visual DPI matrix",
+    "Physical mouse timeline dragging and screen-visible latency",
+    "Successful project selection via the external tool",
+    "Complete inline editing, IME and modeless export GUI workflow"
+  ],
+  "dataSafety": "No real user project was selected or edited. The unused planned target was a disposable project copy. No recording or export was started. Unrelated Shell entries are omitted. No alternate screenshot or direct PowerShell UI Automation was used."
+}

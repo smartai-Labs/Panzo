@@ -1,0 +1,9 @@
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `release` profile [optimized] target(s) in 7.31s
+     Running unittests src\lib.rs (target\release\deps\panzo_windows-0cf8cf1fcd9ec903.exe)
+
+running 1 test
+test platform::preview_window::tests::background_and_native_filmstrip_ui_review ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 114 filtered out; finished in 3.65s
+

@@ -1,0 +1,9 @@
+﻿{
+    "name":  "rounded-export",
+    "command":  "export-probe",
+    "project":  ".tmp/ui-detail-rounded.panzo",
+    "extra":  "\"D:\\ChatGPT\\Panzo\\.tmp\\ui-detail-export-20260919.mp4\" 2",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "0855F583FCB2913BF57ACD6AFF097CBA073C01176051F85CFA9FA5CF9B6532C2"
+}

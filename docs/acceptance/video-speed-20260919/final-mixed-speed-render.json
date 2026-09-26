@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-mixed-speed-render",
+    "command":  "render-hash-probe",
+    "project":  ".tmp/video-speed-release.panzo",
+    "extra":  "6000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "58957F32F2CE918A0E5EEB8AC40BF37E88C88B3E354E0EA758013D9B66BD2D7D"
+}

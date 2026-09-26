@@ -1,0 +1,14 @@
+{
+  "package": "D:\\ChatGPT\\Panzo\\dist\\Panzo-RE-MVP-crop-titlebar-20260919",
+  "archiveSha256": "26149BBC4BF5186AE3FD80F3DF3CAE617B4EB029C8305EF6E9C5CECD99593B08",
+  "archiveEntries": 900,
+  "files": {
+    "panzo.exe": "FAFD064BDE598058C4A2E3084AE472C59CFF5294BC2CF8A4027013D4229BCBC5",
+    "panzo-cli.exe": "CEDBE3E2EE080A9390DFF71FC068C125D5B20793F44164DB90BC353A4851B947"
+  },
+  "sourceAndArchiveHashesMatch": true,
+  "guiSubsystem": 2,
+  "cliSubsystem": 3,
+  "newReportLinksExist": true,
+  "mediaExcluded": true
+}

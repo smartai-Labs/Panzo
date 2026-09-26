@@ -1,0 +1,10 @@
+Panzo MP4 export — 1920×1080 / 60 fps
+  Project: D:\ChatGPT\Panzo\.tmp\camera-crosshair-review.panzo
+  Output: D:\ChatGPT\Panzo\.tmp\camera-crosshair-review.mp4
+  Frames: 120
+  Duration tick: 20000000
+  Output bytes: 634384
+  fMP4 fragments: 7
+  Trailing bytes: 0
+  Encoder: NVIDIA H.264 Encoder MFT (hardware)
+  Elapsed: 2426 ms

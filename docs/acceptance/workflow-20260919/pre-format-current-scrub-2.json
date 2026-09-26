@@ -1,0 +1,9 @@
+﻿{
+    "name":  "current-scrub-2",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/crop-release.panzo",
+    "extra":  "12000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "FC20BBA6CC42E7241839B16A55C2EAA4C73483F9CD3252DEA9F8460745E86E9D"
+}

@@ -1,0 +1,13 @@
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `release` profile [optimized] target(s) in 8.35s
+     Running unittests src\lib.rs (target\release\deps\panzo_windows-0cf8cf1fcd9ec903.exe)
+
+running 5 tests
+test platform::preview::tests::retained_preview_survives_seek_ui_review ... ok
+test platform::preview_window::tests::background_and_low_resolution_filmstrip_ui_review ... ok
+test platform::preview_window::tests::exercise_layout_ui_review ... ok
+test platform::preview_window::tests::render_ui_review ... ok
+test platform::recorder_window::tests::render_ui_review ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 110 filtered out; finished in 4.08s
+

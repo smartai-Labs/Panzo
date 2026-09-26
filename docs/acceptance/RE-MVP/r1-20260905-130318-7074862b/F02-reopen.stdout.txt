@@ -1,0 +1,52 @@
+First open:
+Panzo Editor Workbench smoke
+  Window created: true
+  Output: 1920x1080 (source native)
+  Timer ticks: 10
+  Rendered frames: 1
+  Paint calls: 1
+  Average render: 49195 us
+  Maximum render: 49195 us
+  Background decodes: 0
+  Source texture uploads: 1
+  Background texture uploads: 0
+  Output texture allocations: 0
+  GPU direct preview: true
+  GPU presentations: 1
+  CPU readbacks: 0
+  Last project tick: 0
+  Graceful close: true
+  Trim action elapsed: 0 us
+  Trim smoke status: not-requested
+  Queued playback completed: false
+  Queued playback latency: 0 us
+  Scrub presented frames: 0
+  Scrub maximum presentation gap: 0 us
+  Scrub release settled exactly: false
+  Media errors: 0
+Second open:
+Panzo Editor Workbench smoke
+  Window created: true
+  Output: 1920x1080 (source native)
+  Timer ticks: 10
+  Rendered frames: 1
+  Paint calls: 1
+  Average render: 49356 us
+  Maximum render: 49356 us
+  Background decodes: 0
+  Source texture uploads: 1
+  Background texture uploads: 0
+  Output texture allocations: 0
+  GPU direct preview: true
+  GPU presentations: 1
+  CPU readbacks: 0
+  Last project tick: 0
+  Graceful close: true
+  Trim action elapsed: 0 us
+  Trim smoke status: not-requested
+  Queued playback completed: false
+  Queued playback latency: 0 us
+  Scrub presented frames: 0
+  Scrub maximum presentation gap: 0 us
+  Scrub release settled exactly: false
+  Media errors: 0

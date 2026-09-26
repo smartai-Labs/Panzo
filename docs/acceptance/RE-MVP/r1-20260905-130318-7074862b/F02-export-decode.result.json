@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F02-export-decode",
+    "command":  "decode-probe",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  768,
+    "output":  "Panzo Media Foundation BGRA decoder probe\n  Input: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-130318-7074862b\\F02-export.mp4\n  Frame size: 1920x1080\n  Decoded frames: 120\n  First PTS: 0\n  Last PTS: 19833333\n  Strictly increasing PTS: true\n  First BGRA frame bytes: 8294400\n",
+    "error":  "",
+    "stdoutFile":  "F02-export-decode.stdout.txt",
+    "stderrFile":  "F02-export-decode.stderr.txt"
+}

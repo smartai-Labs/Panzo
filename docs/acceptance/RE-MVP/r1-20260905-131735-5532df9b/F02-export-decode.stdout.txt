@@ -1,0 +1,8 @@
+Panzo Media Foundation BGRA decoder probe
+  Input: D:\ChatGPT\Panzo\.tmp\r1-20260905-131735-5532df9b\F02-export.mp4
+  Frame size: 1920x1080
+  Decoded frames: 120
+  First PTS: 0
+  Last PTS: 19833333
+  Strictly increasing PTS: true
+  First BGRA frame bytes: 8294400

@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-scrub-warm-1",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/ui-polish-20260919.panzo",
+    "extra":  "12000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "773850FC0D4649B2F11519ADE30700EBFB94943D21308C5DAF5CCEAA3AA64EEA"
+}

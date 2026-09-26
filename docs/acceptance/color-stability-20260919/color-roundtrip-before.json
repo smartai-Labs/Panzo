@@ -1,0 +1,162 @@
+{
+  "encoder": "NVIDIA H.264 Encoder MFT",
+  "mp4": "D:\\ChatGPT\\Panzo\\docs\\acceptance\\color-stability-20260919\\color-chart-916cd5f7-7f64-4dc5-80b8-93933ae14d3b.mp4",
+  "patches": [
+    {
+      "decodedRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expectedRgb": [
+        0,
+        0,
+        0
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        255.0,
+        255.0,
+        255.0
+      ],
+      "expectedRgb": [
+        255,
+        255,
+        255
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        130.0,
+        130.0,
+        130.0
+      ],
+      "expectedRgb": [
+        128,
+        128,
+        128
+      ],
+      "maxChannelError": 2.0
+    },
+    {
+      "decodedRgb": [
+        19.0,
+        19.0,
+        19.0
+      ],
+      "expectedRgb": [
+        32,
+        32,
+        32
+      ],
+      "maxChannelError": 13.0
+    },
+    {
+      "decodedRgb": [
+        255.0,
+        0.0,
+        0.0
+      ],
+      "expectedRgb": [
+        255,
+        0,
+        0
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        0.0,
+        255.0,
+        0.0
+      ],
+      "expectedRgb": [
+        0,
+        255,
+        0
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        0.0,
+        0.0,
+        255.0
+      ],
+      "expectedRgb": [
+        0,
+        0,
+        255
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        255.0,
+        255.0,
+        0.0
+      ],
+      "expectedRgb": [
+        255,
+        255,
+        0
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        0.0,
+        255.0,
+        255.0
+      ],
+      "expectedRgb": [
+        0,
+        255,
+        255
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        255.0,
+        0.0,
+        255.0
+      ],
+      "expectedRgb": [
+        255,
+        0,
+        255
+      ],
+      "maxChannelError": 0.0
+    },
+    {
+      "decodedRgb": [
+        27.0,
+        101.0,
+        189.0
+      ],
+      "expectedRgb": [
+        38,
+        103,
+        181
+      ],
+      "maxChannelError": 11.0
+    },
+    {
+      "decodedRgb": [
+        237.0,
+        141.0,
+        69.0
+      ],
+      "expectedRgb": [
+        221,
+        137,
+        75
+      ],
+      "maxChannelError": 16.0
+    }
+  ]
+}

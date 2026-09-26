@@ -1,0 +1,13 @@
+﻿{
+    "runId":  "re-mvp-20260905-144822-911cb06d",
+    "capturedAtUtc":  "2026-09-05T06:48:22.8307911Z",
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\re-mvp\\release\\panzo-cli.exe",
+    "executableSha256":  "BDB08EF6BC8930F2AA0034FFC19AF4A4D74807D6B9C5B6AA491054924A064FA6",
+    "executableModifiedUtc":  "2026-09-05T06:47:53.2099278Z",
+    "buildType":  "release",
+    "phase":  "re-mvp",
+    "runtime":  "4.0.30319.42000",
+    "externalGpuLoadControlled":  false,
+    "note":  "GUI latency is internal seek-to-playing-state, not input-to-visible-video. R1 adds scripted native input-handler/Present regression, not physical pointer-to-DWM sampling.",
+    "environmentCaptureError":  "拒绝访问 "
+}

@@ -1,0 +1,12 @@
+﻿{
+    "fmt":  "Pass",
+    "clippy":  "Pass",
+    "existingUiTestsPassed":  27,
+    "nativeTitlebar":  "Pass",
+    "offscreenRender":  "Pass",
+    "releaseRecorderOpen":  "Pass",
+    "releasePreview":  "Pass",
+    "releaseAccepted":  false,
+    "scope":  "Header alignment and matching non-client hit regions",
+    "executable":  "target/release/panzo.exe"
+}

@@ -1,0 +1,48 @@
+{
+  "runId": "r0-prototype-2026-09-05T04-22-17-792Z",
+  "status": "Pass",
+  "scope": "isolated-browser-prototype-not-native-app",
+  "checks": [
+    {
+      "name": "editor-loaded",
+      "status": "Pass"
+    },
+    {
+      "name": "scrub-changes-time",
+      "status": "Pass"
+    },
+    {
+      "name": "camera-trim-single-undo",
+      "status": "Pass"
+    },
+    {
+      "name": "split-delete-undo",
+      "status": "Pass"
+    },
+    {
+      "name": "command-button-not-latched",
+      "status": "Pass"
+    },
+    {
+      "name": "background-update",
+      "status": "Pass"
+    },
+    {
+      "name": "compact-layout",
+      "status": "Pass"
+    },
+    {
+      "name": "recorder-and-simulated-roundtrip",
+      "status": "Pass"
+    },
+    {
+      "name": "export-cancel-and-complete",
+      "status": "Pass"
+    },
+    {
+      "name": "real-local-video-preview",
+      "status": "Pass"
+    }
+  ],
+  "javascriptErrors": []
+}

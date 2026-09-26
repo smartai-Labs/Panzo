@@ -1,0 +1,10 @@
+Panzo MP4 export — 1920×1080 / 60 fps
+  Project: D:\ChatGPT\Panzo\.tmp\ui-polish-20260919.panzo
+  Output: D:\ChatGPT\Panzo\.tmp\ui-polish-export-20260919.mp4
+  Frames: 120
+  Duration tick: 20000000
+  Output bytes: 239749
+  fMP4 fragments: 7
+  Trailing bytes: 0
+  Encoder: NVIDIA H.264 Encoder MFT (hardware)
+  Elapsed: 2531 ms

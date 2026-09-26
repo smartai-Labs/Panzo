@@ -1,0 +1,96 @@
+{
+  "copy": ".tmp/crop-titlebar-compat-output\\re-mvp-edit-be80af75-9be2-4610-b368-0c94b78f2f2d.panzo",
+  "sourcePreserved": true,
+  "splitIdentity": true,
+  "removedRangeMapping": true,
+  "trimmedRanges": true,
+  "saveReopen": true,
+  "snapshotImmutable": true,
+  "existingOutputPreserved": true,
+  "cancellationCleansPartial": true,
+  "exports": [
+    {
+      "path": ".tmp/crop-titlebar-compat-output\\re-mvp-edit-be80af75-9be2-4610-b368-0c94b78f2f2d.panzo\\native.mp4",
+      "width": 2560,
+      "height": 1440,
+      "frames": 168,
+      "durationTick": 28000000,
+      "expectedDurationTick": 28000000,
+      "durationWithinOneFrame": true,
+      "completeDecode": true,
+      "increasingPts": true,
+      "keyframes": [
+        {
+          "outputIndex": 0,
+          "projectTick": 0,
+          "sourceTick": 6000000,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.6804224537037037
+        },
+        {
+          "outputIndex": 83,
+          "projectTick": 13833333,
+          "sourceTick": 19833333,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.4922610134548611
+        },
+        {
+          "outputIndex": 84,
+          "projectTick": 14000000,
+          "sourceTick": 40000000,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.4877992983217593
+        },
+        {
+          "outputIndex": 167,
+          "projectTick": 27833333,
+          "sourceTick": 53833333,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.4669939959490741
+        }
+      ]
+    },
+    {
+      "path": ".tmp/crop-titlebar-compat-output\\re-mvp-edit-be80af75-9be2-4610-b368-0c94b78f2f2d.panzo\\1080p.mp4",
+      "width": 1920,
+      "height": 1080,
+      "frames": 168,
+      "durationTick": 28000000,
+      "expectedDurationTick": 28000000,
+      "durationWithinOneFrame": true,
+      "completeDecode": true,
+      "increasingPts": true,
+      "keyframes": [
+        {
+          "outputIndex": 0,
+          "projectTick": 0,
+          "sourceTick": 6000000,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.8912877764917696
+        },
+        {
+          "outputIndex": 83,
+          "projectTick": 13833333,
+          "sourceTick": 19833333,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.6169947595164609
+        },
+        {
+          "outputIndex": 84,
+          "projectTick": 14000000,
+          "sourceTick": 40000000,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.6229013953189301
+        },
+        {
+          "outputIndex": 167,
+          "projectTick": 27833333,
+          "sourceTick": 53833333,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 0.6004028420781893
+        }
+      ]
+    }
+  ],
+  "elapsedMs": 45082
+}

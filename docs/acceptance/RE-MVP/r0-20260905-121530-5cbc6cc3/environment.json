@@ -1,0 +1,12 @@
+﻿{
+    "runId":  "r0-20260905-121530-5cbc6cc3",
+    "capturedAtUtc":  "2026-09-05T04:15:30.9299028Z",
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\release\\panzo-cli.exe",
+    "executableSha256":  "CA4FA8256E66056128519616FBC5BBE1534DE5DABDA779BA5C61DBA56730756F",
+    "executableModifiedUtc":  "2026-09-02T17:26:59.3773053Z",
+    "buildType":  "existing-release",
+    "runtime":  "4.0.30319.42000",
+    "externalGpuLoadControlled":  false,
+    "note":  "Existing release characterization only. GUI probe latency is internal seek-to-playing-state, not input-to-visible-video. No continuous pointer sampling in this script.",
+    "environmentCaptureError":  "拒绝访问 "
+}

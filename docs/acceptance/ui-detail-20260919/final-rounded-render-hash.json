@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-rounded-render-hash",
+    "command":  "render-hash-probe",
+    "project":  ".tmp/ui-detail-rounded.panzo",
+    "extra":  "3000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "1FD7C8C5C6DBC0D40FA739A16D940608BEC887C28E905946D4EEA4C95337C704"
+}

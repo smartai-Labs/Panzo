@@ -1,0 +1,66 @@
+{
+  "frames": 150,
+  "report": "Panzo MP4 export — 1920×1080 / 60 fps\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\ui-background-review.panzo\n  Output: D:\\ChatGPT\\Panzo\\docs\\acceptance\\crop-titlebar-20260919\\cropped-8be08937-164e-43a8-8a11-52ee8592b013.mp4\n  Frames: 150\n  Duration tick: 25000000\n  Output bytes: 220524\n  fMP4 fragments: 9\n  Trailing bytes: 0\n  Encoder: NVIDIA H.264 Encoder MFT (hardware)\n  Elapsed: 3428 ms",
+  "samples": [
+    {
+      "crop": {
+        "bottom": 0,
+        "left": 0,
+        "right": 0,
+        "top": 0
+      },
+      "frame": 0,
+      "meanRgbError": 0.29440947580476634
+    },
+    {
+      "crop": {
+        "bottom": 0,
+        "left": 0,
+        "right": 0,
+        "top": 0
+      },
+      "frame": 59,
+      "meanRgbError": 0.27681788165274884
+    },
+    {
+      "crop": {
+        "bottom": 0,
+        "left": 219,
+        "right": 219,
+        "top": 0
+      },
+      "frame": 60,
+      "meanRgbError": 0.4992435071177203
+    },
+    {
+      "crop": {
+        "bottom": 0,
+        "left": 219,
+        "right": 219,
+        "top": 0
+      },
+      "frame": 89,
+      "meanRgbError": 0.4115948207404435
+    },
+    {
+      "crop": {
+        "bottom": 200,
+        "left": 100,
+        "right": 450,
+        "top": 100
+      },
+      "frame": 90,
+      "meanRgbError": 0.43722571908619
+    },
+    {
+      "crop": {
+        "bottom": 200,
+        "left": 100,
+        "right": 450,
+        "top": 100
+      },
+      "frame": 149,
+      "meanRgbError": 0.3819076995093245
+    }
+  ]
+}

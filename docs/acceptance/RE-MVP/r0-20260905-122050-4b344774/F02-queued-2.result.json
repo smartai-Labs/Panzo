@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F02-queued-2",
+    "command":  "preview-queued-playback-smoke",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  9271,
+    "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 147\n  Rendered frames: 148\n  Paint calls: 31\n  Average render: 7697 us\n  Maximum render: 50963 us\n  Background decodes: 0\n  Source texture uploads: 140\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 148\n  CPU readbacks: 0\n  Last project tick: 336335909\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 2309671 us\n",
+    "error":  "",
+    "stdoutFile":  "F02-queued-2.stdout.txt",
+    "stderrFile":  "F02-queued-2.stderr.txt"
+}

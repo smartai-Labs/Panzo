@@ -1,0 +1,16 @@
+{
+  "verified": true,
+  "files": [
+    {
+      "name": "panzo.exe",
+      "matches": true
+    },
+    {
+      "name": "panzo-cli.exe",
+      "matches": true
+    }
+  ],
+  "entries": 829,
+  "archiveSha256": "2ec0cb575320163ef9fe7d96c62e7110de0f902f803688d47606d1384ef8752a",
+  "releaseAccepted": false
+}

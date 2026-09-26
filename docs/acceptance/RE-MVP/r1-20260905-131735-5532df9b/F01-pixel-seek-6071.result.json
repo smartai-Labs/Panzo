@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F01-pixel-seek-6071",
+    "command":  "decode-seek-probe",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  1548,
+    "output":  "Panzo Media Foundation random-seek probe\n  Input: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-131735-5532df9b\\F01.panzo\\media\\screen.mp4\n  Indexed frames: 364\n  Requested tick: 60710000\n  Selected frame: 363 @ 60529993\n  First PTS after seek: 38018997\n  Frames decoded after seek: 124\n  Selected BGRA frame bytes: 14745600\n  Pixels match sequential decode: true\n",
+    "error":  "",
+    "stdoutFile":  "F01-pixel-seek-6071.stdout.txt",
+    "stderrFile":  "F01-pixel-seek-6071.stderr.txt"
+}

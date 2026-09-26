@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-preview-seek",
+    "command":  "preview-session-probe",
+    "project":  ".tmp/camera-focus-review.panzo",
+    "extra":  "102774675",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "399F70F7FE7BF12A2E775B5A9541EA15B170558193A95A32778B0CA2622315A2"
+}

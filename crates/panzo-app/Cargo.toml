@@ -1,0 +1,26 @@
+[package]
+name = "panzo-app"
+autobins = false
+default-run = "panzo"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+panzo-core = { path = "../panzo-core" }
+panzo-windows = { path = "../panzo-windows" }
+serde_json.workspace = true
+windows.workspace = true
+
+[[bin]]
+name = "panzo"
+path = "src/gui.rs"
+
+[[bin]]
+name = "panzo-cli"
+path = "src/main.rs"
+
+[lints]
+workspace = true

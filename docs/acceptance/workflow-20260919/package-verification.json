@@ -1,0 +1,9 @@
+{
+  "package": "dist\\Panzo-RE-MVP-workflow-20260919",
+  "zipSha256": "BBA9CC6B2B9C96BDB454ED6603C43254F1255165626C0BCD612CE1DB525D79DA",
+  "entries": 1030,
+  "binaryHashesMatchTestedBuild": true,
+  "peSubsystemsValid": true,
+  "newDocumentationLinksResolve": true,
+  "noMediaOrEventTracksInArchive": true
+}

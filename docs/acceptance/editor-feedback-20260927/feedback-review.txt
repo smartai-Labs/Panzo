@@ -1,0 +1,1 @@
+Invalid input retained with local guidance; cancel preserves value; stale preparation not an error; split/delete boundaries blocked; save issue survives unrelated updates; real successful save resolves it. Failure injected, no physical mouse input.

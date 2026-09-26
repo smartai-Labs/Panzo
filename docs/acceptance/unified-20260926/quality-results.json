@@ -1,0 +1,17 @@
+﻿{
+    "fmt":  0,
+    "clippy":  0,
+    "tests":  0,
+    "testsPassed":  223,
+    "testsIgnoredByDefault":  19,
+    "nativeNavigation":  "Pass",
+    "nativeTitlebar":  "Pass",
+    "validationCasesPassed":  17,
+    "manualAcceptance":  "NotRun",
+    "releaseAccepted":  false,
+    "shortRegressionPassed":  13,
+    "shortRegressionFailed":  9,
+    "recoveredEditExport":  "Pass",
+    "candidateIdentity":  "Verified",
+    "recordingPreflight":  "Failed: WGC 0x8007000E, also reproduced on historical candidate"
+}

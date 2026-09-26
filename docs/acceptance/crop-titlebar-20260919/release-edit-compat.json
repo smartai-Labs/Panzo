@@ -1,0 +1,9 @@
+﻿{
+    "name":  "release-edit-compat",
+    "command":  "recording-editing-probe",
+    "project":  ".tmp/video-speed-compat.panzo",
+    "extra":  ".tmp/crop-titlebar-compat-output",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "CEDBE3E2EE080A9390DFF71FC068C125D5B20793F44164DB90BC353A4851B947"
+}

@@ -1,0 +1,22 @@
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.42s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-9914fa80a83c7a93.exe)
+
+running 1 test
+test platform::preview::tests::retained_preview_survives_seek_ui_review ... FAILED
+
+failures:
+
+---- platform::preview::tests::retained_preview_survives_seek_ui_review stdout ----
+
+thread 'platform::preview::tests::retained_preview_survives_seek_ui_review' (60632) panicked at crates\panzo-windows\src\platform\preview.rs:972:50:
+called `Result::unwrap()` on an `Err` value: SelectionMismatch { evaluator_tick: TimeTick(0), decoded_tick: TimeTick(438032959) }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    platform::preview::tests::retained_preview_survives_seek_ui_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 108 filtered out; finished in 0.43s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "rule-planner",
+    "version": "0.1.0",
+    "parameterSet": "default-v1"
+  },
+  "sourceRevision": {
+    "clickTrackHash": "sha256:fixture:top-left-edge:clicks",
+    "captureGeometryHash": "sha256:fixture:1920x1080"
+  },
+  "baseState": {
+    "centerX": 0.5,
+    "centerY": 0.5,
+    "scale": 1.0
+  },
+  "segments": [
+    {
+      "id": "camera-segment-0001",
+      "kind": "zoom-in",
+      "startTick": 7000000,
+      "endTick": 10500000,
+      "from": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "to": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-1"
+      ],
+      "locked": false,
+      "userModified": false
+    },
+    {
+      "id": "camera-segment-0002",
+      "kind": "zoom-out",
+      "startTick": 22000000,
+      "endTick": 26500000,
+      "from": {
+        "centerX": 0.3125,
+        "centerY": 0.3125,
+        "scale": 1.6
+      },
+      "to": {
+        "centerX": 0.5,
+        "centerY": 0.5,
+        "scale": 1.0
+      },
+      "easing": "smootherstep",
+      "origin": "auto",
+      "sourceClickIds": [
+        "click-1"
+      ],
+      "locked": false,
+      "userModified": false
+    }
+  ]
+}

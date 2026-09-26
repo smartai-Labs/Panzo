@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F01-play-through-end",
+    "command":  "preview-smoke",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  7834,
+    "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 282\n  Rendered frames: 237\n  Paint calls: 233\n  Average render: 1549 us\n  Maximum render: 49541 us\n  Background decodes: 0\n  Source texture uploads: 233\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 237\n  CPU readbacks: 0\n  Last project tick: 60696666\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: false\n  Queued playback latency: 0 us\n  Scrub presented frames: 0\n  Scrub maximum presentation gap: 0 us\n  Scrub release settled exactly: false\n  Media errors: 0\n",
+    "error":  "",
+    "stdoutFile":  "F01-play-through-end.stdout.txt",
+    "stderrFile":  "F01-play-through-end.stderr.txt"
+}

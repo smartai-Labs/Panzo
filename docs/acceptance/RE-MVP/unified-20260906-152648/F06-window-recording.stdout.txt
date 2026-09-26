@@ -1,0 +1,16 @@
+{
+  "projectRoot": "D:\\ChatGPT\\Panzo\\.tmp\\unified-20260906-152648\\F06.panzo",
+  "durationTick": 50194666,
+  "framesReceived": 502,
+  "framesEncoded": 301,
+  "droppedByBackpressure": 0,
+  "droppedByFrameRateLimit": 201,
+  "duplicateTimestamp": 0,
+  "frameGapP99Tick": 100257,
+  "maxFrameGapTick": 100616,
+  "cursorEventsPersisted": 1,
+  "clickEvents": 0,
+  "fmp4Fragments": 16,
+  "encoderName": "NVIDIA H.264 Encoder MFT",
+  "hardwareEncoder": true
+}

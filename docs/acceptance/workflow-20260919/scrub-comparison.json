@@ -1,0 +1,62 @@
+{
+  "fixture": ".tmp/crop-release.panzo",
+  "runs": [
+    {
+      "name": "baseline-scrub-1",
+      "sha256": "CEDBE3E2EE080A9390DFF71FC068C125D5B20793F44164DB90BC353A4851B947",
+      "p95Us": 105097,
+      "p99Us": 130783,
+      "maxRequestUs": 147354,
+      "maximumGapUs": 131412,
+      "presentedFrames": 349,
+      "distinctFrames": 159,
+      "scriptedInputInterruptions": 1,
+      "mediaErrors": 0,
+      "reducedFrames": 0,
+      "exactRelease": true
+    },
+    {
+      "name": "baseline-scrub-2",
+      "sha256": "CEDBE3E2EE080A9390DFF71FC068C125D5B20793F44164DB90BC353A4851B947",
+      "p95Us": 105481,
+      "p99Us": 129193,
+      "maxRequestUs": 147917,
+      "maximumGapUs": 129671,
+      "presentedFrames": 350,
+      "distinctFrames": 159,
+      "scriptedInputInterruptions": 1,
+      "mediaErrors": 0,
+      "reducedFrames": 0,
+      "exactRelease": true
+    },
+    {
+      "name": "current-scrub-1",
+      "sha256": "1DAD3FAFC90A6567858A7017843C4896F2FD76564F4A8509D5DBAC3C31314526",
+      "p95Us": 15341,
+      "p99Us": 191339,
+      "maxRequestUs": 226591,
+      "maximumGapUs": 232165,
+      "presentedFrames": 387,
+      "distinctFrames": 148,
+      "scriptedInputInterruptions": 1,
+      "mediaErrors": 0,
+      "reducedFrames": 0,
+      "exactRelease": true
+    },
+    {
+      "name": "current-scrub-2",
+      "sha256": "1DAD3FAFC90A6567858A7017843C4896F2FD76564F4A8509D5DBAC3C31314526",
+      "p95Us": 19393,
+      "p99Us": 172092,
+      "maxRequestUs": 189901,
+      "maximumGapUs": 207238,
+      "presentedFrames": 398,
+      "distinctFrames": 150,
+      "scriptedInputInterruptions": 1,
+      "mediaErrors": 0,
+      "reducedFrames": 0,
+      "exactRelease": true
+    }
+  ],
+  "limits": "Warm same-host synthetic mixed-speed/crop fixture. Each run reports one OS-input interruption. P95 improves; worst presentation gaps and complete cold/physical-input matrix are not accepted."
+}

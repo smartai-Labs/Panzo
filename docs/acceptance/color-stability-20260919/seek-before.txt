@@ -1,0 +1,27 @@
+cargo :     Finished `test` profile [unoptimized + debuginfo] target(s) in 1.48s
+所在位置 行:2 字符: 174
++ ... 919').Path; cargo test -p panzo-windows video_speed_ui_review -- --ig ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Finished `t...get(s) in 1.48s:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+test platform::preview_window::tests::video_speed_ui_review ... FAILED
+
+failures:
+
+---- platform::preview_window::tests::video_speed_ui_review stdout ----
+
+thread 'platform::preview_window::tests::video_speed_ui_review' (61912) panicked at crates\panzo-windows\src\platform\preview_window.rs:5707:53:
+called `Result::unwrap()` on an `Err` value: Worker("source did not return exact indexed frame TimeTick(98352991) (last decoded: Some(TimeTick(98552323)))")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    platform::preview_window::tests::video_speed_ui_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 128 filtered out; finished in 5.43s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

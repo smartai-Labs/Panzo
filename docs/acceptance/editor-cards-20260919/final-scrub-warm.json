@@ -1,0 +1,9 @@
+﻿{
+    "name":  "final-scrub-warm",
+    "command":  "preview-scrub-smoke",
+    "project":  ".tmp/ui-background-review.panzo",
+    "extra":  "12000",
+    "exitCode":  0,
+    "timedOut":  false,
+    "sha256":  "F656C282FA4A169C9A281FE8AA730F6A2A35106ECA2E145C05840A8C37F742E5"
+}

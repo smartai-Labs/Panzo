@@ -1,0 +1,5 @@
+Thumbnail: 160x90
+Visible filmstrip frames: 18
+Independent 160 px proxy decode: identical pixels
+DPI 96/144/192: thumbnail resolution remains 160 px
+Background: import, replacement, alpha, undo/redo, light/dark rendered

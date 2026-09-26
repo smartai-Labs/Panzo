@@ -1,0 +1,8 @@
+Panzo M3 shared compositor hash probe
+  Project: D:\ChatGPT\Panzo\.tmp\r1-20260905-130318-7074862b\F02.panzo
+  Project tick: 300090000
+  Selected source PTS: 300058635
+  Output: 1920x1080 BGRA8
+  Preview hash: aba658445d009cbf251afca83b2fb6ef3a5dc9290135ddf0b276009dc11c4db2
+  Export hash:  aba658445d009cbf251afca83b2fb6ef3a5dc9290135ddf0b276009dc11c4db2
+  Hashes match: true

@@ -1,0 +1,96 @@
+{
+  "copy": "D:\\ChatGPT\\Panzo\\.tmp\\unified-20260906-152648\\re-mvp-edit-25459c98-7fcc-4119-9853-ec9f4e86edb2.panzo",
+  "sourcePreserved": true,
+  "splitIdentity": true,
+  "removedRangeMapping": true,
+  "trimmedRanges": true,
+  "saveReopen": true,
+  "snapshotImmutable": true,
+  "existingOutputPreserved": true,
+  "cancellationCleansPartial": true,
+  "exports": [
+    {
+      "path": "D:\\ChatGPT\\Panzo\\.tmp\\unified-20260906-152648\\re-mvp-edit-25459c98-7fcc-4119-9853-ec9f4e86edb2.panzo\\native.mp4",
+      "width": 1200,
+      "height": 900,
+      "frames": 141,
+      "durationTick": 23424179,
+      "expectedDurationTick": 23424179,
+      "durationWithinOneFrame": true,
+      "completeDecode": true,
+      "increasingPts": true,
+      "keyframes": [
+        {
+          "outputIndex": 0,
+          "projectTick": 0,
+          "sourceTick": 5019466,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 8.752939814814814
+        },
+        {
+          "outputIndex": 70,
+          "projectTick": 11666666,
+          "sourceTick": 16686132,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 8.752775308641976
+        },
+        {
+          "outputIndex": 71,
+          "projectTick": 11833333,
+          "sourceTick": 33584354,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 8.75056388888889
+        },
+        {
+          "outputIndex": 140,
+          "projectTick": 23333333,
+          "sourceTick": 45084354,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 8.745937345679012
+        }
+      ]
+    },
+    {
+      "path": "D:\\ChatGPT\\Panzo\\.tmp\\unified-20260906-152648\\re-mvp-edit-25459c98-7fcc-4119-9853-ec9f4e86edb2.panzo\\1080p.mp4",
+      "width": 1920,
+      "height": 1080,
+      "frames": 141,
+      "durationTick": 23424179,
+      "expectedDurationTick": 23424179,
+      "durationWithinOneFrame": true,
+      "completeDecode": true,
+      "increasingPts": true,
+      "keyframes": [
+        {
+          "outputIndex": 0,
+          "projectTick": 0,
+          "sourceTick": 5019466,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 10.530128922325103
+        },
+        {
+          "outputIndex": 70,
+          "projectTick": 11666666,
+          "sourceTick": 16686132,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 10.554457465277778
+        },
+        {
+          "outputIndex": 71,
+          "projectTick": 11833333,
+          "sourceTick": 33584354,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 10.55295122813786
+        },
+        {
+          "outputIndex": 140,
+          "projectTick": 23333333,
+          "sourceTick": 45084354,
+          "uncompressedHashesMatch": true,
+          "decodedMeanAbsoluteError": 10.551178787294239
+        }
+      ]
+    }
+  ],
+  "elapsedMs": 9717
+}

@@ -1,0 +1,12 @@
+﻿{
+    "caseId":  "F02-export",
+    "command":  "export-probe",
+    "status":  "Pass",
+    "exitCode":  0,
+    "watchdogExpired":  false,
+    "processElapsedMs":  2784,
+    "output":  "Panzo M3 1080p60 export\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-130318-7074862b\\F02.panzo\n  Output: D:\\ChatGPT\\Panzo\\.tmp\\r1-20260905-130318-7074862b\\F02-export.mp4\n  Frames: 120\n  Duration tick: 20000000\n  Output bytes: 397208\n  fMP4 fragments: 7\n  Trailing bytes: 0\n  Encoder: NVIDIA H.264 Encoder MFT (hardware)\n  Elapsed: 2532 ms\n",
+    "error":  "",
+    "stdoutFile":  "F02-export.stdout.txt",
+    "stderrFile":  "F02-export.stderr.txt"
+}

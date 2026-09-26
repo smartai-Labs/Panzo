@@ -1,0 +1,25 @@
+cargo :     Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+所在位置 行:2 字符: 90
++ ... 919').Path; cargo test -p panzo-windows color_roundtrip_ui_review --  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Finished `t...get(s) in 0.06s:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+
+thread 'platform::video_processor::color_tests::color_roundtrip_ui_review' (6504) panicked at crates\panzo-windows\src\
+platform\video_color_tests.rs:95:9:
+{"decodedRgb":[19.0,19.0,19.0],"expectedRgb":[32,32,32],"maxChannelError":13.0}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test platform::video_processor::color_tests::color_roundtrip_ui_review ... FAILED
+
+failures:
+
+failures:
+    platform::video_processor::color_tests::color_roundtrip_ui_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 127 filtered out; finished in 0.72s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`

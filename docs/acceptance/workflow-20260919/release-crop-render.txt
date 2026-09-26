@@ -1,0 +1,8 @@
+Panzo M3 shared compositor hash probe
+  Project: D:\ChatGPT\Panzo\.tmp\crop-release.panzo
+  Project tick: 12000000
+  Selected source PTS: 20911497
+  Output: 1920x1080 BGRA8
+  Preview hash: 0183058ea6ac1641f6aacfb20b67614f721882ea0757d7f00cfc2335803448e5
+  Export hash:  0183058ea6ac1641f6aacfb20b67614f721882ea0757d7f00cfc2335803448e5
+  Hashes match: true

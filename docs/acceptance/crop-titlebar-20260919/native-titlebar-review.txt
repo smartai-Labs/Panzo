@@ -1,0 +1,4 @@
+normal: window RECT { left: 156, top: 156, right: 1596, bottom: 1056 }, caption end 1287, action hover/tooltip + HTCLIENT, caption drag + native min/max/close hit tests passed
+maximized: window RECT { left: -8, top: -8, right: 2568, bottom: 1448 }, caption end 2421, action hover/tooltip + HTCLIENT, caption drag + native min/max/close hit tests passed
+restored: window RECT { left: 156, top: 156, right: 1596, bottom: 1056 }, caption end 1287, action hover/tooltip + HTCLIENT, caption drag + native min/max/close hit tests passed
+Minimize/restore, canceled pointer release and export panel activation passed; project unchanged.

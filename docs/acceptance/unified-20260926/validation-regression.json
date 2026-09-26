@@ -1,0 +1,74 @@
+﻿{
+    "status":  "Pass",
+    "scope":  "Validation fixtures only; no recording/GPU acceptance",
+    "results":  [
+                    {
+                        "caseId":  "success",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "throw",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "exit17",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "expected-native",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "missing-report",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "child-fail",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "missing-case",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "empty",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "timeout",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "timeout-descendant",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "argument",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "binary-identity-both-files",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "source-identity",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "relative-path-after-location-change",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "early-failure-report-verify-recording-editing.ps1",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "early-failure-report-verify-re-mvp-final.ps1",
+                        "status":  "Pass"
+                    },
+                    {
+                        "caseId":  "package-has-no-legacy-build-default",
+                        "status":  "Pass"
+                    }
+                ]
+}

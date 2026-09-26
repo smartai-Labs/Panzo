@@ -1,0 +1,8 @@
+Panzo M3 shared compositor hash probe
+  Project: D:\ChatGPT\Panzo\.tmp\camera-focus-review.panzo
+  Project tick: 102770000
+  Selected source PTS: 193003983
+  Output: 1920x1080 BGRA8
+  Preview hash: 0267d9dc6576cbd2c3b877aa99c289ec980165e6164607db53b48ad629090b76
+  Export hash:  0267d9dc6576cbd2c3b877aa99c289ec980165e6164607db53b48ad629090b76
+  Hashes match: true

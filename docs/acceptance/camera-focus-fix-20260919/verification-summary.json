@@ -1,0 +1,29 @@
+﻿{
+    "beforeReverseDriftPixels":  [
+                                     43.074890185419186,
+                                     22.45125514463366
+                                 ],
+    "afterReverseDriftPixels":  [
+                                    0.0,
+                                    0.0
+                                ],
+    "maximumReverseDriftPixels":  1.310951347477385E-13,
+    "removedAutoMicroPans":  1,
+    "passedFinalProbes":  5,
+    "cliSha256":  "399F70F7FE7BF12A2E775B5A9541EA15B170558193A95A32778B0CA2622315A2",
+    "projectFilesUnchanged":  [
+                                  {
+                                      "sha256":  "2E415A70EE210ED5A3D7D9F0727EE6E5B8AB4573D5608F6CC246A147BD5171F2",
+                                      "path":  "project.json"
+                                  },
+                                  {
+                                      "sha256":  "CA3AA07A92FBAED725F5210DCB145892461990F86C77A3D67C31B423C6E61547",
+                                      "path":  "tracks/camera.json"
+                                  },
+                                  {
+                                      "sha256":  "3015F25BB89C781BD61B41EB82BFCDD9B09D46FABAC8A016B97ED565DAA47741",
+                                      "path":  "edit/workbench.json"
+                                  }
+                              ],
+    "exportSha256":  "9A759F19AE28054C987567D052AE5D35DAF023D6AB0E69797536FE9BD644FCE9"
+}

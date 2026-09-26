@@ -1,0 +1,9 @@
+/target/
+/target-*/
+/dist/
+/.tmp/
+*.panzo/
+*.mp4
+*.part.mp4
+*.pdb
+Acceptance-Report.local.md

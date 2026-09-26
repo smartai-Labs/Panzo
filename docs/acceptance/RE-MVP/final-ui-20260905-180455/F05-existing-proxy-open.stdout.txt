@@ -1,0 +1,5 @@
+Preparing preview: 0%
+Proxy ready: D:\ChatGPT\Panzo\.tmp\final-ui-20260905-180455\F05.panzo\cache\scrub-v1\839d252-18d26323617273c4.mp4
+Source geometry: (2560, 1440)
+Frames: 54001
+Preparation elapsed ms: 52

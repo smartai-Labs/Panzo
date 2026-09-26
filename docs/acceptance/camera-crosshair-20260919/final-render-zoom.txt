@@ -1,0 +1,8 @@
+Panzo M3 shared compositor hash probe
+  Project: D:\ChatGPT\Panzo\.tmp\camera-crosshair-review.panzo
+  Project tick: 2500000
+  Selected source PTS: 2401166
+  Output: 1920x1080 BGRA8
+  Preview hash: 0236d503e2cc26c5ebae22a1a00f7c6d40ea29c217d5fb307d317a69c61ccb42
+  Export hash:  0236d503e2cc26c5ebae22a1a00f7c6d40ea29c217d5fb307d317a69c61ccb42
+  Hashes match: true

@@ -1,0 +1,41 @@
+﻿{
+    "runId":  "r1-20260905-130318-7074862b",
+    "capturedAtUtc":  "2026-09-05T05:03:18.4480059Z",
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\r1\\release\\panzo-cli.exe",
+    "executableSha256":  "CDBDE5B81C76C31ECBAC3C5FB690C9FF2CF90CFDB66C722C8D73DB6E27F84E4E",
+    "executableModifiedUtc":  "2026-09-05T05:02:46.3884461Z",
+    "buildType":  "release",
+    "phase":  "r1",
+    "runtime":  "4.0.30319.42000",
+    "externalGpuLoadControlled":  false,
+    "note":  "GUI latency is internal seek-to-playing-state, not input-to-visible-video. R1 adds scripted native input-handler/Present regression, not physical pointer-to-DWM sampling.",
+    "os":  {
+               "Caption":  "Microsoft Windows 10 专业版",
+               "Version":  "10.0.19045",
+               "BuildNumber":  "19045"
+           },
+    "cpu":  [
+                {
+                    "Name":  "Intel(R) Core(TM) i7-14700KF",
+                    "NumberOfCores":  20,
+                    "NumberOfLogicalProcessors":  28
+                }
+            ],
+    "gpu":  [
+                {
+                    "Name":  "OrayIddDriver Device",
+                    "DriverVersion":  "17.1.58.818",
+                    "CurrentHorizontalResolution":  null,
+                    "CurrentVerticalResolution":  null,
+                    "CurrentRefreshRate":  null
+                },
+                {
+                    "Name":  "NVIDIA GeForce RTX 4080 SUPER",
+                    "DriverVersion":  "32.0.16.1062",
+                    "CurrentHorizontalResolution":  2560,
+                    "CurrentVerticalResolution":  1440,
+                    "CurrentRefreshRate":  99
+                }
+            ],
+    "physicalMemoryBytes":  68545409024
+}

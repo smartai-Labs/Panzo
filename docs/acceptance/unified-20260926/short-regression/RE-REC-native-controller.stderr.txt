@@ -1,0 +1,9 @@
+Recorder Window smoke exited with code ; see D:\ChatGPT\Panzo\.tmp\recorder-ui-b8ab00da2ddc4d8d96d2246a1fb8511d\smoke.s
+tderr.log
+����λ�� D:\ChatGPT\Panzo\scripts\verify-recorder-ui.ps1:61 �ַ�: 9
++         throw "Recorder Window smoke exited with code $($process.Exit ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Recorder Window...moke.stderr.log:String) [], RuntimeException
+    + FullyQualifiedErrorId : Recorder Window smoke exited with code ; see D:\ChatGPT\Panzo\.tmp\recorder-ui-b8ab00da2 
+   ddc4d8d96d2246a1fb8511d\smoke.stderr.log
+ 

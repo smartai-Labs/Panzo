@@ -1,0 +1,195 @@
+﻿{
+    "sourceAssetsPreserved":  true,
+    "fixtures":  [
+                     {
+                         "id":  "F01",
+                         "sourceProject":  "C:\\Users\\Administrator\\Videos\\Panzo\\panzo-1788359585144-000.panzo",
+                         "protectedCopy":  "D:\\ChatGPT\\Panzo\\.tmp\\r0-20260905-122050-4b344774\\F01.panzo",
+                         "status":  "Measured",
+                         "durationTick":  60696666,
+                         "captureSize":  {
+                                             "width":  2560,
+                                             "height":  1440
+                                         },
+                         "hashes":  {
+                                        "project.json":  "F07CDFBA3E25DF47CA592D6157EF48AB4F2006E001D32B35A59B74AE4D925551",
+                                        "media\\screen.mp4":  "8C8AA0CE985F2FB5BFCA136C079453F046E8D4FE1DAC94D0666F7BFA23284DFE",
+                                        "events\\cursor.jsonl":  "6903A77A5747B39F5609803A2BDC7413E6C667CA8DE5678F337C05993E0A49DE",
+                                        "events\\clicks.jsonl":  "83006B1D553B22C805CA493A4245B077C92EA8019E40F7CA65AFF3FF16D657DB",
+                                        "tracks\\camera.json":  "05041024536B3686FA51769205DC35306EE22BF5ABCC215A688E7F8DD7F8998E"
+                                    },
+                         "samples":  3,
+                         "queuedMedianMs":  605.297,
+                         "queuedP95Ms":  618.782,
+                         "queuedMaxMs":  618.782
+                     },
+                     {
+                         "id":  "F02",
+                         "sourceProject":  "D:\\ChatGPT\\Panzo\\.tmp\\m1-acceptance-49a75b0350cc4e79a2e31fbdfce3b618.panzo",
+                         "protectedCopy":  "D:\\ChatGPT\\Panzo\\.tmp\\r0-20260905-122050-4b344774\\F02.panzo",
+                         "status":  "Measured",
+                         "durationTick":  600185333,
+                         "captureSize":  {
+                                             "width":  2560,
+                                             "height":  1440
+                                         },
+                         "hashes":  {
+                                        "project.json":  "120672BA4C94208B981127033EE6598FEC7366C934DC903C8FD79D9E30860AC8",
+                                        "media\\screen.mp4":  "1CF31A17E023991826AFB6FE6C429E7579E72DE1E54F9E1D39DC5C58B06CE3AE",
+                                        "events\\cursor.jsonl":  "B5E16D5713D1006C788CE1C37D5398631A4D91D3AFB97B869516193AA3D41338",
+                                        "events\\clicks.jsonl":  "987D45C71A49C93A903F5E9385AE9A11AC3FDA0CB7152EDA1B7CF74115E2635F",
+                                        "tracks\\camera.json":  "24F25AFFA1F5AE1E4402EBEB98D40834E2E7CCC8657D9D5067DAC17679B4590B"
+                                    },
+                         "samples":  3,
+                         "queuedMedianMs":  2337.88,
+                         "queuedP95Ms":  2386.286,
+                         "queuedMaxMs":  2386.286
+                     }
+                 ],
+    "runId":  "r0-20260905-122050-4b344774",
+    "releaseAcceptance":  "NotRun",
+    "measurements":  [
+                         {
+                             "caseId":  "F01-end-seek",
+                             "command":  "preview-session-probe",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  2126,
+                             "output":  "Panzo M3 project preview session probe\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\r0-20260905-122050-4b344774\\F01.panzo\n  Source frames: 360\n  Duration tick: 60696666\n  Scrub project/source tick: 60696666/60029827\n  Scrub poll count: 1\n  Seek project/source tick: 60696666/60491141\n  Play+advance project tick: 1000000\n  Start hash: 5ed71eea092a281a88e91df0d5b2c5cedc06428cae8fdaa31549aafff29916b4\n  Returned start hash: 5ed71eea092a281a88e91df0d5b2c5cedc06428cae8fdaa31549aafff29916b4\n  Deterministic start frame: true\n  Camera diagnostics visible: true\n",
+                             "error":  "",
+                             "stdoutFile":  "F01-end-seek.stdout.txt",
+                             "stderrFile":  "F01-end-seek.stderr.txt",
+                             "metricKind":  "end-seek-correctness"
+                         },
+                         {
+                             "caseId":  "F01-queued-1",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  6855,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 215\n  Rendered frames: 125\n  Paint calls: 27\n  Average render: 12617 us\n  Maximum render: 53713 us\n  Background decodes: 0\n  Source texture uploads: 123\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 125\n  CPU readbacks: 0\n  Last project tick: 60696666\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 605297 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F01-queued-1.stdout.txt",
+                             "stderrFile":  "F01-queued-1.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  605.297,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F01-queued-2",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  6983,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 216\n  Rendered frames: 124\n  Paint calls: 27\n  Average render: 12707 us\n  Maximum render: 54068 us\n  Background decodes: 0\n  Source texture uploads: 118\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 124\n  CPU readbacks: 0\n  Last project tick: 60696666\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 571473 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F01-queued-2.stdout.txt",
+                             "stderrFile":  "F01-queued-2.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  571.473,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F01-queued-3",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  7022,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 214\n  Rendered frames: 125\n  Paint calls: 27\n  Average render: 13304 us\n  Maximum render: 53270 us\n  Background decodes: 0\n  Source texture uploads: 123\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 125\n  CPU readbacks: 0\n  Last project tick: 60696666\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 618782 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F01-queued-3.stdout.txt",
+                             "stderrFile":  "F01-queued-3.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  618.782,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F01-trim",
+                             "command":  "preview-trim-smoke",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  6977,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 2560x1440 (source native)\n  Timer ticks: 208\n  Rendered frames: 2\n  Paint calls: 2\n  Average render: 33700 us\n  Maximum render: 50443 us\n  Background decodes: 0\n  Source texture uploads: 2\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 2\n  CPU readbacks: 0\n  Last project tick: 53790677\n  Graceful close: true\n  Trim action elapsed: 8324 us\n  Trim smoke status: passed-incrementally\n  Queued playback completed: false\n  Queued playback latency: 0 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F01-trim.stdout.txt",
+                             "stderrFile":  "F01-trim.stderr.txt",
+                             "metricKind":  "camera-edit-ui-commit"
+                         },
+                         {
+                             "caseId":  "F02-end-seek",
+                             "command":  "preview-session-probe",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  8409,
+                             "output":  "Panzo M3 project preview session probe\n  Project: D:\\ChatGPT\\Panzo\\.tmp\\r0-20260905-122050-4b344774\\F02.panzo\n  Source frames: 3562\n  Duration tick: 600185333\n  Scrub project/source tick: 600185333/600018600\n  Scrub poll count: 1\n  Seek project/source tick: 600185333/600056988\n  Play+advance project tick: 1000000\n  Start hash: 180dfadfac26811494827a13450549e514e56954c859272b4e5ddc226fd6f7ec\n  Returned start hash: 180dfadfac26811494827a13450549e514e56954c859272b4e5ddc226fd6f7ec\n  Deterministic start frame: true\n  Camera diagnostics visible: true\n",
+                             "error":  "",
+                             "stdoutFile":  "F02-end-seek.stdout.txt",
+                             "stderrFile":  "F02-end-seek.stderr.txt",
+                             "metricKind":  "end-seek-correctness"
+                         },
+                         {
+                             "caseId":  "F02-queued-1",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Fail",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  9028,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 145\n  Rendered frames: 146\n  Paint calls: 30\n  Average render: 7432 us\n  Maximum render: 51391 us\n  Background decodes: 0\n  Source texture uploads: 140\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 146\n  CPU readbacks: 0\n  Last project tick: 335744405\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 2386286 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F02-queued-1.stdout.txt",
+                             "stderrFile":  "F02-queued-1.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  2386.286,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F02-queued-2",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Fail",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  9271,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 147\n  Rendered frames: 148\n  Paint calls: 31\n  Average render: 7697 us\n  Maximum render: 50963 us\n  Background decodes: 0\n  Source texture uploads: 140\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 148\n  CPU readbacks: 0\n  Last project tick: 336335909\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 2309671 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F02-queued-2.stdout.txt",
+                             "stderrFile":  "F02-queued-2.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  2309.671,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F02-queued-3",
+                             "command":  "preview-queued-playback-smoke",
+                             "status":  "Fail",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  9428,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 146\n  Rendered frames: 147\n  Paint calls: 31\n  Average render: 7670 us\n  Maximum render: 51976 us\n  Background decodes: 0\n  Source texture uploads: 143\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 147\n  CPU readbacks: 0\n  Last project tick: 336053646\n  Graceful close: true\n  Trim action elapsed: 0 us\n  Trim smoke status: not-requested\n  Queued playback completed: true\n  Queued playback latency: 2337880 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F02-queued-3.stdout.txt",
+                             "stderrFile":  "F02-queued-3.stderr.txt",
+                             "metricKind":  "internal-queued-playback-state",
+                             "latencyMs":  2337.88,
+                             "cacheState":  "fresh-process-os-cache-uncontrolled"
+                         },
+                         {
+                             "caseId":  "F02-trim",
+                             "command":  "preview-trim-smoke",
+                             "status":  "Pass",
+                             "exitCode":  0,
+                             "watchdogExpired":  false,
+                             "processElapsedMs":  9218,
+                             "output":  "Panzo Editor Workbench smoke\n  Window created: true\n  Output: 1920x1080 (source native)\n  Timer ticks: 68\n  Rendered frames: 2\n  Paint calls: 2\n  Average render: 30772 us\n  Maximum render: 53805 us\n  Background decodes: 0\n  Source texture uploads: 2\n  Background texture uploads: 0\n  Output texture allocations: 0\n  GPU direct preview: true\n  GPU presentations: 2\n  CPU readbacks: 0\n  Last project tick: 449716400\n  Graceful close: true\n  Trim action elapsed: 4722 us\n  Trim smoke status: passed-incrementally\n  Queued playback completed: false\n  Queued playback latency: 0 us\n",
+                             "error":  "",
+                             "stdoutFile":  "F02-trim.stdout.txt",
+                             "stderrFile":  "F02-trim.stderr.txt",
+                             "metricKind":  "camera-edit-ui-commit"
+                         }
+                     ]
+}

@@ -1,0 +1,49 @@
+﻿{
+    "executable":  "D:\\ChatGPT\\Panzo\\target\\re-mvp-prototype-ui-diagnostic\\release\\panzo-cli.exe",
+    "sha256":  "407C8360893F16CE3F25292B57C57098339C9851A34320EEFB503974593E18C9",
+    "unchanged":  true,
+    "project":  "D:\\ChatGPT\\Panzo\\.tmp\\final-ui-20260906-142316\\F05.panzo",
+    "scope":  "Targeted software scrub reproduction; does not erase an earlier failure or establish a root cause by itself",
+    "results":  [
+                    {
+                        "round":  1,
+                        "status":  "Pass",
+                        "watchdogExpired":  false,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-1.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-1.stderr.txt",
+                        "exitCode":  null
+                    },
+                    {
+                        "round":  2,
+                        "status":  "Pass",
+                        "watchdogExpired":  false,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-2.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-2.stderr.txt",
+                        "exitCode":  null
+                    },
+                    {
+                        "round":  3,
+                        "status":  "Pass",
+                        "watchdogExpired":  false,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-3.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-3.stderr.txt",
+                        "exitCode":  null
+                    },
+                    {
+                        "round":  4,
+                        "status":  "Pass",
+                        "watchdogExpired":  false,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-4.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-4.stderr.txt",
+                        "exitCode":  null
+                    },
+                    {
+                        "round":  5,
+                        "status":  "Fail",
+                        "watchdogExpired":  false,
+                        "stdout":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-5.stdout.txt",
+                        "stderr":  "D:\\ChatGPT\\Panzo\\docs\\acceptance\\RE-MVP\\ui-scrub-diagnostic-20260906-144203\\round-5.stderr.txt",
+                        "exitCode":  null
+                    }
+                ]
+}

@@ -1,0 +1,26 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:2 字符: 1
++ cargo test -p panzo-windows nv12_conversion_matches_bt709 -- --nocapt ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.02s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-2f16acd26c46fda2.exe)
+
+running 1 test
+
+thread 'platform::video_processor::color_tests::nv12_conversion_matches_bt709_at_native_and_scaled_sizes' (53684) panic
+ked at crates\panzo-windows\src\platform\video_color_tests.rs:44:17:
+1280x720 RGB [0, 0, 0]: YUV [0, 128, 128], expected [16.0, 128.0, 128.0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test platform::video_processor::color_tests::nv12_conversion_matches_bt709_at_native_and_scaled_sizes ... FAILED
+
+failures:
+
+failures:
+    platform::video_processor::color_tests::nv12_conversion_matches_bt709_at_native_and_scaled_sizes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 127 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `-p panzo-windows --lib`
