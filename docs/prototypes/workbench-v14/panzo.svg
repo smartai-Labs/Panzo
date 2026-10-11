@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Panzo</title>
+  <desc id="desc">A folded viewfinder with a play-shaped aperture, in glacier blue and indigo.</desc>
+  <defs>
+    <linearGradient id="base" x1="36" y1="16" x2="218" y2="244" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#252D44"/><stop offset="1" stop-color="#141925"/>
+    </linearGradient>
+    <linearGradient id="frame" x1="63" y1="52" x2="195" y2="167" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D3E7FF"/><stop offset="0.55" stop-color="#9EBEFF"/><stop offset="1" stop-color="#7E8EEF"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="55" y1="154" x2="153" y2="205" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#778EEB"/><stop offset="1" stop-color="#ACB9FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#base)"/>
+  <path d="M58 78a24 24 0 0 1 24-24h92a24 24 0 0 1 24 24v60a24 24 0 0 1-24 24h-52l-32 32v-62h75V84H90v29H58V78Z" fill="url(#frame)"/>
+  <path d="M58 132h32v62l-20 17a7 7 0 0 1-12-5v-74Z" fill="url(#fold)"/>
+  <path d="m114 91 33 17-33 17V91Z" fill="#F8FBFF" stroke="#F8FBFF" stroke-width="4" stroke-linejoin="round"/>
+</svg>

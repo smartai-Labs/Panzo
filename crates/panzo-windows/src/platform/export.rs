@@ -20,7 +20,59 @@ use thiserror::Error;
 
 const EXPORT_WIDTH: u32 = 1_920;
 const EXPORT_HEIGHT: u32 = 1_080;
+#[cfg(test)]
 const EXPORT_FPS: i64 = 60;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExportFormat {
+    Mp4,
+    Gif,
+}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum ExportQuality {
+    Clear,
+    #[default]
+    Balanced,
+    Small,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ExportOptions {
+    pub format: ExportFormat,
+    pub fps: u32,
+    pub range: Option<(TimeTick, TimeTick)>,
+    pub audio: bool,
+    pub quality: ExportQuality,
+}
+impl Default for ExportOptions {
+    fn default() -> Self {
+        Self {
+            format: ExportFormat::Mp4,
+            fps: 60,
+            range: None,
+            audio: true,
+            quality: ExportQuality::Balanced,
+        }
+    }
+}
+impl ExportOptions {
+    pub fn extension(self) -> &'static str {
+        match self.format {
+            ExportFormat::Mp4 => "mp4",
+            ExportFormat::Gif => "gif",
+        }
+    }
+    fn validate(self) -> Result<(), ExportError> {
+        let valid = match self.format {
+            ExportFormat::Mp4 => matches!(self.fps, 30 | 60),
+            ExportFormat::Gif => matches!(self.fps, 10 | 15 | 20 | 25 | 30),
+        };
+        if valid {
+            Ok(())
+        } else {
+            Err(ExportError::InvalidOptions)
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExportRequest {
@@ -35,6 +87,8 @@ pub struct ExportReport {
     pub project_root: PathBuf,
     pub output_path: PathBuf,
     pub frames_written: u32,
+    pub frames_per_second: u32,
+    pub format: ExportFormat,
     pub width: u32,
     pub height: u32,
     pub duration_tick: TimeTick,
@@ -50,8 +104,8 @@ impl fmt::Display for ExportReport {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(
             formatter,
-            "Panzo MP4 export — {}×{} / 60 fps",
-            self.width, self.height
+            "Panzo {:?} export — {}×{} / {} fps",
+            self.format, self.width, self.height, self.frames_per_second
         )?;
         writeln!(formatter, "  Project: {}", self.project_root.display())?;
         writeln!(formatter, "  Output: {}", self.output_path.display())?;
@@ -83,10 +137,17 @@ pub enum ExportPreset {
     #[default]
     Native,
     Hd1080,
+    Share720,
+    Compact480,
 }
 
 impl ExportPreset {
     pub fn dimensions(self, source: (u32, u32), settings: &WorkbenchSettings) -> (u32, u32) {
+        if matches!(self, Self::Share720 | Self::Compact480) {
+            let source = settings.canvas.size.map_or(source, |c| (c.width, c.height));
+            let bound = if self == Self::Share720 { 1280 } else { 640 };
+            return fit_dimensions(source, bound);
+        }
         if let Some(canvas) = settings.canvas.size {
             let size = if self == Self::Hd1080 {
                 canvas.hd()
@@ -131,6 +192,30 @@ impl ProjectExporter {
         cancel: &std::sync::atomic::AtomicBool,
         progress: impl Fn(u32, u32),
     ) -> Result<ExportReport, ExportError> {
+        Self::export_snapshot_with_options(
+            request,
+            snapshot,
+            preset,
+            ExportOptions::default(),
+            cancel,
+            progress,
+        )
+    }
+
+    pub fn export_snapshot_with_options(
+        request: &ExportRequest,
+        snapshot: &ExportSnapshot,
+        preset: ExportPreset,
+        options: ExportOptions,
+        cancel: &std::sync::atomic::AtomicBool,
+        progress: impl Fn(u32, u32),
+    ) -> Result<ExportReport, ExportError> {
+        options.validate()?;
+        if request.output_path.extension().and_then(|v| v.to_str()) != Some(options.extension()) {
+            return Err(ExportError::InvalidOutputExtension(
+                request.output_path.clone(),
+            ));
+        }
         if cancel.load(std::sync::atomic::Ordering::Acquire) {
             return Err(ExportError::Cancelled);
         }
@@ -145,10 +230,15 @@ impl ProjectExporter {
             &encoded_output,
             snapshot,
             preset,
+            options,
             cancel,
             &progress,
         )
         .and_then(|mut report| {
+            if options.format == ExportFormat::Gif {
+                fs::rename(&encoded_output, &temporary_output).map_err(Fmp4ProbeError::from)?;
+                return Ok(report);
+            }
             let started = Instant::now();
             crate::platform::fmp4_writer::normalize_export_timing(
                 &encoded_output,
@@ -193,12 +283,42 @@ impl ProjectExporter {
     }
 }
 
+#[allow(clippy::too_many_lines)] // One cancellation-safe streaming export transaction.
 fn export_to_temporary(
     request: &ExportRequest,
     temporary_output: &Path,
     snapshot: &ExportSnapshot,
     preset: ExportPreset,
+    options: ExportOptions,
     cancel: &std::sync::atomic::AtomicBool,
+    progress: &impl Fn(u32, u32),
+) -> Result<ExportReport, ExportError> {
+    std::thread::scope(|scope| {
+        let token = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(cancel.load(std::sync::atomic::Ordering::Acquire)));
+        let done = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        struct Finish(std::sync::Arc<std::sync::atomic::AtomicBool>);
+        impl Drop for Finish { fn drop(&mut self) { self.0.store(true, std::sync::atomic::Ordering::Release); } }
+        let guard = Finish(done.clone());
+        let worker_token = token.clone();
+        scope.spawn(move || {
+            while !done.load(std::sync::atomic::Ordering::Acquire) {
+                if cancel.load(std::sync::atomic::Ordering::Acquire) { worker_token.store(true, std::sync::atomic::Ordering::Release); break; }
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+        });
+        let result = export_to_temporary_inner(request, temporary_output, snapshot, preset, options, &token, progress);
+        drop(guard);
+        result
+    })
+}
+
+fn export_to_temporary_inner(
+    request: &ExportRequest,
+    temporary_output: &Path,
+    snapshot: &ExportSnapshot,
+    preset: ExportPreset,
+    options: ExportOptions,
+    cancel: &std::sync::Arc<std::sync::atomic::AtomicBool>,
     progress: &impl Fn(u32, u32),
 ) -> Result<ExportReport, ExportError> {
     let started = Instant::now();
@@ -206,15 +326,22 @@ fn export_to_temporary(
     let manifest = layout.load_manifest()?;
     let media_path = layout.root().join(&manifest.media.screen);
     reject_source_overwrite(&media_path, &request.output_path)?;
-    let settings = &snapshot.settings;
+    let mut export_settings=snapshot.settings.clone();
+    export_settings.video=Some(export_settings.video_edit(TimeTick(manifest.media.duration_tick)).map_err(EditorSessionError::from)?);
+    let settings=&export_settings;
     settings.validate().map_err(EditorSessionError::from)?;
     let video = settings
         .video_edit(TimeTick(manifest.media.duration_tick))
         .map_err(EditorSessionError::from)?;
-    let project_duration = video.duration();
+    let project_duration = settings.project_duration(TimeTick(manifest.media.duration_tick));
+    let (range_start, range_end) = options.range.unwrap_or((TimeTick::ZERO, project_duration));
+    if range_start < TimeTick::ZERO || range_end <= range_start || range_end > project_duration {
+        return Err(ExportError::InvalidDuration(range_end));
+    }
+    let selected_duration = TimeTick(range_end.0 - range_start.0);
     let duration = request
         .maximum_duration
-        .map_or(project_duration, |limit| limit.min(project_duration));
+        .map_or(selected_duration, |limit| limit.min(selected_duration));
     if duration <= TimeTick::ZERO {
         return Err(ExportError::InvalidDuration(duration));
     }
@@ -229,16 +356,50 @@ fn export_to_temporary(
     let mut decoder = MfBgraDecoder::open(&media_path)?;
     let (width, height) = preset.dimensions((decoder.width(), decoder.height()), settings);
     let output_descriptor = OutputDescriptor::bgra8(width, height)?;
-    let frame_count = export_frame_count(duration)?;
+    let frame_count = frame_count_at_rate(duration, options.fps)?;
 
     let compositor = D3d11Compositor::create()?;
-    let conversion_device = D3d11Device::create_hardware().map_err(ExportError::D3dDevice)?;
-    let converter =
-        Nv12VideoProcessor::create_with_output(&conversion_device, width, height, width, height)?;
-    let mut writer = Nv12Fmp4Writer::create_with_config(
-        temporary_output,
-        Nv12VideoConfig::native_screen_60(width, height)?,
-    )?;
+    compositor.set_project_root_with_cancel(layout.root(),cancel.clone());
+    let conversion_device = if options.format == ExportFormat::Mp4 {
+        Some(D3d11Device::create_hardware().map_err(ExportError::D3dDevice)?)
+    } else {
+        None
+    };
+    let converter = conversion_device
+        .as_ref()
+        .map(|device| Nv12VideoProcessor::create_with_output(device, width, height, width, height))
+        .transpose()?;
+    let mut audio =
+        if options.format == ExportFormat::Mp4 && options.audio && settings.audio.enabled {
+            crate::platform::audio::AudioMixer::with_clips(layout.root(), &settings.mixing_clips()).map_err(ExportError::Audio)?
+        } else {
+            crate::platform::audio::AudioMixer::default()
+        };
+    let with_audio = options.audio && settings.audio.enabled && audio.has_audio();
+    let mut encoding = Nv12VideoConfig::sharing(width, height, options.fps)?;
+    encoding.target_bitrate = match options.quality {
+        ExportQuality::Clear => encoding.target_bitrate.saturating_mul(2).min(80_000_000),
+        ExportQuality::Balanced => encoding.target_bitrate,
+        ExportQuality::Small => (encoding.target_bitrate / 2).max(300_000),
+    };
+    let mut written_audio = 0u64;
+    let mut writer = if options.format == ExportFormat::Mp4 {
+        Some(Nv12Fmp4Writer::create_with_audio(
+            temporary_output,
+            encoding,
+            with_audio,
+        )?)
+    } else {
+        None
+    };
+    let mut gif = if options.format == ExportFormat::Gif {
+        let file = fs::File::create(temporary_output).map_err(Fmp4ProbeError::from)?;
+        let mut encoder = image::codecs::gif::GifEncoder::new_with_speed(file, 10);
+        encoder.set_repeat(image::codecs::gif::Repeat::Infinite)?;
+        Some(encoder)
+    } else {
+        None
+    };
     let mut decoded_index = 0_usize;
     let mut current_frame = decoder.read_next()?.ok_or(ExportError::NoSourceFrame)?;
 
@@ -246,9 +407,14 @@ fn export_to_temporary(
         if cancel.load(std::sync::atomic::Ordering::Acquire) {
             return Err(ExportError::Cancelled);
         }
-        let project_tick = export_frame_tick(output_index);
+        let project_tick =
+            TimeTick(range_start.0 + frame_tick_at_rate(output_index, options.fps).0);
         let evaluation = evaluator.evaluate_edit(project_tick, output_descriptor, settings)?;
-        while decoded_index < evaluation.source_frame.frame_index {
+        if settings.source_video_enabled && decoded_index>evaluation.source_frame.frame_index{
+            decoder.seek(evaluation.source_frame.presentation_tick)?;
+            loop{if cancel.load(std::sync::atomic::Ordering::Acquire){return Err(ExportError::Cancelled);}match decoder.read_next_toward(evaluation.source_frame.presentation_tick)?{super::media_decoder::TargetFrameRead::Before(_)=>{},super::media_decoder::TargetFrameRead::AtOrAfter(f)=>{current_frame=f;decoded_index=evaluation.source_frame.frame_index;break;},super::media_decoder::TargetFrameRead::End=>return Err(ExportError::NoSourceFrame)}}
+        }
+        while settings.source_video_enabled && decoded_index < evaluation.source_frame.frame_index {
             if cancel.load(std::sync::atomic::Ordering::Acquire) {
                 return Err(ExportError::Cancelled);
             }
@@ -258,7 +424,7 @@ fn export_to_temporary(
             })?;
             decoded_index += 1;
         }
-        assert_selected_frame(&current_frame, &evaluation)?;
+        if settings.source_video_enabled{assert_selected_frame(&current_frame, &evaluation)?;}
         let bgra = compose_export_frame(
             &compositor,
             &current_frame,
@@ -266,18 +432,64 @@ fn export_to_temporary(
             settings,
             background.as_ref(),
         )?;
-        let nv12 = converter.convert_bgra_bytes(&bgra.pixels)?;
-        let sample_start = export_frame_tick(output_index);
-        let sample_end = export_frame_tick(output_index + 1).min(duration);
-        writer.write_nv12(
-            &nv12,
-            sample_start.as_i64(),
-            sample_end.as_i64() - sample_start.as_i64(),
-        )?;
+        let sample_start = frame_tick_at_rate(output_index, options.fps);
+        let sample_end = frame_tick_at_rate(output_index + 1, options.fps).min(duration);
+        if let (Some(writer), Some(converter)) = (&mut writer, &converter) {
+            let nv12 = converter.convert_bgra_bytes(&bgra.pixels)?;
+            writer.write_nv12(&nv12, sample_start.0, sample_end.0 - sample_start.0)?;
+            if with_audio {
+                let end = crate::platform::audio::frames_at(sample_end);
+                while written_audio < end {
+                    let count = (end - written_audio).min(1024) as usize;
+                    let samples = audio
+                        .render(written_audio, count, range_start, &video, settings.audio)
+                        .map_err(ExportError::Audio)?;
+                    writer.write_audio(&samples, written_audio)?;
+                    written_audio += count as u64;
+                }
+            }
+        }
+        if let Some(encoder) = &mut gif {
+            let mut pixels = bgra.pixels;
+            for pixel in pixels.chunks_exact_mut(4) {
+                pixel.swap(0, 2);
+                pixel[3] = 255;
+            }
+            let image = image::RgbaImage::from_raw(width, height, pixels)
+                .ok_or(ExportError::InvalidOptions)?;
+            let delay = gif_delay_ms(sample_start, sample_end);
+            encoder.encode_frame(image::Frame::from_parts(
+                image,
+                0,
+                0,
+                image::Delay::from_numer_denom_ms(delay, 1),
+            ))?;
+        }
         progress(output_index + 1, frame_count);
     }
 
-    let finalized = writer.finish()?;
+    if options.format == ExportFormat::Gif {
+        drop(gif);
+        return Ok(ExportReport {
+            project_root: layout.root().into(),
+            output_path: temporary_output.into(),
+            frames_written: frame_count,
+            frames_per_second: options.fps,
+            format: options.format,
+            width,
+            height,
+            duration_tick: duration,
+            output_bytes: fs::metadata(temporary_output)
+                .map_err(Fmp4ProbeError::from)?
+                .len(),
+            fragment_count: 0,
+            trailing_bytes: 0,
+            encoder_name: "Panzo GIF".into(),
+            hardware_encoder: false,
+            elapsed_ms: started.elapsed().as_millis(),
+        });
+    }
+    let finalized = writer.ok_or(ExportError::InvalidOptions)?.finish()?;
     if finalized.inspection.trailing_bytes != 0 {
         return Err(ExportError::TrailingOutputBytes(
             finalized.inspection.trailing_bytes,
@@ -287,6 +499,8 @@ fn export_to_temporary(
         project_root: layout.root().into(),
         output_path: temporary_output.into(),
         frames_written: finalized.frames_written,
+        frames_per_second: options.fps,
+        format: options.format,
         width,
         height,
         duration_tick: TimeTick(finalized.duration_tick),
@@ -306,7 +520,7 @@ pub(crate) fn compose_export_frame(
     settings: &panzo_core::WorkbenchSettings,
     background: Option<&crate::platform::background_image::DecodedBackgroundImage>,
 ) -> Result<crate::platform::compositor::CompositedFrame, ExportError> {
-    assert_selected_frame(frame, evaluation)?;
+    if settings.source_video_enabled{assert_selected_frame(frame, evaluation)?;}
     compositor
         .compose_with_background(frame, evaluation, settings, background)
         .map_err(ExportError::from)
@@ -366,19 +580,45 @@ fn read_cursor_events(path: &Path) -> Result<CursorTimeline, ExportError> {
     CursorTimeline::new(events).map_err(ExportError::Evaluation)
 }
 
+#[cfg(test)]
 fn export_frame_count(duration: TimeTick) -> Result<u32, ExportError> {
-    let frames = (i128::from(duration.as_i64()) * i128::from(EXPORT_FPS)
+    frame_count_at_rate(duration, EXPORT_FPS as u32)
+}
+fn frame_count_at_rate(duration: TimeTick, fps: u32) -> Result<u32, ExportError> {
+    let frames = (i128::from(duration.as_i64()) * i128::from(fps)
         + i128::from(TICKS_PER_SECOND - 1))
         / i128::from(TICKS_PER_SECOND);
     u32::try_from(frames).map_err(|_| ExportError::DurationTooLong(duration))
 }
 
+#[cfg(test)]
 fn export_frame_tick(frame_index: u32) -> TimeTick {
-    TimeTick(i64::from(frame_index) * TICKS_PER_SECOND / EXPORT_FPS)
+    frame_tick_at_rate(frame_index, EXPORT_FPS as u32)
+}
+fn frame_tick_at_rate(frame_index: u32, fps: u32) -> TimeTick {
+    TimeTick(i64::from(frame_index) * TICKS_PER_SECOND / i64::from(fps))
+}
+fn gif_delay_ms(start: TimeTick, end: TimeTick) -> u32 {
+    let centisecond = TICKS_PER_SECOND / 100;
+    let rounded = |tick: TimeTick| (tick.0 + centisecond / 2) / centisecond;
+    u32::try_from((rounded(end) - rounded(start)).max(1) * 10).unwrap_or(u32::MAX)
+}
+#[allow(clippy::cast_sign_loss)] // Valid positive dimensions, clamped to at least two pixels.
+fn fit_dimensions(source: (u32, u32), width: u32) -> (u32, u32) {
+    let ratio = f64::from(width) / f64::from(source.0.max(1));
+    let ratio = ratio.min(1.0);
+    (
+        ((f64::from(source.0) * ratio) as u32 & !1).max(2),
+        ((f64::from(source.1) * ratio) as u32 & !1).max(2),
+    )
 }
 
 fn temporary_output_path(output: &Path) -> Result<PathBuf, ExportError> {
-    if output.extension().and_then(|value| value.to_str()) != Some("mp4") {
+    if output
+        .extension()
+        .and_then(|value| value.to_str())
+        .is_none_or(|v| v != "mp4" && v != "gif")
+    {
         return Err(ExportError::InvalidOutputExtension(output.into()));
     }
     let file_name = output
@@ -419,6 +659,12 @@ fn reject_source_overwrite(source: &Path, output: &Path) -> Result<(), ExportErr
 
 #[derive(Debug, Error)]
 pub enum ExportError {
+    #[error("音频导出失败：{0}")]
+    Audio(String),
+    #[error("无效的导出格式或帧率")]
+    InvalidOptions,
+    #[error(transparent)]
+    Image(#[from] image::ImageError),
     #[error("导出已取消，原视频未改变")]
     Cancelled,
     #[error("输出文件已存在，请选择新的文件名：{0}")]
@@ -474,7 +720,7 @@ pub enum ExportError {
     },
     #[error("export output contains {0} trailing bytes")]
     TrailingOutputBytes(u64),
-    #[error("export output path must end in .mp4: {0}")]
+    #[error("export extension must match the selected MP4/GIF format: {0}")]
     InvalidOutputExtension(PathBuf),
     #[error("invalid export output path: {0}")]
     InvalidOutputPath(PathBuf),
@@ -498,6 +744,30 @@ pub enum ExportError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn selectable_rates_preserve_total_duration_and_size() {
+        for fps in [10, 15, 20, 25, 30, 60] {
+            assert_eq!(
+                frame_count_at_rate(TimeTick::from_millis(1000), fps).unwrap(),
+                fps
+            );
+            assert_eq!(frame_tick_at_rate(fps, fps), TimeTick::from_millis(1000));
+            if fps <= 30 {
+                let milliseconds: u32 = (0..fps)
+                    .map(|index| {
+                        gif_delay_ms(
+                            frame_tick_at_rate(index, fps),
+                            frame_tick_at_rate(index + 1, fps),
+                        )
+                    })
+                    .sum();
+                assert_eq!(milliseconds, 1000);
+            }
+        }
+        assert_eq!(fit_dimensions((1920, 1080), 640), (640, 360));
+        assert_eq!(fit_dimensions((720, 1280), 640), (640, 1136));
+    }
 
     #[test]
     #[ignore = "requires explicit synthetic project, GPU and output directory"]
@@ -646,6 +916,12 @@ mod tests {
             )
             .unwrap();
         editor.set_video_speed(&second, 200).unwrap();
+        editor.set_canvas_inset(100.0/1080.0).unwrap();
+        editor.set_video_scale(&second,750).unwrap();
+        editor.set_video_scale(&third,1255).unwrap();
+        let background=directory.join("export-background.png");
+        image::RgbaImage::from_pixel(64,64,image::Rgba([45,75,110,255])).save(&background).unwrap();
+        editor.import_background_image(&background).unwrap();
         let snapshot = ExportSnapshot {
             camera: editor.camera().clone(),
             settings: editor.settings().clone(),
@@ -688,7 +964,7 @@ mod tests {
                 let n = frame.pixels.chunks_exact(4).step_by(13).count() * 3;
                 let error = difference as f64 / n as f64;
                 assert!(error < 1.0, "frame {count}: {error}");
-                samples.push(serde_json::json!({"frame":count,"crop":prepared.evaluation.camera_transform.crop,"meanRgbError":error}));
+                samples.push(serde_json::json!({"frame":count,"crop":prepared.evaluation.camera_transform.crop,"contentScale":prepared.evaluation.camera_transform.content_scale,"meanRgbError":error}));
             }
             count += 1;
         }

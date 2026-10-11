@@ -1,0 +1,44 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-recent-colors\\release\\panzo.exe",
+  "sha256": "f8b407ab424187ab98c384e2ff4a20e4a1a1d81e1a6366a0e691d3c91e561b35",
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\recent-release-06eeae30-5d76-4c8d-96be-f303dfa5b953",
+  "cases": [
+    {
+      "monitor": {
+        "work": [
+          2560,
+          0,
+          5120,
+          1440
+        ],
+        "primary": false
+      },
+      "popup": [
+        3326,
+        295,
+        3618,
+        773
+      ],
+      "root": [
+        2572,
+        12,
+        3752,
+        862
+      ],
+      "rootEnabled": true,
+      "ownedByRoot": true,
+      "insideRoot": true,
+      "noApplyCancel": true,
+      "dragSamples": 165,
+      "dragBackgroundColors": [
+        3486256
+      ],
+      "liveSwatch": 15233818,
+      "liveUpdated": true,
+      "historyFrozenWhileOpen": true
+    }
+  ],
+  "passed": false,
+  "isolatedPid": 73992,
+  "error": "Traceback (most recent call last):\n  File \"D:\\ChatGPT\\Panzo\\scripts\\test-recent-colors-release.py\", line 90, in <module>\n    physical_click(u.GetDlgItem(picture,4));wait_closed(popup);popup=None;time.sleep(.15)\n                                            ~~~~~~~~~~~^^^^^^^\n  File \"D:\\ChatGPT\\Panzo\\scripts\\test-recent-colors-release.py\", line 45, in wait_closed\n    assert not u.IsWindow(h),'popup did not dismiss'\n           ^^^^^^^^^^^^^^^^^\nAssertionError: popup did not dismiss\n"
+}

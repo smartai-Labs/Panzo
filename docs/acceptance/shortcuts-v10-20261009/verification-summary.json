@@ -1,0 +1,49 @@
+﻿{
+    "verifiedAtUtc":  "2026-10-08T23:49:07.1752186Z",
+    "candidate":  {
+                      "directory":  "D:\\ChatGPT\\Panzo\\target\\desktop-v10\\release",
+                      "sourceSha256":  "0EEAB153C57921278C6F7312178483FA858F01D6CD9F1422C57CF4FBEA22446D",
+                      "binaries":  [
+                                       {
+                                           "name":  "panzo.exe",
+                                           "sha256":  "3953339B58919A308A63CE106BB7AADBBDD128C5CE3BC2F0E95D4F0868EF6CB6",
+                                           "bytes":  8290816
+                                       },
+                                       {
+                                           "name":  "panzo-cli.exe",
+                                           "sha256":  "8116849AAE5E0200A3B4E4F8830EC9A5BDD93B1553C734DA62D6A431F84A224B",
+                                           "bytes":  9551360
+                                       }
+                                   ],
+                      "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\desktop-v10\\release\\candidate-build.json"
+                  },
+    "unitTests":  {
+                      "ignored":  37,
+                      "report":  "tests.txt",
+                      "failed":  0,
+                      "passed":  222
+                  },
+    "nativeReport":  "release/shortcut-smoke.json",
+    "nativePassed":  true,
+    "configuredActions":  67,
+    "testProcesses":  [
+                          72868,
+                          34700,
+                          66020,
+                          25684
+                      ],
+    "crashDumps":  [
+
+                   ],
+    "screenshots":  [
+                        "release/shortcuts-default-dark.png",
+                        "release/shortcuts-image-dark.png",
+                        "release/shortcuts-image-light.png",
+                        "release/shortcut-global-conflict.png",
+                        "release/custom-video-shortcuts.png"
+                    ],
+    "notes":  [
+                  "Window images use PrintWindow on test-owned HWNDs so desktop occlusion cannot contaminate screenshots.",
+                  "The video test waits for the asynchronous frame seek to settle before splitting. All project edits target an isolated fixture copy."
+              ]
+}

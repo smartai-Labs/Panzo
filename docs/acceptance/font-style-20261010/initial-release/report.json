@@ -1,0 +1,66 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-fonts\\release\\panzo.exe",
+  "sha256": "cd96aaacaffa1ca23d99ff97b44ab67fb9e7992b5137382f6071084f52b08a01",
+  "passed": true,
+  "isolatedPid": 18312,
+  "emptyDraft": true,
+  "selectedFamily": "Arial",
+  "selectedWeight": "700 · 粗体",
+  "keyboardSynchronized": true,
+  "canvasToInspector": true,
+  "inspectorToCanvas": true,
+  "transparentPixels": 672,
+  "backgroundPixels": 672,
+  "transparentBackground": true,
+  "draftMoved": true,
+  "committedOnToolChange": true,
+  "reopenedText": "右侧同步修改",
+  "escapeClosed": true,
+  "cancelRestored": true,
+  "editPersisted": true,
+  "selectedInspectorVisible": true,
+  "selectedInspectorPersisted": true,
+  "savedTextPixels": 1078,
+  "gdiBefore": 169,
+  "repaintChecks": 270,
+  "whiteBlocks": [],
+  "wrongBackgrounds": [],
+  "gdiAfter": 169,
+  "hung": false,
+  "numberFields": [
+    {
+      "value": "4",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true,
+      "visibleInkPixels": 21
+    },
+    {
+      "value": "24",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true,
+      "visibleInkPixels": 40
+    }
+  ]
+}

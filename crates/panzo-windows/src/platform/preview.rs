@@ -223,7 +223,19 @@ impl PreviewSessionProbe {
 
 /// Owns the project data and Windows render resources needed for deterministic interactive
 /// preview. Both preview and export use `FrameEvaluator` and `D3d11Compositor`.
+struct SuspendedProject {
+    settings: WorkbenchSettings,
+    camera: CameraTrack,
+    background: Option<DecodedBackgroundImage>,
+    output: OutputDescriptor,
+    tick: TimeTick,
+}
 pub struct ProjectPreviewSession {
+    quality: super::preview_quality::PreviewQuality,
+    suspended_project: Option<SuspendedProject>,
+    asset_id: Option<String>,
+    asset_positions: std::collections::BTreeMap<String,TimeTick>,
+    audio: crate::platform::audio_preview::AudioPreview,
     source_duration: TimeTick,
     project_root: PathBuf,
     media_path: PathBuf,
@@ -272,16 +284,14 @@ impl PreparedPreviewSession {
         let layout = ProjectLayout::open(project_root)?;
         let manifest = layout.load_manifest()?;
         let duration_tick = TimeTick(manifest.media.duration_tick);
-        let (camera, settings) = match edit_state {
+        let (camera, mut settings) = match edit_state {
             Some(state) => state,
             None => load_effective_edit_state(layout.root())?,
         };
         camera.validate().map_err(RenderEvaluationError::from)?;
         settings.validate()?;
-        let duration = settings
-            .video_edit(duration_tick)
-            .map_err(EditorSessionError::from)?
-            .duration();
+        settings.video=Some(settings.video_edit(duration_tick).map_err(EditorSessionError::from)?);
+        let duration = settings.project_duration(duration_tick);
         let controller = PreviewController::new(duration)?;
         let background = load_effective_background(layout.root(), &settings)?;
         check_preparation_cancelled(cancelled)?;
@@ -404,8 +414,21 @@ impl ProjectPreviewSession {
         prepared: PreparedPreviewSession,
     ) -> Result<Self, PreviewSessionError> {
         let compositor = D3d11Compositor::create()?;
+        compositor.set_project_root(&prepared.project_root,true);
         let decoded_frame_native = prepared.decoded_frame.is_some();
+        let audio = crate::platform::audio_preview::AudioPreview::new(
+            &prepared.project_root,
+            prepared
+                .settings
+                .video_edit(prepared.source_duration)
+                .map_err(EditorSessionError::from)?,
+            prepared.settings.audio,
+            prepared.settings.mixing_clips(),
+        );
         Ok(Self {
+            quality:Default::default(),
+            suspended_project:None,asset_id:None,asset_positions:Default::default(),
+            audio,
             source_duration: prepared.source_duration,
             project_root: prepared.project_root,
             media_path: prepared.media_path,
@@ -426,6 +449,82 @@ impl ProjectPreviewSession {
         })
     }
 
+    pub fn preview_quality(&self)->super::preview_quality::PreviewQuality {self.quality}
+    pub fn preview_source_limit(&self)->Option<u32> {
+        self.decoded_frame.as_ref().and_then(|f|{let (w,h)=f.native_size.unwrap_or((f.width,f.height));self.quality.limit(w,h)})
+    }
+    pub fn set_preview_quality(&mut self,q:super::preview_quality::PreviewQuality) {
+        if self.quality==q{return;}
+        self.cancel_interactive_render();self.quality=q;
+        self.decoder.set_preview_limit(self.preview_source_limit());
+        self.decoded_frame_native=false;
+        self.compositor.set_preview_quality(q);
+    }
+    pub fn is_asset_preview(&self)->bool {self.asset_id.is_some()}
+    pub fn preview_asset_id(&self)->Option<&str> {self.asset_id.as_deref()}
+    pub fn project_playhead(&self)->TimeTick {self.suspended_project.as_ref().map_or(self.snapshot().project_tick,|p|p.tick)}
+    pub fn leave_asset_preview(&mut self)->Result<(),PreviewSessionError> {
+        let Some(saved)=self.suspended_project.take() else {return Ok(());};
+        if let Some(id)=self.asset_id.take(){self.asset_positions.insert(id,self.snapshot().project_tick);}
+        self.pause();self.output=saved.output;
+        self.apply_edit_state_with_background(saved.camera,saved.settings,saved.background)?;
+        self.seek(saved.tick)?;Ok(())
+    }
+    /// Uses the same clock, mixer, decode worker, compositor and GPU presenter.
+    /// Only the render input changes; project data is never edited by previewing an asset.
+    pub fn preview_asset(&mut self,id:&str,project:&WorkbenchSettings)->Result<(),PreviewSessionError> {
+        if self.asset_id.as_deref()==Some(id) {return Ok(());}
+        let mut raw=WorkbenchSettings::default();
+        raw.source_video_enabled=false;raw.camera_enabled=false;raw.cursor.visible=false;
+        raw.canvas.inset=0.0;raw.canvas.corner_radius=0.0;raw.canvas.shadow=0.0;
+        raw.audio.source_muted=true;
+        raw.background.color="#1E1F21".into();
+        let mut output=self.suspended_project.as_ref().map_or(self.output,|p|p.output);
+        if id=="__source__" {
+            raw.source_video_enabled=true;raw.audio=Default::default();
+            // The source uses the original capture size and includes all recorded audio.
+            if let Some(f)=&self.decoded_frame {
+                let (w,h)=f.native_size.unwrap_or((f.width,f.height));output.width=w;output.height=h;
+            }
+        } else if let Some(a)=project.visual_assets.iter().find(|a|a.id==id) {
+            raw.visual_assets.push(a.clone());
+            raw.insert_visual_asset(id,"video",TimeTick::ZERO).map_err(PreviewSessionError::Worker)?;
+            raw.visual_clips[0].id="__preview_asset__".into();
+            output.width=a.width;output.height=a.height;
+        } else if let Some(a)=project.audio_assets.iter().find(|a|a.id==id) {
+            raw.audio_assets.push(a.clone());
+            raw.insert_audio_asset(id,"music",TimeTick::ZERO).map_err(PreviewSessionError::Worker)?;
+            raw.subtitles.push(panzo_core::media_edit::SubtitleCue {
+                id:"__preview_audio_title__".into(),start:TimeTick::ZERO,end:raw.audio_clips[0].end(),
+                text:format!("♫  {}\n音频素材",a.name),anchor:Default::default()
+            });
+            raw.subtitle_style.background=false;raw.subtitle_style.bottom=0.45;
+        } else if let Some(a)=project.subtitle_assets.iter().find(|a|a.id==id) {
+            raw.subtitles=a.cues.clone();raw.subtitle_style=project.subtitle_style.clone();
+        } else {return Err(PreviewSessionError::Worker("素材已删除".into()));}
+        raw.validate()?;
+        self.leave_asset_preview()?;
+        self.pause();self.set_crop_editing(false);
+        let saved=SuspendedProject {settings:self.settings.clone(),camera:self.camera.clone(),background:self.background.take(),output:self.output,tick:self.snapshot().project_tick};
+        let camera=self.camera.clone();
+        self.set_output(output);
+        // Empty background is intentional for source previews.
+        if let Err(e)=self.apply_edit_state_with_background(camera,raw,None) {
+            self.output=saved.output;
+            self.apply_edit_state_with_background(saved.camera,saved.settings,saved.background)?;
+            return Err(e);
+        }
+        self.suspended_project=Some(saved);self.asset_id=Some(id.into());
+        let at=self.asset_positions.get(id).copied().unwrap_or(TimeTick::ZERO).min(self.snapshot().duration_tick);
+        self.seek(at)?;Ok(())
+    }
+
+    pub fn preview_muted(&self) -> bool { self.audio.muted() }
+    pub fn toggle_preview_mute(&self) { self.audio.toggle_mute(); }
+    pub fn take_audio_warning(&self) -> Option<String> {
+        self.audio.take_warning()
+    }
+
     pub fn project_root(&self) -> &Path {
         &self.project_root
     }
@@ -439,13 +538,17 @@ impl ProjectPreviewSession {
     }
 
     pub fn set_frame_ready_callback(&self, callback: impl Fn() + Send + Sync + 'static) {
-        self.decoder.set_completion_callback(callback);
+        let callback=Arc::new(callback);
+        self.decoder.set_completion_callback(move||callback());
     }
+
+    pub fn set_asset_ready_callback(&self,callback:impl Fn()+Send+Sync+'static){self.compositor.set_asset_ready_callback(Arc::new(callback));}
 
     pub const fn output(&self) -> OutputDescriptor {
         self.output
     }
 
+    pub fn set_crop_target(&self,id:Option<String>){self.compositor.set_crop_target(id);}
     pub fn set_crop_editing(&mut self, enabled: bool) {
         if self.crop_editing != enabled {
             self.cancel_interactive_render();
@@ -461,7 +564,9 @@ impl ProjectPreviewSession {
     fn preview_evaluation(&self, mut frame: FrameEvaluation) -> FrameEvaluation {
         if self.crop_editing {
             frame.camera_state = CameraState::BASE;
+            let content_scale = frame.camera_transform.content_scale;
             frame.camera_transform = CameraState::BASE.into();
+            frame.camera_transform.content_scale = content_scale;
             frame.cursor = self
                 .cursor
                 .evaluate(frame.source_tick, frame.camera_transform);
@@ -502,39 +607,53 @@ impl ProjectPreviewSession {
             return None;
         }
         let video = self.settings.video_edit(self.source_duration).ok()?;
-        next_video_delay(&video, &self.source_timeline, snapshot.project_tick)
+        next_video_delay(&video, &self.source_timeline, snapshot.project_tick).or_else(||(snapshot.project_tick<snapshot.duration_tick).then_some(Duration::from_millis(16)))
     }
 
     pub fn play(&mut self) -> PreviewSnapshot {
-        self.controller.play()
+        let snapshot = self.controller.play();
+        self.audio.sync(snapshot, true);
+        snapshot
     }
 
     pub fn pause(&mut self) -> PreviewSnapshot {
-        self.controller.pause()
+        let snapshot = self.controller.pause();
+        self.audio.sync(snapshot, true);
+        snapshot
     }
 
     pub fn toggle_playback(&mut self) -> PreviewSnapshot {
-        self.controller.toggle_playback()
+        let snapshot = self.controller.toggle_playback();
+        self.audio.sync(snapshot, true);
+        snapshot
     }
 
     pub fn seek(&mut self, project_tick: TimeTick) -> Result<PreviewSnapshot, PreviewSessionError> {
         self.cancel_interactive_render();
-        self.controller
+        let snapshot = self
+            .controller
             .seek(project_tick)
-            .map_err(PreviewSessionError::Controller)
+            .map_err(PreviewSessionError::Controller)?;
+        self.audio.sync(snapshot, true);
+        Ok(snapshot)
     }
 
     pub fn jump_to_start(&mut self) -> PreviewSnapshot {
-        self.controller.jump_to_start()
+        let snapshot = self.controller.jump_to_start();
+        self.audio.sync(snapshot, true);
+        snapshot
     }
 
     pub fn advance(
         &mut self,
         elapsed_tick: TimeTick,
     ) -> Result<PreviewSnapshot, PreviewSessionError> {
-        self.controller
+        let snapshot = self
+            .controller
             .advance(elapsed_tick)
-            .map_err(PreviewSessionError::Controller)
+            .map_err(PreviewSessionError::Controller)?;
+        self.audio.sync(snapshot, false);
+        Ok(snapshot)
     }
 
     pub fn toggle_camera_diagnostics(&mut self) -> PreviewSnapshot {
@@ -595,6 +714,9 @@ impl ProjectPreviewSession {
             .map_err(Into::into)
     }
 
+    pub fn resize_presenter(&self,p:&mut GpuPreviewPresenter,output:OutputDescriptor)->Result<(),PreviewSessionError>{
+        self.compositor.resize_presenter(p,output.width,output.height)?;Ok(())
+    }
     pub fn apply_edit_state(
         &mut self,
         camera: CameraTrack,
@@ -616,13 +738,13 @@ impl ProjectPreviewSession {
     }
 
     pub fn background_matches(&self, settings: &WorkbenchSettings) -> bool {
-        self.settings.background == settings.background
+        self.is_asset_preview() || self.settings.background == settings.background
     }
 
     pub fn apply_edit_state_with_background(
         &mut self,
         camera: CameraTrack,
-        settings: WorkbenchSettings,
+        mut settings: WorkbenchSettings,
         background: Option<DecodedBackgroundImage>,
     ) -> Result<(), PreviewSessionError> {
         self.cancel_interactive_render();
@@ -634,6 +756,7 @@ impl ProjectPreviewSession {
         let video = settings
             .video_edit(self.source_duration)
             .map_err(EditorSessionError::from)?;
+        self.audio.edit(video.clone(), settings.audio, settings.mixing_clips());
         let previous = self
             .settings
             .video_edit(self.source_duration)
@@ -645,7 +768,7 @@ impl ProjectPreviewSession {
                 .any(|clip| old.id == clip.id && old.speed_percent != clip.speed_percent)
         });
         let tick = self.controller.snapshot().project_tick;
-        let duration = video.duration();
+        let duration = settings.project_duration(self.source_duration);
         // Keep the same source image under the playhead when speed changes, including undo.
         let anchored_tick = if speed_changed {
             if tick == previous.duration() {
@@ -663,6 +786,7 @@ impl ProjectPreviewSession {
         if let Some(tick) = anchored_tick {
             self.controller.seek(tick)?;
         }
+        settings.video=Some(video);
         self.camera = camera;
         self.settings = settings;
         self.background = background;
@@ -777,7 +901,14 @@ impl ProjectPreviewSession {
         let snapshot = self.controller.snapshot();
         let evaluation = FrameEvaluator::new(&self.source_timeline, &self.camera, &self.cursor)?
             .evaluate_edit(snapshot.project_tick, self.output, &self.settings)?;
-        let evaluation = self.preview_evaluation(evaluation);
+        let mut evaluation = self.preview_evaluation(evaluation);
+        if !self.settings.source_video_enabled {
+            if let Some(decoded)=&self.decoded_frame {
+                evaluation.source_frame.presentation_tick=decoded.pts;
+                self.cancel_interactive_render();
+                return self.prepare_preview(snapshot,evaluation).map(Some);
+            }
+        }
         let target_index = evaluation.source_frame.frame_index;
         let target_pts = *self
             .source_timeline
@@ -896,8 +1027,10 @@ impl ProjectPreviewSession {
         let snapshot = self.controller.snapshot();
         let evaluation = FrameEvaluator::new(&self.source_timeline, &self.camera, &self.cursor)?
             .evaluate_edit(snapshot.project_tick, self.output, &self.settings)?;
-        let evaluation = self.preview_evaluation(evaluation);
-        self.decode_selected(evaluation.source_frame.frame_index)?;
+        let mut evaluation = self.preview_evaluation(evaluation);
+        if !self.settings.source_video_enabled && self.decoded_frame.is_some() {
+            evaluation.source_frame.presentation_tick=self.decoded_frame.as_ref().unwrap().pts;
+        } else { self.decode_selected(evaluation.source_frame.frame_index)?; }
         self.prepare_preview(snapshot, evaluation)
     }
 
@@ -1407,4 +1540,10 @@ mod tests {
         assert_eq!(seek_anchor_index(target_index, third), 520);
         assert_eq!(seek_anchor_index(target_index, fourth), 0);
     }
+}
+
+#[cfg(test)]
+impl ProjectPreviewSession {
+    pub(crate) fn review_source_size(&self)->Option<(u32,u32)>{self.decoded_frame.as_ref().map(|f|(f.width,f.height))}
+    pub(crate) fn review_visual_size(&self,slot:&str)->Option<(u32,u32)>{self.compositor.review_visual_size(slot)}
 }

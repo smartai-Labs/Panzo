@@ -1,0 +1,41 @@
+{
+  "activeHash": "3f35e3da48304cbfc1e19e3f69a69a84966a4aa6603640da3a20cf81ef10fc52",
+  "expiredHash": "6f77f852d070d718abceaf639531c5424c1abecf4b2b603c640169f3546be7a1",
+  "exports": [
+    {
+      "firstCenterBgr": [
+        1,
+        255,
+        0
+      ],
+      "format": "mp4",
+      "fps": 30,
+      "frames": 30,
+      "lastCenterBgr": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "firstCenterBgr": [
+        0,
+        255,
+        0
+      ],
+      "format": "gif",
+      "fps": 15,
+      "frames": 15,
+      "lastCenterBgr": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "previewExportHashMatches": true,
+  "sourceUnchanged": true,
+  "speedPercent": 200,
+  "trimStartMs": 500,
+  "undoRedoSaveReopen": true
+}

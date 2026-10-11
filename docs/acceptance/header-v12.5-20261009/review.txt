@@ -1,0 +1,4 @@
+normal-dark: menu/theme/system buttons center y=16; matching native hit tests; page menu/status/fit aligned; no gear or extra project row; GPU bounds follow enlarged well.
+maximized-dark: menu/theme/system buttons center y=16; matching native hit tests; page menu/status/fit aligned; no gear or extra project row; GPU bounds follow enlarged well.
+restored-light: menu/theme/system buttons center y=16; matching native hit tests; page menu/status/fit aligned; no gear or extra project row; GPU bounds follow enlarged well.
+Programmatic minimize/restore passed; dirty state then undo passed. Physical native button clicks and cross-monitor DPI switching were not exercised. Project left unchanged.

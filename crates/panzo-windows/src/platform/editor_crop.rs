@@ -1,6 +1,6 @@
 use super::{
     CameraState, HWND, PreparedPreviewFrame, RECT, ReleaseCapture, SetCapture, WindowState,
-    client_rect, preview_video_rect,
+    client_rect,
 };
 
 #[derive(Clone, Copy)]
@@ -13,12 +13,25 @@ pub(super) struct CropDrag {
 
 impl WindowState {
     pub(super) fn toggle_crop_editing(&mut self) {
-        if !self.crop_editing && self.selected_crop().is_none() {
+        self.set_crop_editing(!self.crop_editing);
+    }
+
+    pub(super) fn set_crop_editing(&mut self, enabled: bool) {
+        if enabled && self.session.is_asset_preview() {
+            if let Err(error)=self.select_preview_source(false) { self.record_result(Err(error));return; }
+        }
+        if enabled && self.selected_crop().is_none() {
             return;
         }
-        self.crop_editing = !self.crop_editing;
+        self.crop_editing = enabled;
         self.session.set_crop_editing(self.crop_editing);
+        let target=self.selected_video.as_ref().filter(|id|self.crop_editing&&self.editor.settings().visual_clips.iter().any(|c|&c.id==*id)).cloned();
+        self.session.set_crop_target(target);
         if self.crop_editing {
+            if let Some(bin) = &self.project_bin {
+                super::project_bin::select_preview(bin, false);
+            }
+            self.deferred_playback.cancel();
             self.session.pause();
             self.selected_segment = None;
             if let Some(crop) = self.selected_crop() {
@@ -36,15 +49,25 @@ impl WindowState {
         );
     }
 
+    fn crop_content_rect(&self,frame:&PreparedPreviewFrame)->panzo_core::SourceRect {
+        let mut evaluation=frame.evaluation;let content_scale=evaluation.camera_transform.content_scale;evaluation.camera_transform=CameraState::BASE.into();evaluation.camera_transform.content_scale=content_scale;
+        if let Some(clip)=self.selected_video.as_ref().and_then(|id|self.editor.settings().visual_clips.iter().find(|c|&c.id==id)) {
+            let size=self.editor.settings().visual_assets.iter().find(|a|a.id==clip.asset_id)
+                .map_or(frame.source_size(),|a|(a.width,a.height));
+            evaluation.camera_transform.content_scale=1.0;
+            let r=evaluation.content_rect(size,self.editor.settings().canvas.inset);
+            let w=(r.right-r.left)*clip.scale;let h=(r.bottom-r.top)*clip.scale;
+            return panzo_core::SourceRect{left:clip.x-w/2.,right:clip.x+w/2.,top:clip.y-h/2.,bottom:clip.y+h/2.};
+        }
+        evaluation.content_rect(frame.source_size(),self.editor.settings().canvas.inset)
+    }
+
     pub(super) fn crop_overlay(&self, frame: &PreparedPreviewFrame) -> Option<[f64; 4]> {
         if !self.crop_editing {
             return None;
         }
         let crop = self.selected_crop()?;
-        let mut evaluation = frame.evaluation;
-        evaluation.camera_transform = CameraState::BASE.into();
-        let rect =
-            evaluation.content_rect(frame.source_size(), self.editor.settings().canvas.inset);
+        let rect = self.crop_content_rect(frame);
         let w = rect.right - rect.left;
         let h = rect.bottom - rect.top;
         Some([
@@ -56,13 +79,8 @@ impl WindowState {
     }
 
     fn crop_source_rect(&self, client: RECT) -> RECT {
-        let video = preview_video_rect(client, &self.frame, self.theme);
-        let mut evaluation = self.frame.evaluation;
-        evaluation.camera_transform = CameraState::BASE.into();
-        let content = evaluation.content_rect(
-            self.frame.source_size(),
-            self.editor.settings().canvas.inset,
-        );
+        let video = self.preview_rect(client);
+        let content = self.crop_content_rect(&self.frame);
         let w = f64::from(video.right - video.left);
         let h = f64::from(video.bottom - video.top);
         RECT {
@@ -74,7 +92,9 @@ impl WindowState {
     }
 
     pub(super) fn crop_hit(&self, client: RECT, x: i32, y: i32) -> Option<(i8, i8)> {
-        if !self.crop_editing {
+        if !self.crop_editing
+            || !super::HitRect(self.control_layout(client).preview_well).contains(x, y)
+        {
             return None;
         }
         let crop = self.selected_crop()?;
@@ -136,8 +156,12 @@ impl WindowState {
             (dx, dy),
             self.crop_locked,
         );
+        if self.selected_crop() == Some(crop) {
+            return;
+        }
         if let Err(error) = self.set_selected_crop(crop) {
             self.set_status(crate::platform::editor_ui::StatusSeverity::Warning, error);
+            return;
         }
         // Only the editing overlay changes while dragging; reuse the already decoded full frame.
         self.session
@@ -150,7 +174,16 @@ impl WindowState {
         } else if let Ok(frame) = self.session.compose_prepared(&self.frame) {
             self.fallback_frame = Some(frame);
         }
-        self.refresh(hwnd, true);
+        // Geometry is stable during a drag. Do not refresh the project bin, child
+        // layout, accessibility tree or the rest of the inspector on every move.
+        let layout = self.control_layout(client_rect(hwnd));
+        for rect in layout.crop_edges.iter().map(|r| r.0)
+            .chain(self.preview_surface.is_none().then_some(layout.preview_well))
+        {
+            if rect.right > rect.left && rect.bottom > rect.top {
+                unsafe { let _ = windows::Win32::Graphics::Gdi::InvalidateRect(Some(hwnd), Some(&rect), false); }
+            }
+        }
     }
 
     pub(super) fn finish_crop_drag(&mut self, hwnd: HWND, cancel: bool) {

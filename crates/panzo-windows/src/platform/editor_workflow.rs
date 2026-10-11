@@ -14,6 +14,7 @@ impl WindowState {
 
     pub(super) fn set_canvas_preset(&mut self, id: ControlId) {
         let ratio = match id {
+            ControlId::CanvasStandard => Some((4, 3)),
             ControlId::CanvasWide => Some((16, 9)),
             ControlId::CanvasPortrait => Some((9, 16)),
             ControlId::CanvasSquare => Some((1, 1)),
@@ -26,6 +27,19 @@ impl WindowState {
             .map_err(PreviewWindowError::from)
             .and_then(|()| self.apply_editor_state());
         self.record_editor_result(result, "画布尺寸已更新");
+    }
+
+    pub(super) fn choose_canvas_resolution(&mut self, hwnd: HWND) {
+        use crate::platform::{app_menu, editor_ui::IconKind};
+        let sizes = [(1920,1080), (2560,1440), (3840,2160)];
+        let current = self.canvas_size();
+        let rows = sizes.iter().enumerate().map(|(i,(w,h))| app_menu::Row::labelled(i as i32+1,format!("{w} × {h}"),IconKind::Monitor,true).checked(current.width==*w && current.height==*h)).chain([app_menu::Row::command(4,"原始尺寸",IconKind::Restore,true)]).collect();
+        let anchor = self.control_layout(client_rect(hwnd)).control_rect(ControlId::CanvasResolution).0;
+        if let Ok(Some(id)) = app_menu::show_rows(hwnd,anchor,self.theme,rows,false) {
+            let size = if id==4 {None} else {sizes.get((id-1) as usize).map(|(w,h)|CanvasSize{width:*w,height:*h})};
+            let result = self.editor.set_canvas_size(size).map_err(PreviewWindowError::from).and_then(|()|self.apply_editor_state());
+            self.record_editor_result(result,"分辨率已更新 · 可撤销");
+        }
     }
 
     pub(super) fn update_canvas_output(&mut self) -> Result<(), PreviewWindowError> {
@@ -44,6 +58,10 @@ impl WindowState {
     }
 
     pub(super) fn seek_clip_boundary(&mut self, forward: bool) {
+        if self.session.is_asset_preview() {
+            self.seek_absolute(if forward { self.session.snapshot().duration_tick } else { TimeTick::ZERO });
+            return;
+        }
         if self.crop_editing {
             self.toggle_crop_editing();
         }
@@ -72,6 +90,7 @@ impl WindowState {
         }
         let dpi = i32::try_from(self.theme.dpi).unwrap_or(96).max(1);
         let layout = crate::platform::ui_preferences::LayoutPreferences {
+            project_bin_width: self.project_bin_width_dip,
             inspector_width: self.inspector_width_dip,
             inspector_visible: self.theme.metrics.inspector_width > 0,
             timeline_height: self.theme.metrics.timeline_height * 96 / dpi,
@@ -90,6 +109,7 @@ impl WindowState {
             return;
         }
         let layout = crate::platform::ui_preferences::layout();
+        self.project_bin_width_dip = layout.project_bin_width.clamp(0, 420);
         self.inspector_width_dip = layout.inspector_width;
         self.theme.metrics.inspector_width = if layout.inspector_visible {
             self.theme.scale(layout.inspector_width)

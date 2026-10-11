@@ -118,7 +118,7 @@ impl ProjectEditorSession {
                 .settings
                 .video_edit(self.duration)
                 .map_err(|e| e.to_string())?;
-            CameraTrackEditor::new(draft.state.camera.clone(), self.duration)
+            CameraTrackEditor::new(draft.state.camera.clone(), TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))
                 .map_err(|e| e.to_string())?;
             load_effective_background(&self.project_root, &draft.state.settings)
                 .map_err(|e| e.to_string())?;

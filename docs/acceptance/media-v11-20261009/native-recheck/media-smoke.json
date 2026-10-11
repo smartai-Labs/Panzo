@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checks": [
+    "protocol 2 package installed through native plugin manager",
+    "user endpoint/model/key saved; plaintext key absent from saved settings",
+    "standalone worker decodes imported WAV into project PCM; waveform and clip saved",
+    "trim, start, gain, fades commit via shared undo/redo and save",
+    "native mouse drag moves audio and trims its edge; each gesture is one undo step",
+    "voiceover countdown cancels without recording or adding an asset",
+    "configured AI called by independent plugin; real mixed audio uploaded to loopback; timestamped cues persisted",
+    "manual correction and themed workbench; missing timestamps rejected without replacing existing subtitles",
+    "cancel interrupts worker network wait and preserves existing subtitles",
+    "SRT export preserves corrected text and timestamps",
+    "fresh process reopens subtitles/audio and restores model configuration",
+    "disabled plugin blocks new AI jobs while persisted audio and captions remain editable"
+  ],
+  "binary": "target/desktop-v11/release/panzo.exe",
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\ui-release-7b02c456-5a0f-4e7b-8aa6-a8c20259260d",
+  "project": "D:\\ChatGPT\\Panzo\\.tmp\\ui-release-7b02c456-5a0f-4e7b-8aa6-a8c20259260d\\media-test.panzo",
+  "exitCodes": [
+    0,
+    0
+  ]
+}

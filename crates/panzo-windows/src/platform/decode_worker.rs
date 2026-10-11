@@ -81,6 +81,7 @@ impl Mailbox {
 
 #[derive(Default)]
 struct Shared {
+    preview_limit: AtomicUsize,
     mailbox: Mutex<Mailbox>,
     wake: Condvar,
     completed: Mutex<Option<Arc<dyn Fn() + Send + Sync>>>,
@@ -131,6 +132,7 @@ impl DecodeWorker {
             )?;
         let permit = WorkerPermit;
         let shared = Arc::new(Shared::default());
+        shared.preview_limit.store(preview_limit.unwrap_or(0) as usize,Ordering::Release);
         let worker_shared = Arc::clone(&shared);
         let path = path.to_owned();
         let proxy = allow_proxy
@@ -142,8 +144,9 @@ impl DecodeWorker {
             .name("panzo-media-preview".into())
             .spawn(move || {
                 let _permit = permit;
-                let mut decoder = MfBgraDecoder::open_with_preview_limit(path, preview_limit)
+                let mut decoder = MfBgraDecoder::open_with_preview_limit(&path, preview_limit)
                     .map_err(|error| error.to_string());
+                let mut preview_limit=preview_limit;
                 let budget = if preview_limit == Some(160) {
                     2 * 1024 * 1024
                 } else if allow_proxy {
@@ -170,6 +173,14 @@ impl DecodeWorker {
                         }
                         mailbox.pending.take().expect("pending request")
                     };
+                    let wanted=worker_shared.preview_limit.load(Ordering::Acquire) as u32;
+                    let wanted=(wanted!=0).then_some(wanted);
+                    if wanted!=preview_limit {
+                        preview_limit=wanted;
+                        let input=proxy_info.as_ref().map_or(&path,|p:&Arc<crate::platform::preview_proxy::PreviewProxy>|&p.path);
+                        decoder=MfBgraDecoder::open_with_preview_limit(input,preview_limit).map_err(|e|e.to_string());
+                        cache=FrameCache::new(budget);position=None;
+                    }
                     if proxy_info.is_none()
                         && let Some(Ok(info)) = worker_proxy.as_ref().and_then(|job| job.result())
                         && let Ok(proxy_decoder) =
@@ -206,7 +217,7 @@ impl DecodeWorker {
                             // Only metadata is copied; proxy and presented frames share
                             // immutable pixels, while the cache keeps proxy timestamps.
                             let mut mapped = (*frame).clone();
-                            proxy.restore_source_time(&mut mapped)?;
+                            proxy.restore_source_time_with_limit(&mut mapped,preview_limit)?;
                             Ok(Arc::new(mapped))
                         });
                     }
@@ -268,6 +279,9 @@ impl DecodeWorker {
         lock(&self.shared.mailbox).cancel();
     }
 
+    pub fn set_preview_limit(&self,limit:Option<u32>) {
+        self.cancel();self.shared.preview_limit.store(limit.unwrap_or(0) as usize,Ordering::Release);
+    }
     pub fn set_completion_callback(&self, callback: impl Fn() + Send + Sync + 'static) {
         *lock(&self.shared.completed) = Some(Arc::new(callback));
     }

@@ -1,0 +1,11 @@
+[package]
+name = "panzo-image-filters"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+[dependencies]
+panzo-plugin-api = { path = "../../crates/panzo-plugin-api" }
+serde_json.workspace = true
+[lints]
+workspace = true

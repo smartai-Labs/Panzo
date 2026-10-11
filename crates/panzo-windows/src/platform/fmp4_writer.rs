@@ -83,6 +83,20 @@ impl Nv12VideoConfig {
         })
     }
 
+    pub fn sharing(width: u32, height: u32, fps: u32) -> Result<Self, Fmp4ProbeError> {
+        validate_video_dimensions(width, height)?;
+        let bitrate = (u64::from(width) * u64::from(height) * u64::from(fps) / 6)
+            .clamp(600_000, u64::from(MAX_SCREEN_CAPTURE_BITRATE));
+        Self {
+            width,
+            height,
+            frames_per_second: fps,
+            target_bitrate: bitrate as u32,
+            gop_frames: fps,
+        }
+        .validate()
+    }
+
     fn validate(self) -> Result<Self, Fmp4ProbeError> {
         validate_video_dimensions(self.width, self.height)?;
         if self.frames_per_second == 0 || self.target_bitrate == 0 || self.gop_frames == 0 {
@@ -149,6 +163,7 @@ pub struct Nv12Fmp4Writer {
     frame_bytes: usize,
     frames_written: u32,
     last_sample_end_tick: i64,
+    audio: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -171,6 +186,13 @@ impl Nv12Fmp4Writer {
         output_path: impl AsRef<Path>,
         config: Nv12VideoConfig,
     ) -> Result<Self, Fmp4ProbeError> {
+        Self::create_with_audio(output_path, config, false)
+    }
+    pub fn create_with_audio(
+        output_path: impl AsRef<Path>,
+        config: Nv12VideoConfig,
+        audio: bool,
+    ) -> Result<Self, Fmp4ProbeError> {
         let output_path = output_path.as_ref();
         validate_output_path(output_path)?;
         let config = config.validate()?;
@@ -188,8 +210,9 @@ impl Nv12Fmp4Writer {
                 PCWSTR(wide.as_ptr()),
             )
         })?;
+        let audio_output = audio.then(|| audio_media_type(true)).transpose()?;
         let media_sink = stage("MFCreateFMPEG4MediaSink", unsafe {
-            MFCreateFMPEG4MediaSink(&byte_stream, &output_type, None::<&IMFMediaType>)
+            MFCreateFMPEG4MediaSink(&byte_stream, &output_type, audio_output.as_ref())
         })?;
         let media_sink = MediaSinkSession::new(media_sink);
         let writer_attributes = create_attributes(2)?;
@@ -216,6 +239,11 @@ impl Nv12Fmp4Writer {
         stage("IMFSinkWriter::SetInputMediaType", unsafe {
             writer.SetInputMediaType(0, &input_type, &encoder_attributes)
         })?;
+        if audio {
+            stage("audio input", unsafe {
+                writer.SetInputMediaType(1, &audio_media_type(false)?, None::<&IMFAttributes>)
+            })?;
+        }
         let encoder = inspect_encoder(&writer)?;
         stage("IMFSinkWriter::BeginWriting", unsafe {
             writer.BeginWriting()
@@ -233,6 +261,7 @@ impl Nv12Fmp4Writer {
             frame_bytes,
             frames_written: 0,
             last_sample_end_tick: 0,
+            audio,
         })
     }
 
@@ -271,6 +300,24 @@ impl Nv12Fmp4Writer {
         Ok(())
     }
 
+    pub fn write_audio(&mut self, samples: &[i16], first_frame: u64) -> Result<(), Fmp4ProbeError> {
+        if !self.audio || samples.is_empty() {
+            return Ok(());
+        }
+        let bytes = samples
+            .iter()
+            .flat_map(|v| v.to_le_bytes())
+            .collect::<Vec<_>>();
+        let start = crate::platform::audio::tick_at(first_frame).0;
+        let end = crate::platform::audio::tick_at(first_frame + samples.len() as u64 / 2).0;
+        let sample = nv12_sample(&bytes, start, end - start, bytes.len())?;
+        stage("audio WriteSample", unsafe {
+            self.writer
+                .as_ref()
+                .ok_or(Fmp4ProbeError::WriterAlreadyFinalized)?
+                .WriteSample(1, &sample)
+        })
+    }
     pub fn encoder_name(&self) -> &str {
         &self.encoder.name
     }
@@ -295,6 +342,9 @@ impl Nv12Fmp4Writer {
         stage("IMFSinkWriter::NotifyEndOfSegment", unsafe {
             writer.NotifyEndOfSegment(0)
         })?;
+        if self.audio {
+            stage("audio end", unsafe { writer.NotifyEndOfSegment(1) })?;
+        }
         stage("IMFSinkWriter::Finalize", unsafe { writer.Finalize() })?;
         drop(writer);
         self.media_sink.shutdown()?;
@@ -554,6 +604,7 @@ fn inspect_fmp4_reader(
     let moov = read_box_metadata(reader, moov_header)?;
     let media_timescale = find_media_timescale(&moov, 0, moov.len())?;
     let default_durations = find_default_sample_durations(&moov, 0, moov.len())?;
+    let video_id = find_video_track(&moov, 0, moov.len())?;
     drop(moov);
 
     position = 0;
@@ -575,12 +626,13 @@ fn inspect_fmp4_reader(
                 if let Some(moof) = pending_moof.take() {
                     let metadata = read_box_metadata(reader, moof)?;
                     // Commit timing only once the complete mdat is within the file.
-                    last_video_end = last_video_end.max(inspect_moof_timing(
+                    last_video_end = last_video_end.max(inspect_moof_timing_selected(
                         &metadata,
                         0,
                         metadata.len(),
                         &default_durations,
                         &mut track_decode_times,
+                        video_id,
                     )?);
                     fragments += 1;
                     media_data += 1;
@@ -735,6 +787,30 @@ fn child_boxes(
     Ok(boxes)
 }
 
+fn find_video_track(bytes: &[u8], start: usize, end: usize) -> Result<Option<u32>, Fmp4ProbeError> {
+    for trak in child_boxes(bytes, start, end)?
+        .iter()
+        .filter(|b| &b.kind == b"trak")
+    {
+        let children = child_boxes(bytes, trak.payload_start, trak.end)?;
+        for mdia in children.iter().filter(|b| &b.kind == b"mdia") {
+            let media = child_boxes(bytes, mdia.payload_start, mdia.end)?;
+            if media
+                .iter()
+                .filter(|b| &b.kind == b"hdlr")
+                .any(|b| bytes.get(b.payload_start + 8..b.payload_start + 12) == Some(b"vide"))
+                && let Some(tkhd) = children.iter().find(|b| &b.kind == b"tkhd")
+            {
+                let p = &bytes[tkhd.payload_start..tkhd.end];
+                return Ok(Some(read_u32(
+                    p,
+                    if p.first() == Some(&1) { 20 } else { 12 },
+                )?));
+            }
+        }
+    }
+    Ok(None)
+}
 fn find_media_timescale(
     bytes: &[u8],
     moov_start: usize,
@@ -748,10 +824,15 @@ fn find_media_timescale(
             .into_iter()
             .filter(|header| &header.kind == b"mdia")
         {
-            for mdhd in child_boxes(bytes, mdia.payload_start, mdia.end)?
-                .into_iter()
-                .filter(|header| &header.kind == b"mdhd")
+            let media = child_boxes(bytes, mdia.payload_start, mdia.end)?;
+            if media
+                .iter()
+                .filter(|b| &b.kind == b"hdlr")
+                .any(|b| bytes.get(b.payload_start + 8..b.payload_start + 12) != Some(b"vide"))
             {
+                continue;
+            }
+            for mdhd in media.into_iter().filter(|header| &header.kind == b"mdhd") {
                 let payload = &bytes[mdhd.payload_start..mdhd.end];
                 let offset = match payload.first() {
                     Some(0) => 12,
@@ -795,6 +876,23 @@ fn inspect_moof_timing(
     moof_end: usize,
     trex_durations: &[(u32, u32)],
     track_decode_times: &mut Vec<(u32, i128)>,
+) -> Result<i128, Fmp4ProbeError> {
+    inspect_moof_timing_selected(
+        bytes,
+        moof_start,
+        moof_end,
+        trex_durations,
+        track_decode_times,
+        None,
+    )
+}
+fn inspect_moof_timing_selected(
+    bytes: &[u8],
+    moof_start: usize,
+    moof_end: usize,
+    trex_durations: &[(u32, u32)],
+    track_decode_times: &mut Vec<(u32, i128)>,
+    video_id: Option<u32>,
 ) -> Result<i128, Fmp4ProbeError> {
     let mut maximum_end = 0_i128;
     for traf in child_boxes(bytes, moof_start, moof_end)?
@@ -845,7 +943,9 @@ fn inspect_moof_timing(
                 decode_time,
             )?;
             decode_time = end;
-            maximum_end = maximum_end.max(maximum);
+            if video_id.is_none_or(|id| id == track_id) {
+                maximum_end = maximum_end.max(maximum);
+            }
         }
         if let Some((_, time)) = track_decode_times
             .iter_mut()
@@ -1033,6 +1133,45 @@ fn set_video_geometry(
     set_u64(media_type, MF_MT_PIXEL_ASPECT_RATIO, pack_pair(1, 1))
 }
 
+fn audio_media_type(encoded: bool) -> Result<IMFMediaType, Fmp4ProbeError> {
+    use windows::Win32::Media::MediaFoundation::{
+        MF_MT_AAC_AUDIO_PROFILE_LEVEL_INDICATION, MF_MT_AAC_PAYLOAD_TYPE,
+        MF_MT_AUDIO_AVG_BYTES_PER_SECOND, MF_MT_AUDIO_BITS_PER_SAMPLE, MF_MT_AUDIO_BLOCK_ALIGNMENT,
+        MF_MT_AUDIO_NUM_CHANNELS, MF_MT_AUDIO_SAMPLES_PER_SECOND, MF_MT_MAJOR_TYPE, MF_MT_SUBTYPE,
+        MFAudioFormat_AAC, MFAudioFormat_PCM, MFCreateMediaType, MFMediaType_Audio,
+    };
+    let media = stage("audio media type", unsafe { MFCreateMediaType() })?;
+    stage("audio major", unsafe {
+        media.SetGUID(&MF_MT_MAJOR_TYPE, &MFMediaType_Audio)
+    })?;
+    stage("audio subtype", unsafe {
+        media.SetGUID(
+            &MF_MT_SUBTYPE,
+            if encoded {
+                &MFAudioFormat_AAC
+            } else {
+                &MFAudioFormat_PCM
+            },
+        )
+    })?;
+    for (key, value) in [
+        (MF_MT_AUDIO_NUM_CHANNELS, 2),
+        (MF_MT_AUDIO_SAMPLES_PER_SECOND, 48_000),
+        (MF_MT_AUDIO_BITS_PER_SAMPLE, 16),
+        (MF_MT_AUDIO_BLOCK_ALIGNMENT, if encoded { 1 } else { 4 }),
+        (
+            MF_MT_AUDIO_AVG_BYTES_PER_SECOND,
+            if encoded { 24_000 } else { 192_000 },
+        ),
+    ] {
+        set_u32(&media, key, value)?;
+    }
+    if encoded {
+        set_u32(&media, MF_MT_AAC_PAYLOAD_TYPE, 0)?;
+        set_u32(&media, MF_MT_AAC_AUDIO_PROFILE_LEVEL_INDICATION, 0x29)?;
+    }
+    Ok(media)
+}
 fn create_attributes(capacity: u32) -> Result<IMFAttributes, Fmp4ProbeError> {
     let mut attributes = None;
     stage("MFCreateAttributes", unsafe {

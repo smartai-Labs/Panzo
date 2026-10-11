@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-08",
+  "candidate": "target/multimodal-ocr/release/panzo.exe",
+  "sourceSha256": "C134938D3CCE10068A243B1095FC115D3721C6A96E50F26FA56AB1D96DEB7426",
+  "binaries": [
+    {
+      "name": "panzo.exe",
+      "sha256": "257D48499AFF6D9CEFB23BE49A7C4760D9D2BECA2DF3C0D7150AAC9D6C8D3F02",
+      "bytes": 7048192
+    },
+    {
+      "name": "panzo-cli.exe",
+      "sha256": "A5404167FDB4B5FB68186EB4665D90A51ACE9A68DECED3300120F3F745B60364",
+      "bytes": 8309248
+    }
+  ],
+  "workspaceTests": {
+    "passed": 266,
+    "failed": 0,
+    "ignored": 30
+  },
+  "newAutomatedRegressions": 7,
+  "nativeConfigurationDialog": "passed",
+  "freshProcessKeyReload": "passed",
+  "maskedSettingsScreenshotsInspected": true,
+  "format": "passed",
+  "clippyWarningsDenied": "passed",
+  "diffWhitespace": "passed",
+  "networkValidation": "loopback HTTP mock, generated image, synthetic key; no external API recognition performed",
+  "configurationStorage": "isolated fixture; user settings untouched",
+  "sourceIdentityMatchesBuild": true,
+  "runningProcess": 55468,
+  "priorUnsavedProjectInstancePreserved": 44840,
+  "providerCompatibility": "OpenAI-compatible Chat Completions image_url input; chosen model must support images",
+  "notVerified": [
+    "real provider authentication and billing",
+    "real model OCR quality"
+  ]
+}

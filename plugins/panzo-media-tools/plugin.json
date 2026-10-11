@@ -1,0 +1,1 @@
+﻿{"id":"panzo.media-tools","name":"声音、旁白与 AI 字幕","version":"1.0.0","publisher":"Panzo","description":"本地导入音频、录制旁白；使用用户配置的语音模型生成字幕。仅在点击生成时向所选服务发送音频和密钥。","protocol":2,"target":"x86_64-windows","commands":[{"id":"audio.import","name":"导入音频"},{"id":"audio.record","name":"录制旁白"},{"id":"speech.transcribe","name":"AI 自动字幕"}],"executable_sha256":""}

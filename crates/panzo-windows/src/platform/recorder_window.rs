@@ -1,4 +1,19 @@
+#[cfg(test)]
+#[path = "stage_c_review.rs"]
+mod stage_c_review;
+#[cfg(test)]
+#[path = "stage_d_review.rs"]
+mod stage_d_review;
 use crate::platform::capture_probe::primary_monitor;
+#[path = "capture_menu.rs"]
+mod capture_menu;
+use capture_menu::draw_home;
+#[cfg(test)]
+#[path = "stage_a_review.rs"]
+mod stage_a_review;
+#[cfg(test)]
+#[path = "stage_b_review.rs"]
+mod stage_b_review;
 #[cfg(test)]
 #[path = "unified_window_review.rs"]
 pub(crate) mod unified_window_review;
@@ -26,10 +41,10 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use thiserror::Error;
 use windows::Win32::Foundation::{COLORREF, HINSTANCE, HWND, LPARAM, LRESULT, POINT, RECT, WPARAM};
 use windows::Win32::Graphics::Gdi::{
-    BeginPaint, BitBlt, ClientToScreen, CreateCompatibleBitmap, CreateCompatibleDC,
-    CreateSolidBrush, DT_END_ELLIPSIS, DT_LEFT, DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER, DeleteDC,
-    DeleteObject, DrawTextW, EndPaint, FillRect, HGDIOBJ, InvalidateRect, PAINTSTRUCT, SRCCOPY,
-    SelectObject, SetBkMode, SetTextColor, TRANSPARENT,
+    BeginPaint, BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, CreateSolidBrush,
+    DT_END_ELLIPSIS, DT_LEFT, DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER, DeleteDC, DeleteObject,
+    DrawTextW, EndPaint, FillRect, HGDIOBJ, InvalidateRect, PAINTSTRUCT, SRCCOPY, SelectObject,
+    SetBkMode, SetTextColor, TRANSPARENT,
 };
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::Controls::WM_MOUSELEAVE;
@@ -38,16 +53,14 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
     VK_ESCAPE, VK_RETURN, VK_SHIFT, VK_SPACE, VK_TAB,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    AppendMenuW, CS_HREDRAW, CS_VREDRAW, CW_USEDEFAULT, CreatePopupMenu, CreateWindowExW,
-    DefWindowProcW, DestroyMenu, DestroyWindow, DispatchMessageW, GWLP_USERDATA, GetClientRect,
-    GetMessageW, GetWindowLongPtrW, IDC_ARROW, KillTimer, LoadCursorW, MF_SEPARATOR, MF_STRING,
-    MINMAXINFO, MSG, PostQuitMessage, RegisterClassW, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER,
-    SetCursor, SetForegroundWindow, SetTimer, SetWindowLongPtrW, SetWindowPos, SetWindowTextW,
-    ShowWindow, TPM_LEFTALIGN, TPM_RETURNCMD, TrackPopupMenu, TranslateMessage, WINDOW_EX_STYLE,
-    WM_CANCELMODE, WM_CAPTURECHANGED, WM_CLOSE, WM_DESTROY, WM_DPICHANGED, WM_ERASEBKGND,
-    WM_GETMINMAXINFO, WM_KEYDOWN, WM_KILLFOCUS, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE,
-    WM_NCDESTROY, WM_PAINT, WM_SETFOCUS, WM_SIZE, WM_TIMER, WNDCLASSW, WS_OVERLAPPEDWINDOW,
-    WS_VISIBLE,
+    CS_HREDRAW, CS_VREDRAW, CW_USEDEFAULT, CreateWindowExW, DefWindowProcW, DestroyWindow,
+    DispatchMessageW, GWLP_USERDATA, GetClientRect, GetMessageW, GetWindowLongPtrW, IDC_ARROW,
+    KillTimer, LoadCursorW, MINMAXINFO, MSG, PostQuitMessage, RegisterClassW, SW_SHOW,
+    SWP_NOACTIVATE, SWP_NOZORDER, SetCursor, SetForegroundWindow, SetTimer, SetWindowLongPtrW,
+    SetWindowPos, SetWindowTextW, ShowWindow, TranslateMessage, WINDOW_EX_STYLE, WM_CANCELMODE,
+    WM_CAPTURECHANGED, WM_CLOSE, WM_DESTROY, WM_DPICHANGED, WM_ERASEBKGND, WM_GETMINMAXINFO,
+    WM_KEYDOWN, WM_KILLFOCUS, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE, WM_NCDESTROY, WM_PAINT,
+    WM_SETFOCUS, WM_SIZE, WM_TIMER, WNDCLASSW, WS_OVERLAPPEDWINDOW, WS_VISIBLE,
 };
 use windows::core::{Error as WindowsError, PCWSTR, w};
 
@@ -60,10 +73,12 @@ const WM_QUIT_WINDOW: u32 = windows::Win32::UI::WindowsAndMessaging::WM_APP + 31
 pub(crate) enum NavigationIntent {
     OpenProject(PathBuf),
     NewRecording,
+    StartRecording,
+    Home,
     Quit,
 }
 const MAXIMUM_RECORDING_DURATION: Duration = Duration::from_hours(24);
-const TOOLTIP_DELAY: Duration = Duration::from_millis(550);
+const TOOLTIP_DELAY: Duration = Duration::from_millis(450);
 const MONITOR_SOURCE_COMMAND: usize = 1;
 const FIRST_WINDOW_SOURCE_COMMAND: usize = 1_000;
 
@@ -149,6 +164,7 @@ impl RecorderWindow {
         initial_project: Option<PathBuf>,
     ) -> Result<RecorderWindowSmokeReport, RecorderWindowError> {
         enable_per_monitor_dpi_awareness();
+        let _painting = crate::platform::desktop_ui::PaintSession::new();
         let initial_theme = EditorTheme::current(system_dpi());
         fs::create_dir_all(project_library).map_err(|source| {
             RecorderWindowError::CreateLibrary {
@@ -202,19 +218,34 @@ impl RecorderWindow {
             initial_theme.scale(1440),
             initial_theme.scale(900),
         );
+        let workspace = if crate::platform::workspace::enabled(
+            matches!(automation, Automation::None) && ready.is_none(),
+        ) {
+            Some(win(
+                "CreateWorkspace",
+                crate::platform::workspace::create(),
+            )?)
+        } else {
+            None
+        };
+        if workspace.is_some() {
+            state.home = true;
+        }
         let hwnd = win("CreateWindowExW", unsafe {
             CreateWindowExW(
                 WINDOW_EX_STYLE::default(),
                 class_name,
                 w!("Panzo"),
-                WS_OVERLAPPEDWINDOW
-                    | WS_VISIBLE
-                    | windows::Win32::UI::WindowsAndMessaging::WS_CLIPCHILDREN,
+                (if workspace.is_some() {
+                    windows::Win32::UI::WindowsAndMessaging::WS_CHILD | windows::Win32::UI::WindowsAndMessaging::WS_CLIPSIBLINGS
+                } else {
+                    WS_OVERLAPPEDWINDOW | WS_VISIBLE
+                }) | windows::Win32::UI::WindowsAndMessaging::WS_CLIPCHILDREN,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
                 initial_width,
                 initial_height,
-                None,
+                workspace,
                 None,
                 Some(instance),
                 None,
@@ -229,6 +260,15 @@ impl RecorderWindow {
         preview_window::editor_titlebar::initialize(hwnd);
         let host = unsafe { &mut *state_pointer };
         host.hwnd = Some(hwnd);
+        if matches!(automation, Automation::None) && ready.is_none() {
+            let (shell, errors) = crate::platform::app_shell::ShellIntegration::install(hwnd);
+            host.shell = Some(shell);
+            host.status = if errors.is_empty() {
+                "选择功能开始 · 可在设置中自定义快捷键".into()
+            } else {
+                errors.join("；")
+            };
+        }
         if let Some(editor) = host.editor.as_mut() {
             let result = editor
                 .attach(hwnd)
@@ -242,6 +282,19 @@ impl RecorderWindow {
             }
             host.last_project = Some(editor.project_root().to_path_buf());
         } else {
+            host.refresh(hwnd);
+        }
+        let notices = crate::platform::capture_tools::configure(
+            project_library,
+            matches!(automation, Automation::None) && ready.is_none(),
+        );
+        crate::platform::capture_tools::set_pin_recovery_available(
+            host.shell
+                .as_ref()
+                .is_some_and(crate::platform::app_shell::ShellIntegration::pin_recovery_available),
+        );
+        if !notices.is_empty() {
+            host.status = notices.join("；");
             host.refresh(hwnd);
         }
         telemetry.window_created.store(true, Ordering::Relaxed);
@@ -261,6 +314,15 @@ impl RecorderWindow {
             let _ = windows::Win32::Graphics::Gdi::UpdateWindow(hwnd);
         }
 
+        if let Some(root) = workspace {
+            crate::platform::workspace::attach(
+                root,
+                hwnd,
+                project_library,
+                host.editor.is_some() || host.requested_project.is_some(),
+            )
+            .map_err(RecorderWindowError::Editor)?;
+        }
         if let Some(ready) = ready {
             ready(hwnd.0 as usize);
         }
@@ -279,6 +341,12 @@ impl RecorderWindow {
             }
             if status == 0 {
                 break;
+            }
+            if crate::platform::shortcuts::dialog_message(&message)
+                || crate::platform::capture_tools::dialog_message(&message)
+                || crate::platform::workspace::dialog_message(&message)
+            {
+                continue;
             }
             let panel = unsafe { &*state_pointer }
                 .editor
@@ -462,6 +530,12 @@ struct ContentTransition {
 
 #[allow(clippy::struct_excessive_bools)]
 struct WindowState {
+    recording_options: crate::platform::recorder::RecordingOptions,
+    hud: Option<crate::platform::recording_hud::RecordingHud>,
+    import_job: Option<crate::platform::media_import::ImportJob>,
+    home: bool,
+    camera_enabled: bool,
+    shell: Option<crate::platform::app_shell::ShellIntegration>,
     transition: Option<ContentTransition>,
     accessibility: crate::platform::accessibility::AccessibilityHost,
     library_root: PathBuf,
@@ -525,6 +599,12 @@ impl WindowState {
             |project| format!("上一个项目已就绪：{}", project.display()),
         );
         Self {
+            home: matches!(automation, Automation::None),
+            camera_enabled: crate::platform::ui_preferences::capture_camera_enabled(),
+            shell: None,
+            recording_options: crate::platform::ui_preferences::recording_options(),
+            hud: None,
+            import_job: None,
             library_root,
             transition: None,
             accessibility: crate::platform::accessibility::AccessibilityHost::default(),
@@ -557,7 +637,16 @@ impl WindowState {
         }
     }
 
+    fn open_recording_setup(&mut self,hwnd:HWND) {
+        let mode=match self.capture_source {RecordingSource::Region(_)=>0,RecordingSource::Window(_)=>1,_=>2};
+        let label=format!("{} · {} × {}",self.capture_source.label(),self.capture_width,self.capture_height);
+        let mut options=self.recording_options.clone();options.camera.enabled=self.camera_enabled;
+        if let Err(e)=crate::platform::recording_setup::open(hwnd,&label,mode,&options){self.fail(e);}
+    }
     fn start_recording(&mut self) {
+        if self.import_job.is_some() {
+            return;
+        }
         if self.editor.is_some() {
             self.set_status(
                 crate::platform::editor_ui::StatusSeverity::Information,
@@ -575,12 +664,25 @@ impl WindowState {
                 return;
             }
         };
-        let control = RecordingControl::default();
+        self.home = false;
+        let mut control = RecordingControl::default();
+        control.camera_enabled = self.camera_enabled;
+        control.options = self.recording_options.clone();
+        control.options.camera.enabled = self.camera_enabled;
         let worker_control = control.clone();
         let worker_project = project_root.clone();
         let worker_source = self.capture_source.clone();
         let (sender, receiver) = mpsc::channel();
         std::thread::spawn(move || {
+            let deadline = Instant::now()
+                + Duration::from_secs(u64::from(worker_control.options.countdown_seconds.min(10)));
+            while Instant::now() < deadline {
+                if worker_control.stop_requested() {
+                    let _ = sender.send(BackgroundResult::Recording(Err("录制已取消".into())));
+                    return;
+                }
+                std::thread::sleep(Duration::from_millis(25));
+            }
             let result = CaptureRecorder::record_with_control(
                 &worker_project,
                 MAXIMUM_RECORDING_DURATION,
@@ -604,6 +706,31 @@ impl WindowState {
             .auto_stop_after
             .map(|duration| now + duration + Duration::from_secs(30));
         self.worker = Some(receiver);
+        if let Some(hwnd) = self.hwnd {
+            match crate::platform::recording_hud::RecordingHud::new(hwnd, control.clone()) {
+                Ok(hud) => {
+                    self.hud = Some(hud);
+                    unsafe {
+                        let _ = windows::Win32::UI::WindowsAndMessaging::SetWindowDisplayAffinity(
+                            crate::platform::workspace::window(hwnd),
+                            windows::Win32::UI::WindowsAndMessaging::WDA_EXCLUDEFROMCAPTURE,
+                        );
+                    }
+                }
+                Err(error) => {
+                    self.status =
+                        format!("悬浮条不可用：{error}；可使用录制快捷键或主窗口停止录制");
+                }
+            }
+            if self.hud.is_some() {
+                unsafe {
+                    let _ = windows::Win32::UI::WindowsAndMessaging::ShowWindow(
+                        crate::platform::workspace::window(hwnd),
+                        windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE,
+                    );
+                }
+            }
+        }
         self.control = Some(control);
         self.last_project = Some(project_root);
     }
@@ -628,6 +755,11 @@ impl WindowState {
 
     #[allow(clippy::too_many_lines)] // One ordered, nonblocking scheduling pass.
     fn on_timer(&mut self, hwnd: HWND) {
+        if let Some(hud) = &self.hud {
+            hud.update();
+        }
+        self.poll_import(hwnd);
+        let was_active = self.phase.is_active();
         crate::platform::editor_ui::sync_window_theme(&mut self.theme, hwnd);
         if self.close_when_finished && self.editor.is_none() && !self.phase.is_active() {
             self.telemetry.graceful_close.store(true, Ordering::Relaxed);
@@ -647,6 +779,11 @@ impl WindowState {
                 let _ = InvalidateRect(Some(hwnd), None, false);
             }
         }
+        if self.pointer.tooltip_visible {
+            if let Some(id)=self.pointer.hot {
+                crate::platform::hover_tip::show(hwnd,ControlLayout::for_state(hwnd,self).control_rect(id).0,id.tooltip());
+            }
+        } else {crate::platform::hover_tip::hide(hwnd);}
         if self.auto_start {
             self.auto_start = false;
             self.start_recording();
@@ -688,8 +825,20 @@ impl WindowState {
             });
         if let Some(result) = worker_result {
             self.worker = None;
+            self.hud = None;
+            unsafe {
+                let _ = windows::Win32::UI::WindowsAndMessaging::SetWindowDisplayAffinity(
+                    crate::platform::workspace::window(hwnd),
+                    windows::Win32::UI::WindowsAndMessaging::WDA_NONE,
+                );
+                let _ = ShowWindow(
+                    crate::platform::workspace::window(hwnd),
+                    windows::Win32::UI::WindowsAndMessaging::SW_RESTORE,
+                );
+            }
             match result {
                 Ok(BackgroundResult::Recording(Ok(report))) => {
+                    crate::platform::workspace::switch(1);
                     self.control = None;
                     self.complete_recording(report);
                     if self.auto_export {
@@ -702,7 +851,16 @@ impl WindowState {
                 Ok(
                     BackgroundResult::Recording(Err(error)) | BackgroundResult::Export(Err(error)),
                 )
-                | Err(error) => self.fail(error),
+                | Err(error) => {
+                    self.control = None;
+                    if error == "录制已取消" {
+                        self.last_project = find_last_ready_project(&self.library_root);
+                        self.phase = RecorderPhase::Ready;
+                        self.status = error;
+                    } else {
+                        self.fail(error);
+                    }
+                }
             }
             let automation_finished = self.auto_export
                 && matches!(self.phase, RecorderPhase::Complete | RecorderPhase::Failed);
@@ -733,10 +891,13 @@ impl WindowState {
             post_quit_window(hwnd);
             return;
         }
-        self.refresh(hwnd);
+        if was_active || self.phase.is_active() {
+            self.refresh(hwnd);
+        }
     }
 
     fn complete_recording(&mut self, report: RecordingReport) {
+        let _ = crate::platform::asset_index::register(&self.library_root, &report.project_root);
         self.phase = RecorderPhase::Complete;
         self.started_at = None;
         self.set_status(
@@ -746,6 +907,29 @@ impl WindowState {
                 report.frames_encoded, report.dropped_by_backpressure
             ),
         );
+        if let Ok(bytes) =
+            std::fs::read(report.project_root.join("diagnostics/audio-warnings.json"))
+            && let Ok(warnings) = serde_json::from_slice::<Vec<String>>(&bytes)
+            && !warnings.is_empty()
+        {
+            let message = format!(
+                "音频设备中断，录制已提前停止。已完成的内容已保存。\n{}",
+                warnings.join("\n")
+            );
+            self.status.clone_from(&message);
+            if let Some(hwnd) = self.hwnd {
+                let text = wide(&message);
+                unsafe {
+                    crate::platform::app_dialog::message(
+                        Some(hwnd),
+                        PCWSTR(text.as_ptr()),
+                        w!("录音提示"),
+                        windows::Win32::UI::WindowsAndMessaging::MB_OK
+                            | windows::Win32::UI::WindowsAndMessaging::MB_ICONWARNING,
+                    );
+                }
+            }
+        }
         self.last_project = Some(report.project_root.clone());
         self.last_report = Some(report.clone());
         *self
@@ -789,6 +973,7 @@ impl WindowState {
     }
 
     fn complete_export(&mut self, report: ExportReport) {
+        let _ = crate::platform::asset_index::register(&self.library_root, &report.output_path);
         self.phase = RecorderPhase::Complete;
         self.started_at = None;
         self.set_status(
@@ -827,7 +1012,7 @@ impl WindowState {
         let keyboard_focus_was_visible = self.pointer.keyboard_focus;
         self.pointer.keyboard_focus = false;
         self.cancel_pressed_control(hwnd, true);
-        let controls = ControlLayout::for_window(hwnd, self.theme);
+        let controls = ControlLayout::for_state(hwnd, self);
         let Some(control) = controls
             .hit_control(x, y)
             .filter(|control| self.control_enabled(*control))
@@ -852,8 +1037,44 @@ impl WindowState {
         }
         self.accessibility.invoked(control as u32 + 1);
         match control {
+            RecorderControlId::Home => {
+                if crate::platform::workspace::active() {
+                    crate::platform::workspace::switch(0);
+                    return;
+                }
+                self.home = true;
+                self.refresh(hwnd);
+            }
+            RecorderControlId::Screenshot => self.capture_selection(
+                hwnd,
+                crate::platform::capture_tools::CaptureIntent::Screenshot,
+            ),
+            RecorderControlId::RegionSource => {
+                self.capture_selection(hwnd, crate::platform::capture_tools::CaptureIntent::Region);
+            }
+            RecorderControlId::Pin => {
+                if let Err(error) =
+                    crate::platform::capture_tools::pin_clipboard(hwnd, &self.library_root)
+                {
+                    self.fail(error);
+                }
+            }
+            RecorderControlId::Recent => self.show_recent(hwnd),
+            RecorderControlId::OpenImage => self.open_image(hwnd),
+            RecorderControlId::ImageTools => self.show_image_tools(hwnd),
+            RecorderControlId::Ocr => self.shell_command(hwnd, 20),
+            RecorderControlId::CameraEnabled => {
+                let next = !self.camera_enabled;
+                match crate::platform::ui_preferences::set_capture_camera_enabled(next) {
+                    Ok(()) => self.camera_enabled = next,
+                    Err(error) => self.fail(error),
+                }
+                self.refresh(hwnd);
+            }
             RecorderControlId::Menu => self.show_application_menu(hwnd),
+            RecorderControlId::NewRecording if crate::platform::workspace::active() => self.open_recording_setup(hwnd),
             RecorderControlId::NewRecording => {
+                self.home = false;
                 self.phase = RecorderPhase::Ready;
                 self.set_status(
                     crate::platform::editor_ui::StatusSeverity::Information,
@@ -901,11 +1122,16 @@ impl WindowState {
             RecorderControlId::OpenProject => self.choose_project(hwnd),
             RecorderControlId::Preview => self.open_preview(),
             RecorderControlId::Folder => self.open_project_folder(),
-            RecorderControlId::Diagnostics => self.show_more_menu(hwnd),
+            RecorderControlId::Diagnostics => self.shell_command(hwnd, 15),
         }
     }
 
     fn on_key(&mut self, hwnd: HWND, key: u16) {
+        if key == VK_ESCAPE.0 && !self.home && !self.phase.is_active() {
+            self.home = true;
+            self.refresh(hwnd);
+            return;
+        }
         if key == VK_ESCAPE.0 {
             self.on_close(hwnd);
             return;
@@ -932,7 +1158,7 @@ impl WindowState {
         let Some(hwnd) = self.hwnd else {
             return;
         };
-        let layout = ControlLayout::for_window(hwnd, self.theme);
+        let layout = ControlLayout::for_state(hwnd, self);
         self.pointer.focused = next_keyboard_focus(
             &RecorderControlId::ORDER,
             self.pointer.focused,
@@ -954,13 +1180,14 @@ impl WindowState {
     }
 
     fn on_mouse_move(&mut self, hwnd: HWND, x: i32, y: i32) {
-        let controls = ControlLayout::for_window(hwnd, self.theme);
+        let controls = ControlLayout::for_state(hwnd, self);
         let next = controls
             .hit_control(x, y)
             .filter(|control| self.control_enabled(*control));
         if next != self.pointer.hot {
             let tooltip_was_visible = self.pointer.tooltip_visible;
             self.pointer.tooltip_visible = false;
+            crate::platform::hover_tip::hide(hwnd);
             self.pointer.tooltip_deadline = next.map(|_| Instant::now() + TOOLTIP_DELAY);
             if let Some(previous) = self.pointer.hot {
                 invalidate_control(hwnd, &controls, previous);
@@ -995,7 +1222,7 @@ impl WindowState {
         if self.pointer.pressed.is_none() {
             return;
         }
-        let controls = ControlLayout::for_window(hwnd, self.theme);
+        let controls = ControlLayout::for_state(hwnd, self);
         let released_over = controls
             .hit_control(x, y)
             .filter(|control| self.control_enabled(*control));
@@ -1016,9 +1243,10 @@ impl WindowState {
         self.pointer.tracking_leave = false;
         let tooltip_was_visible = self.pointer.tooltip_visible;
         self.pointer.tooltip_visible = false;
+        crate::platform::hover_tip::hide(hwnd);
         self.pointer.tooltip_deadline = None;
         if let Some(control) = self.pointer.hot.take() {
-            invalidate_control(hwnd, &ControlLayout::for_window(hwnd, self.theme), control);
+            invalidate_control(hwnd, &ControlLayout::for_state(hwnd, self), control);
         }
         if tooltip_was_visible {
             unsafe {
@@ -1044,19 +1272,55 @@ impl WindowState {
         let Some(control) = self.pointer.pressed.take() else {
             return;
         };
-        invalidate_control(hwnd, &ControlLayout::for_window(hwnd, self.theme), control);
+        invalidate_control(hwnd, &ControlLayout::for_state(hwnd, self), control);
     }
 
     fn cancel_pressed_control(&mut self, hwnd: HWND, release_capture: bool) {
         self.clear_pressed_control(hwnd);
         if release_capture {
-            unsafe {
-                let _ = ReleaseCapture();
-            }
+            crate::platform::desktop_ui::release_capture_owned_by(hwnd);
         }
     }
 
     fn control_enabled(&self, control: RecorderControlId) -> bool {
+        if self.import_job.is_some()
+            && !matches!(
+                control,
+                RecorderControlId::Diagnostics
+                    | RecorderControlId::WindowClose
+                    | RecorderControlId::WindowMinimize
+                    | RecorderControlId::WindowMaximize
+            )
+        {
+            return false;
+        }
+        if self.home
+            && matches!(
+                control,
+                RecorderControlId::Source
+                    | RecorderControlId::Record
+                    | RecorderControlId::MonitorSource
+                    | RecorderControlId::WindowSource
+                    | RecorderControlId::RegionSource
+                    | RecorderControlId::CameraEnabled
+                    | RecorderControlId::Home
+            )
+        {
+            return false;
+        }
+        if !self.home
+            && matches!(
+                control,
+                RecorderControlId::Screenshot
+                    | RecorderControlId::Pin
+                    | RecorderControlId::Recent
+                    | RecorderControlId::ImageTools
+                    | RecorderControlId::Ocr
+                    | RecorderControlId::OpenImage
+            )
+        {
+            return false;
+        }
         if self.transition.is_some()
             && !matches!(
                 control,
@@ -1068,16 +1332,25 @@ impl WindowState {
             return false;
         }
         match control {
+            RecorderControlId::Home
+            | RecorderControlId::Screenshot
+            | RecorderControlId::Pin
+            | RecorderControlId::Recent
+            | RecorderControlId::ImageTools
+            | RecorderControlId::Ocr
+            | RecorderControlId::OpenImage
+            | RecorderControlId::RegionSource
+            | RecorderControlId::CameraEnabled
+            | RecorderControlId::Source
+            | RecorderControlId::MonitorSource
+            | RecorderControlId::WindowSource
+            | RecorderControlId::OpenProject => !self.phase.is_active() && self.editor.is_none(),
             RecorderControlId::NewRecording => !self.phase.is_active(),
             RecorderControlId::WindowMinimize
             | RecorderControlId::WindowMaximize
             | RecorderControlId::WindowClose
             | RecorderControlId::Diagnostics
             | RecorderControlId::Menu => true,
-            RecorderControlId::Source
-            | RecorderControlId::MonitorSource
-            | RecorderControlId::WindowSource
-            | RecorderControlId::OpenProject => !self.phase.is_active() && self.editor.is_none(),
             RecorderControlId::Record => {
                 self.editor.is_none()
                     && !matches!(
@@ -1092,7 +1365,7 @@ impl WindowState {
 
     fn show_application_menu(&mut self, hwnd: HWND) {
         use crate::platform::app_menu::{self, Action, Availability};
-        let anchor = ControlLayout::for_window(hwnd, self.theme)
+        let anchor = ControlLayout::for_state(hwnd, self)
             .control_rect(RecorderControlId::Menu)
             .0;
         let available = Availability {
@@ -1103,6 +1376,10 @@ impl WindowState {
             export: false,
         };
         match app_menu::show(hwnd, anchor, self.theme, available) {
+            Ok(Some(Action::Home)) => {
+                self.home = true;
+                self.refresh(hwnd);
+            }
             Ok(Some(Action::NewRecording)) => {
                 self.activate_control(hwnd, RecorderControlId::NewRecording);
             }
@@ -1119,40 +1396,6 @@ impl WindowState {
         }
         self.pointer.hot = None;
         self.refresh(hwnd);
-    }
-
-    fn show_more_menu(&mut self, hwnd: HWND) {
-        use crate::platform::app_menu::{self, Row};
-        let mut rows = app_menu::theme_rows(self.theme);
-        rows.push(Row::heading("诊断"));
-        rows.push(Row::command(2, "查看诊断日志", IconKind::Log, true));
-        let c = ControlLayout::for_window(hwnd, self.theme);
-        let action = match app_menu::show_rows(hwnd, c.diagnostics.0, self.theme, rows, true) {
-            Ok(Some(action)) => action,
-            Ok(None) => return,
-            Err(error) => {
-                self.set_status(
-                    crate::platform::editor_ui::StatusSeverity::Error,
-                    format!("无法打开设置：{error}"),
-                );
-                self.refresh(hwnd);
-                return;
-            }
-        };
-        if let Some(result) = crate::platform::editor_ui::theme_command(action) {
-            if let Err(error) = result {
-                self.set_status(
-                    crate::platform::editor_ui::StatusSeverity::Error,
-                    format!("错误：设置未保存：{error}"),
-                );
-            }
-            crate::platform::editor_ui::sync_window_theme(&mut self.theme, hwnd);
-            self.refresh(hwnd);
-            return;
-        }
-        if action == 2 {
-            self.open_diagnostics();
-        }
     }
 
     #[allow(clippy::too_many_lines)] // Native popup lifetime and selection dispatch stay together.
@@ -1174,70 +1417,36 @@ impl WindowState {
             );
             return;
         }
-        let menu = match unsafe { CreatePopupMenu() } {
-            Ok(menu) => menu,
+        use crate::platform::app_menu::{self, Row};
+        let mut rows = Vec::new();
+        if !windows_only {
+            rows.push(Row::command(
+                MONITOR_SOURCE_COMMAND as i32,
+                "整个主显示器",
+                IconKind::Monitor,
+                true,
+            ));
+            rows.push(Row::separator());
+        }
+        for (index, target) in targets.iter().take(30).enumerate() {
+            rows.push(Row::labelled(
+                (FIRST_WINDOW_SOURCE_COMMAND + index) as i32,
+                menu_label(&target.title).replace("&&", "&"),
+                IconKind::Window,
+                true,
+            ));
+        }
+        let source_rect = ControlLayout::for_state(hwnd, self).source.0;
+        unsafe {
+            let _ = SetForegroundWindow(hwnd);
+        }
+        let command = match app_menu::show_rows(hwnd, source_rect, self.theme, rows, false) {
+            Ok(Some(command)) => command as usize,
+            Ok(None) => return,
             Err(error) => {
                 self.set_status(
                     crate::platform::editor_ui::StatusSeverity::Error,
-                    format!("错误：无法创建捕获来源菜单：{error}"),
-                );
-                return;
-            }
-        };
-        let menu_result = (|| -> windows::core::Result<usize> {
-            let monitor_label = wide("整个主显示器");
-            if !windows_only {
-                unsafe {
-                    AppendMenuW(
-                        menu,
-                        MF_STRING,
-                        MONITOR_SOURCE_COMMAND,
-                        PCWSTR(monitor_label.as_ptr()),
-                    )?;
-                    AppendMenuW(menu, MF_SEPARATOR, 0, PCWSTR::null())?;
-                }
-            }
-            for (index, target) in targets.iter().take(30).enumerate() {
-                let label = menu_label(&target.title);
-                let label = wide(&label);
-                unsafe {
-                    AppendMenuW(
-                        menu,
-                        MF_STRING,
-                        FIRST_WINDOW_SOURCE_COMMAND + index,
-                        PCWSTR(label.as_ptr()),
-                    )?;
-                }
-            }
-            let source_rect = ControlLayout::for_window(hwnd, self.theme).source.0;
-            let mut point = POINT {
-                x: source_rect.left,
-                y: source_rect.bottom,
-            };
-            unsafe {
-                ClientToScreen(hwnd, &raw mut point).ok()?;
-                let _ = SetForegroundWindow(hwnd);
-            }
-            let command = unsafe {
-                TrackPopupMenu(
-                    menu,
-                    TPM_LEFTALIGN | TPM_RETURNCMD,
-                    point.x,
-                    point.y,
-                    None,
-                    hwnd,
-                    None,
-                )
-            };
-            Ok(usize::try_from(command.0).unwrap_or_default())
-        })();
-        let _ = unsafe { DestroyMenu(menu) };
-        let command = match menu_result {
-            Ok(command) => command,
-            Err(error) => {
-                self.set_status(
-                    crate::platform::editor_ui::StatusSeverity::Error,
-                    format!("错误：无法显示捕获来源菜单：{error}"),
+                    format!("无法显示捕获来源：{error}"),
                 );
                 return;
             }
@@ -1439,12 +1648,15 @@ impl WindowState {
                 editor.show_content(hwnd);
             }
         } else {
+            self.home = crate::platform::workspace::active() || transition.intent == NavigationIntent::Home;
             self.phase = RecorderPhase::Ready;
             self.set_status(
                 crate::platform::editor_ui::StatusSeverity::Information,
                 "选择录制来源后开始新录制".into(),
             );
             self.theme = EditorTheme::current(window_dpi(hwnd));
+            if transition.intent==NavigationIntent::StartRecording {self.start_recording();}
+            else if transition.intent==NavigationIntent::NewRecording && crate::platform::workspace::active() {self.open_recording_setup(hwnd);}
             self.refresh(hwnd);
         }
         unsafe {
@@ -1468,27 +1680,24 @@ impl WindowState {
         }
     }
 
-    fn open_diagnostics(&mut self) {
-        let Some(project_root) = &self.last_project else {
-            return;
-        };
-        let log_path = project_root.join("diagnostics/session.log");
-        if !log_path.is_file() {
-            return;
-        }
-        match Command::new("notepad.exe").arg(log_path).spawn() {
-            Ok(_) => self.set_status(
-                crate::platform::editor_ui::StatusSeverity::Information,
-                "诊断日志已打开".into(),
-            ),
-            Err(error) => self.set_status(
-                crate::platform::editor_ui::StatusSeverity::Error,
-                format!("错误：无法打开诊断日志：{error}"),
-            ),
-        }
+    fn hides_on_close(&self) -> bool {
+        !self.close_when_finished
+            && crate::platform::ui_preferences::close_to_tray()
+            && self
+                .shell
+                .as_ref()
+                .is_some_and(crate::platform::app_shell::ShellIntegration::available)
     }
-
     fn on_close(&mut self, hwnd: HWND) {
+        if self.hides_on_close() {
+            unsafe {
+                let _ = ShowWindow(
+                    crate::platform::workspace::window(hwnd),
+                    windows::Win32::UI::WindowsAndMessaging::SW_HIDE,
+                );
+            }
+            return;
+        }
         if self.phase.is_active() {
             self.close_when_finished = true;
             self.request_stop();
@@ -1502,7 +1711,7 @@ impl WindowState {
     fn publish_accessibility(&self, hwnd: HWND) {
         use crate::platform::accessibility::{Kind, Node, STATUS_ID};
         let client = client_rect(hwnd);
-        let layout = ControlLayout::for_window(hwnd, self.theme);
+        let layout = ControlLayout::for_state(hwnd, self);
         let mut nodes: Vec<_> = RecorderControlId::ORDER
             .into_iter()
             .map(|id| {
@@ -1517,14 +1726,25 @@ impl WindowState {
                     node.name = match self.phase {
                         RecorderPhase::Starting | RecorderPhase::Recording => "停止录制",
                         RecorderPhase::Finalizing => "正在完成录制",
-                        _ => "开始录制（无音频）",
+                        _ => "开始录制",
                     }
                     .into();
                 }
                 if id == RecorderControlId::Source {
                     node.help = format!(
-                        "当前录制尺寸 {}×{}；本版本不录制音频",
-                        self.capture_width, self.capture_height
+                        "当前录制尺寸 {}×{}；系统声音{}，麦克风{}",
+                        self.capture_width,
+                        self.capture_height,
+                        if self.recording_options.audio.system {
+                            "开启"
+                        } else {
+                            "关闭"
+                        },
+                        if self.recording_options.audio.microphone {
+                            "开启"
+                        } else {
+                            "关闭"
+                        }
                     );
                 }
                 node
@@ -1569,7 +1789,11 @@ impl WindowState {
 
     fn refresh(&self, hwnd: HWND) {
         self.publish_accessibility(hwnd);
-        let title = format!("Panzo 录制器 — {}", self.phase_label());
+        let title = if self.home {
+            if crate::platform::workspace::active() { "Panzo · 录制与视频".into() } else { "Panzo · 功能菜单".into() }
+        } else {
+            format!("Panzo 录屏 — {}", self.phase_label())
+        };
         let title = wide(&title);
         unsafe {
             let _ = SetWindowTextW(hwnd, PCWSTR(title.as_ptr()));
@@ -1590,6 +1814,9 @@ impl WindowState {
     }
 
     fn elapsed(&self) -> Duration {
+        if let Some(control) = &self.control {
+            return Duration::from_millis(u64::try_from(control.elapsed().0 / 10_000).unwrap_or(0));
+        }
         self.started_at
             .map_or(Duration::ZERO, |started| started.elapsed())
     }
@@ -1644,6 +1871,15 @@ impl HitRect {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RecorderControlId {
+    Home,
+    Screenshot,
+    Pin,
+    Recent,
+    OpenImage,
+    ImageTools,
+    Ocr,
+    RegionSource,
+    CameraEnabled,
     Source,
     Record,
     OpenProject,
@@ -1660,7 +1896,16 @@ enum RecorderControlId {
 }
 
 impl RecorderControlId {
-    const ORDER: [Self; 13] = [
+    const ORDER: [Self; 22] = [
+        Self::Home,
+        Self::Screenshot,
+        Self::Pin,
+        Self::Recent,
+        Self::OpenImage,
+        Self::ImageTools,
+        Self::Ocr,
+        Self::RegionSource,
+        Self::CameraEnabled,
         Self::Menu,
         Self::Diagnostics,
         Self::NewRecording,
@@ -1678,6 +1923,15 @@ impl RecorderControlId {
 
     const fn accessibility_name(self) -> &'static str {
         match self {
+            Self::Home => "功能菜单",
+            Self::Screenshot => "截图",
+            Self::Pin => "贴图",
+            Self::Recent => "最近内容",
+            Self::OpenImage => "导入媒体",
+            Self::ImageTools => "图片工具",
+            Self::Ocr => "文字识图",
+            Self::RegionSource => "选择区域",
+            Self::CameraEnabled => "鼠标跟踪缩放",
             Self::MonitorSource => "整个屏幕",
             Self::WindowSource => "应用窗口",
             Self::Source => "选择显示器或应用窗口",
@@ -1685,7 +1939,7 @@ impl RecorderControlId {
             Self::OpenProject => "打开已有工程",
             Self::Preview => "打开视频编辑器",
             Self::Folder => "打开项目文件夹",
-            Self::Diagnostics => "设置",
+            Self::Diagnostics => "录制设置",
             Self::Menu => "主菜单",
             Self::NewRecording => "新录制",
             Self::WindowMinimize => "最小化",
@@ -1696,6 +1950,15 @@ impl RecorderControlId {
 
     const fn tooltip(self) -> &'static str {
         match self {
+            Self::Home => "返回功能菜单",
+            Self::Screenshot => "截图并标注",
+            Self::Pin => "贴出剪贴板图片",
+            Self::Recent => "查看最近的截图和录制工程",
+            Self::OpenImage => "图片标注、GIF 贴图或 MP4 编辑",
+            Self::ImageTools => "滚动长截图、拼图、批量转换与贴图分组",
+            Self::Ocr => "截图后使用离线 OCR 或多模态识图，可校对并复制结果",
+            Self::RegionSource => "选择单个显示器内的矩形区域",
+            Self::CameraEnabled => "开启或关闭鼠标跟随缩放；可在设置中切换连续跟随 / 点击聚焦",
             Self::MonitorSource => "录制整个主显示器，保持原始分辨率",
             Self::WindowSource => "选择一个可见应用窗口录制",
             Self::Source => "选择整个主显示器或一个可见应用窗口",
@@ -1703,7 +1966,7 @@ impl RecorderControlId {
             Self::OpenProject => "选择 .panzo 工程文件夹中的 project.json",
             Self::Preview => "在编辑器中调整镜头和画布",
             Self::Folder => "在资源管理器中打开项目",
-            Self::Diagnostics => "设置：主题与诊断",
+            Self::Diagnostics => "录制设置",
             Self::Menu => "主菜单",
             Self::NewRecording => "新录制",
             Self::WindowMinimize => "最小化",
@@ -1714,9 +1977,14 @@ impl RecorderControlId {
 
     const fn icon(self, phase: RecorderPhase) -> IconKind {
         match self {
+            Self::Home => IconKind::Home,
+            Self::Screenshot | Self::RegionSource => IconKind::Crop,
+            Self::Pin | Self::WindowSource => IconKind::Window,
+            Self::Recent => IconKind::Restore,
+            Self::OpenImage | Self::ImageTools | Self::Ocr => IconKind::Image,
+            Self::CameraEnabled => IconKind::Camera,
             Self::Menu => IconKind::Menu,
             Self::Source | Self::MonitorSource => IconKind::Monitor,
-            Self::WindowSource => IconKind::Window,
             Self::Record if matches!(phase, RecorderPhase::Starting | RecorderPhase::Recording) => {
                 IconKind::Stop
             }
@@ -1733,6 +2001,10 @@ impl RecorderControlId {
 
 #[derive(Clone, Copy)]
 struct ControlLayout {
+    home: HitRect,
+    region: HitRect,
+    camera: HitRect,
+    features: [HitRect; 6],
     header: crate::platform::editor_ui::HeaderLayout,
     source: HitRect,
     record: HitRect,
@@ -1765,11 +2037,15 @@ impl ControlLayout {
         };
         let row = |top, height| r(x, y + scale(top), cw, scale(height));
         Self {
+            home: r(x - scale(48), y, scale(36), scale(36)),
+            region: r(x + cw * 2 / 3, y + scale(72), cw - cw * 2 / 3, scale(34)),
+            camera: row(208, 30),
+            features: [r(0, 0, 0, 0); 6],
             header,
             hero: r(x, y, cw, scale(344)).0,
             source: row(120, 80),
-            monitor: r(x, y + scale(72), cw / 2, scale(34)),
-            window: r(x + cw / 2, y + scale(72), cw - cw / 2, scale(34)),
+            monitor: r(x, y + scale(72), cw / 3, scale(34)),
+            window: r(x + cw / 3, y + scale(72), cw / 3, scale(34)),
             record: row(244, 46),
             export: HitRect(header.rect(crate::platform::editor_ui::HeaderAction::OpenProject)),
             preview: row(312, 32),
@@ -1800,18 +2076,161 @@ impl ControlLayout {
         layout
     }
 
+    fn for_state(hwnd: HWND, state: &WindowState) -> Self {
+        let mut result = Self::for_window(hwnd, state.theme);
+        result.apply_home(client_rect(hwnd), state);
+        if crate::platform::workspace::active() && state.home {
+            result.apply_empty_workspace(client_rect(hwnd), state.theme);
+            return result;
+        }
+        if crate::platform::workspace::active() && !state.home {
+            let r = client_rect(hwnd);
+            let d = |v| state.theme.scale(v);
+            let side = if r.right > d(900) { d(284) } else { 0 };
+            let width = r.right - side;
+            let hit = |x, y, w, h| {
+                HitRect(RECT {
+                    left: x,
+                    top: y,
+                    right: x + w,
+                    bottom: y + h,
+                })
+            };
+            result.home = hit(0, 0, 0, 0);
+            result.monitor = hit(d(14), d(10), d(104), d(30));
+            result.window = hit(d(122), d(10), d(104), d(30));
+            result.region = hit(d(230), d(10), d(104), d(30));
+            result.export = hit(r.right - d(262), d(10), d(122), d(30));
+            result.diagnostics = hit(r.right - d(132), d(10), d(118), d(30));
+            let wrapped = r.right < d(620);
+            if wrapped {
+                result.export = hit(d(14), d(48), d(122), d(30));
+                result.diagnostics = hit(d(144), d(48), d(118), d(30));
+            }
+            result.source = hit(
+                d(44),
+                d(if wrapped { 132 } else { 100 }),
+                (width - d(88)).max(d(140)),
+                (r.bottom - d(if wrapped { 256 } else { 224 })).max(d(130)),
+            );
+            result.record = hit(width - d(186), r.bottom - d(96), d(160), d(36));
+            result.camera = if side > 0 {
+                hit(width + d(14), d(236), side - d(28), d(36))
+            } else {
+                hit(d(20), r.bottom - d(96), d(274), d(36))
+            };
+            result.preview = hit(d(18), r.bottom - d(49), d(230), d(30));
+            result.status = hit(d(264), r.bottom - d(49), r.right - d(280), d(30)).0;
+        }
+        result
+    }
+    fn apply_empty_workspace(&mut self, client: RECT, theme: EditorTheme) {
+        let d = |n| theme.scale(n);
+        let w = d(208).min((client.right-d(48)).max(1));
+        let x = (client.right-w)/2;
+        let y = (client.bottom-d(104))/2;
+        let empty = HitRect(RECT::default());
+        self.features = [empty; 6];
+        self.source=empty; self.monitor=empty; self.window=empty; self.region=empty;
+        self.camera=empty; self.home=empty; self.folder=empty; self.diagnostics=empty;
+        self.export=empty; self.status=RECT::default();
+        self.preview=HitRect(RECT {left:x,top:y,right:x+w,bottom:y+d(44)});
+        self.record=HitRect(RECT {left:x,top:y+d(60),right:x+w,bottom:y+d(104)});
+    }
+    fn apply_home(&mut self, client: RECT, state: &WindowState) {
+        if !state.home {
+            return;
+        }
+        let result = self;
+        let s = |v| state.theme.scale(v);
+        let width = s(800).min(client.right - s(64));
+        let left = (client.right - width) / 2;
+        let min_top = state.theme.metrics.toolbar_height + s(16);
+        let heading = s(76);
+        let vertical_gap = s(12);
+        let card_height = ((client.bottom - s(32) - min_top - heading - vertical_gap * 3) / 4)
+            .clamp(s(56), s(76));
+        let total_height = heading + 4 * card_height + 3 * vertical_gap;
+        let top = ((client.bottom - total_height) / 2).max(min_top);
+        let gap = s(20);
+        let cw = (width - gap) / 2;
+        result.hero = RECT {
+            left,
+            top,
+            right: left + width,
+            bottom: top + total_height,
+        };
+        let card = |col, row| {
+            HitRect(RECT {
+                left: left + col * (cw + gap),
+                top: top + heading + row * (card_height + vertical_gap),
+                right: left + col * (cw + gap) + cw,
+                bottom: top + heading + row * (card_height + vertical_gap) + card_height,
+            })
+        };
+        result.features = [
+            card(0, 0),
+            card(0, 1),
+            card(1, 3),
+            card(0, 2),
+            card(1, 1),
+            card(1, 2),
+        ];
+        result.record = card(1, 0);
+        result.export = card(0, 3);
+        result.source = HitRect(RECT::default());
+        result.monitor = result.source;
+        result.window = result.source;
+        result.region = result.source;
+        result.camera = result.source;
+        result.preview = result.source;
+        result.home = result.source;
+    }
+
     fn hit_control(self, x: i32, y: i32) -> Option<RecorderControlId> {
         RecorderControlId::ORDER
             .into_iter()
             .find(|id| self.control_rect(*id).contains(x, y))
     }
     fn control_rect(self, id: RecorderControlId) -> HitRect {
+        if crate::platform::workspace::active() && self.source.0.right == 0 && self.preview.0.right > 0 {
+            return match id {
+                RecorderControlId::NewRecording => self.record,
+                RecorderControlId::Preview => self.preview,
+                _ => HitRect(RECT::default()),
+            };
+        }
+        // The workspace host owns menus and native caption buttons; hidden header
+        // controls must not intercept clicks on the embedded recorder toolbar.
+        if crate::platform::workspace::active()
+            && matches!(
+                id,
+                RecorderControlId::Menu
+                    | RecorderControlId::NewRecording
+                    | RecorderControlId::WindowMinimize
+                    | RecorderControlId::WindowMaximize
+                    | RecorderControlId::WindowClose
+                    | RecorderControlId::Folder
+            )
+        {
+            return HitRect(RECT::default());
+        }
         match id {
+            RecorderControlId::Home => self.home,
+            RecorderControlId::Screenshot => self.features[0],
+            RecorderControlId::Pin => self.features[1],
+            RecorderControlId::Recent => self.features[2],
+            RecorderControlId::OpenImage => self.features[3],
+            RecorderControlId::ImageTools => self.features[4],
+            RecorderControlId::Ocr => self.features[5],
+            RecorderControlId::RegionSource => self.region,
+            RecorderControlId::CameraEnabled => self.camera,
             RecorderControlId::Menu => HitRect(
                 self.header
                     .rect(crate::platform::editor_ui::HeaderAction::Menu),
             ),
             RecorderControlId::Source => self.source,
+            RecorderControlId::Record if self.features[0].0.right > 0 => HitRect(RECT::default()),
             RecorderControlId::Record => self.record,
             RecorderControlId::OpenProject => self.export,
             RecorderControlId::Preview => self.preview,
@@ -1819,6 +2238,7 @@ impl ControlLayout {
             RecorderControlId::Diagnostics => self.diagnostics,
             RecorderControlId::MonitorSource => self.monitor,
             RecorderControlId::WindowSource => self.window,
+            RecorderControlId::NewRecording if self.features[0].0.right > 0 => self.record,
             RecorderControlId::NewRecording => HitRect(
                 self.header
                     .rect(crate::platform::editor_ui::HeaderAction::NewRecording),
@@ -1853,9 +2273,25 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
     let p = theme.palette;
     let s = |n| theme.scale(n);
     let c = state.hwnd.map_or_else(
-        || ControlLayout::new(client, theme),
-        |hwnd| ControlLayout::for_window(hwnd, theme),
+        || {
+            let mut layout = ControlLayout::new(client, theme);
+            layout.apply_home(client, state);
+            layout
+        },
+        |hwnd| ControlLayout::for_state(hwnd, state),
     );
+    if crate::platform::workspace::active() && state.home {
+        fill(hdc, &client, crate::platform::desktop_ui::canvas(theme));
+        button(hdc,c.preview.0,"继续编辑最近工程",state,RecorderControlId::Preview,
+            state.control_enabled(RecorderControlId::Preview),false);
+        button(hdc,c.record.0,"新录制",state,RecorderControlId::NewRecording,
+            state.control_enabled(RecorderControlId::NewRecording),false);
+        return;
+    }
+    if crate::platform::workspace::active() && !state.home {
+        draw_desktop_recording(hdc, client, state, &c);
+        return;
+    }
     fill(hdc, &client, p.window);
     let header_controls = [RecorderControlId::Menu, RecorderControlId::Diagnostics];
     let header_states = header_controls.map(|id| ButtonVisualState {
@@ -1873,6 +2309,19 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
             (state.pointer.keyboard_focus && state.pointer.focused == Some(id)).then_some(action)
         });
     draw_header(hdc, c.header, theme, header_states, focused);
+    if state.home {
+        draw_home(hdc, &c, state);
+        return;
+    }
+    button(
+        hdc,
+        c.home.0,
+        "",
+        state,
+        RecorderControlId::Home,
+        state.control_enabled(RecorderControlId::Home),
+        false,
+    );
     let row = |top, height| RECT {
         top: c.hero.top + s(top),
         bottom: c.hero.top + s(top + height),
@@ -1907,6 +2356,7 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
     for (id, label) in [
         (RecorderControlId::MonitorSource, "整个屏幕"),
         (RecorderControlId::WindowSource, "应用窗口"),
+        (RecorderControlId::RegionSource, "选择区域"),
     ] {
         button(
             hdc,
@@ -1969,8 +2419,8 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
             bottom: source.bottom - s(12),
         },
         &format!(
-            "{} × {} · 60 FPS",
-            state.capture_width, state.capture_height
+            "{} × {} · {} FPS",
+            state.capture_width, state.capture_height, state.recording_options.fps
         ),
         p.text_secondary,
         DT_LEFT | DT_SINGLELINE | DT_VCENTER,
@@ -1990,13 +2440,23 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
     if state.pointer.keyboard_focus && state.pointer.focused == Some(RecorderControlId::Source) {
         focus_ring(hdc, source, p.accent, s(10));
     }
-    draw_text_styled(
+    button(
         hdc,
-        row(208, 24),
-        "不录制声音",
-        p.text_secondary,
-        DT_LEFT | DT_SINGLELINE | DT_VCENTER,
-        TextStyle::Caption,
+        c.camera.0,
+        if state.camera_enabled {
+            if state.recording_options.camera.mode == panzo_core::camera_policy::FollowMode::Smooth
+            {
+                "鼠标跟踪缩放：开 · 连续跟随"
+            } else {
+                "鼠标跟踪缩放：开 · 点击聚焦"
+            }
+        } else {
+            "鼠标跟踪缩放：关 · 原始画面"
+        },
+        state,
+        RecorderControlId::CameraEnabled,
+        state.control_enabled(RecorderControlId::CameraEnabled),
+        state.camera_enabled,
     );
     let label = match state.phase {
         RecorderPhase::Recording => format!("停止录制   {}", format_duration(state.elapsed())),
@@ -2035,28 +2495,191 @@ fn draw_scene(hdc: windows::Win32::Graphics::Gdi::HDC, client: RECT, state: &Win
         DT_LEFT | DT_SINGLELINE | DT_VCENTER,
         TextStyle::Caption,
     );
-    if state.pointer.tooltip_visible
-        && let Some(id) = state.pointer.hot
-    {
-        draw_control_tooltip(hdc, client, &c, id, theme);
-    }
 }
 
-fn draw_control_tooltip(
-    hdc: windows::Win32::Graphics::Gdi::HDC,
+#[allow(clippy::too_many_lines, clippy::many_single_char_names)] // Paint the recorder workspace in one device-context pass.
+fn draw_desktop_recording(
+    dc: windows::Win32::Graphics::Gdi::HDC,
     client: RECT,
-    controls: &ControlLayout,
-    control: RecorderControlId,
-    theme: EditorTheme,
+    state: &WindowState,
+    c: &ControlLayout,
 ) {
-    crate::platform::editor_ui::draw_tooltip(
-        hdc,
-        client,
-        controls.control_rect(control).0,
-        control.tooltip(),
-        theme,
+    use crate::platform::{desktop_ui as v, editor_ui};
+    let t = state.theme;
+    let p = t.palette;
+    let d = |n| t.scale(n);
+    let side = if client.right > d(900) { d(284) } else { 0 };
+    let width = client.right - side;
+    let toolbar = d(if client.right < d(620) { 90 } else { 52 });
+    fill(dc, &client, p.panel);
+    fill(
+        dc,
+        &v::rect(0, toolbar, width, client.bottom - toolbar - d(60)),
+        v::canvas(t),
     );
+    v::line(dc, v::rect(0, toolbar - 1, client.right, 1), t);
+    if side > 0 {
+        v::line(dc, v::rect(width, d(52), 1, client.bottom - d(52)), t);
+    }
+    for (id, label) in [
+        (RecorderControlId::MonitorSource, "全屏"),
+        (RecorderControlId::WindowSource, "窗口"),
+        (RecorderControlId::RegionSource, "区域"),
+        (RecorderControlId::OpenProject, "打开工程"),
+        (RecorderControlId::Diagnostics, "录制设置"),
+    ] {
+        button(
+            dc,
+            c.control_rect(id).0,
+            label,
+            state,
+            id,
+            state.control_enabled(id),
+            false,
+        );
+    }
+    let r = c.source.0;
+    editor_ui::rounded_surface(
+        dc,
+        r,
+        editor_ui::rgb(44, 57, 47),
+        editor_ui::rgb(113, 139, 120),
+        d(2),
+    );
+    let cx = i32::midpoint(r.left, r.right);
+    let cy = i32::midpoint(r.top, r.bottom);
+    draw_icon(
+        dc,
+        v::rect(cx - d(27), cy - d(74), d(54), d(54)),
+        IconKind::Monitor,
+        editor_ui::rgb(170, 193, 176),
+    );
+    v::text(
+        dc,
+        v::rect(r.left + d(20), cy - d(3), r.right - r.left - d(40), d(30)),
+        &compact_source_label(&state.capture_source.label()),
+        editor_ui::rgb(224, 233, 225),
+        t.dpi,
+        true,
+    );
+    v::text(
+        dc,
+        v::rect(r.left + d(20), cy + d(31), r.right - r.left - d(40), d(26)),
+        &format!(
+            "{} × {} px · 点击更换录制来源",
+            state.capture_width, state.capture_height
+        ),
+        editor_ui::rgb(170, 190, 174),
+        t.dpi,
+        true,
+    );
+    if side > 0 {
+        v::text(
+            dc,
+            v::rect(width + d(16), d(70), side - d(32), d(30)),
+            "录制参数",
+            p.text,
+            t.dpi,
+            false,
+        );
+        for (y, label, value) in [
+            (120, "帧率", format!("{} fps", state.recording_options.fps)),
+            (
+                154,
+                "倒计时",
+                format!("{} 秒", state.recording_options.countdown_seconds),
+            ),
+            (
+                304,
+                "系统声音",
+                if state.recording_options.audio.system {
+                    "开启"
+                } else {
+                    "关闭"
+                }
+                .into(),
+            ),
+            (
+                342,
+                "麦克风",
+                if state.recording_options.audio.microphone {
+                    "开启"
+                } else {
+                    "关闭"
+                }
+                .into(),
+            ),
+        ] {
+            v::text(
+                dc,
+                v::rect(width + d(16), d(y), d(104), d(28)),
+                label,
+                p.text_secondary,
+                t.dpi,
+                false,
+            );
+            v::text(
+                dc,
+                v::rect(width + d(130), d(y), side - d(146), d(28)),
+                &value,
+                p.text,
+                t.dpi,
+                false,
+            );
+        }
+        v::line(dc, v::rect(width + d(14), d(209), side - d(28), 1), t);
+        v::line(dc, v::rect(width + d(14), d(286), side - d(28), 1), t);
+        v::text(
+            dc,
+            v::rect(width + d(16), d(400), side - d(32), d(26)),
+            "录制完成后进入当前视频工作区",
+            p.text_muted,
+            t.dpi,
+            false,
+        );
+    }
+    button(
+        dc,
+        c.camera.0,
+        if state.camera_enabled {
+            "鼠标跟随缩放 · 开启"
+        } else {
+            "鼠标跟随缩放 · 关闭"
+        },
+        state,
+        RecorderControlId::CameraEnabled,
+        state.control_enabled(RecorderControlId::CameraEnabled),
+        state.camera_enabled,
+    );
+    let label = match state.phase {
+        RecorderPhase::Recording => format!("停止录制  {}", format_duration(state.elapsed())),
+        RecorderPhase::Starting => "正在准备…".into(),
+        RecorderPhase::Finalizing => "正在完成…".into(),
+        _ => "开始录制".into(),
+    };
+    button(
+        dc,
+        c.record.0,
+        &label,
+        state,
+        RecorderControlId::Record,
+        state.control_enabled(RecorderControlId::Record),
+        state.phase.is_active(),
+    );
+    if state.last_project.is_some() {
+        button(
+            dc,
+            c.preview.0,
+            "继续编辑最近工程",
+            state,
+            RecorderControlId::Preview,
+            state.control_enabled(RecorderControlId::Preview),
+            false,
+        );
+    }
+    v::text(dc, c.status, &state.status, p.text_secondary, t.dpi, false);
 }
+
 
 fn button(
     hdc: windows::Win32::Graphics::Gdi::HDC,
@@ -2073,7 +2696,7 @@ fn button(
     let theme = state.theme;
     let role = if destructive {
         ButtonRole::Destructive
-    } else if id == RecorderControlId::Record {
+    } else if matches!(id, RecorderControlId::Record | RecorderControlId::NewRecording) {
         ButtonRole::Primary
     } else if matches!(
         id,
@@ -2121,13 +2744,109 @@ unsafe extern "system" fn window_proc(
     lparam: LPARAM,
 ) -> LRESULT {
     #[cfg(test)]
+    if let Some(result) = workspace_review::handle(hwnd, message) {
+        return result;
+    }
+
+    #[cfg(test)]
     if let Some(result) = unified_window_review::handle_message(hwnd, message, wparam, lparam) {
         return result;
     }
-    if message == WM_QUIT_WINDOW {
+    if message == crate::platform::recording_setup::MESSAGE {
+        if let Some(state)=unsafe{state_mut(hwnd)} {
+            if state.phase.is_active() {return LRESULT(0);}
+            if matches!(wparam.0,1|2|3|10|11) {
+                state.recording_options.fps=(lparam.0 as u32)&255;
+                let sound=(lparam.0>>8)&3;state.recording_options.audio.system=matches!(sound,0|2);state.recording_options.audio.microphone=matches!(sound,1|2);
+                state.camera_enabled=lparam.0&(1<<12)!=0;state.recording_options.camera.enabled=state.camera_enabled;
+            }
+            match wparam.0 {
+                20=>state.open_recording_setup(hwnd),
+                1=>state.capture_selection(hwnd,crate::platform::capture_tools::CaptureIntent::Region),
+                2=>{state.select_capture_source(hwnd,true);crate::platform::recording_setup::source(&state.capture_source.label());},
+                3=>{state.capture_source=RecordingSource::PrimaryMonitor;state.capture_width=state.primary_monitor_width;state.capture_height=state.primary_monitor_height;crate::platform::recording_setup::source(&state.capture_source.label());},
+                10=>{
+                    state.recording_options.fps=(lparam.0 as u32)&255;
+                    let sound=(lparam.0>>8)&3;state.recording_options.audio.system=matches!(sound,0|2);state.recording_options.audio.microphone=matches!(sound,1|2);
+                    state.camera_enabled=lparam.0&(1<<12)!=0;state.recording_options.camera.enabled=state.camera_enabled;
+                    if let Some(editor)=&mut state.editor {editor.request_navigation(hwnd,NavigationIntent::StartRecording);}else{state.start_recording();}
+                },
+                11=>state.record_options(hwnd,false),
+                _=>{},
+            }
+        }return LRESULT(0);
+    }
+    if message == WM_TIMER && wparam.0 == 74 {
         unsafe {
-            let _ = DestroyWindow(hwnd);
+            let _ = KillTimer(Some(hwnd), 74);
         }
+        if let Some(state) = unsafe { state_mut(hwnd) } {
+            state.capture_selection(
+                hwnd,
+                crate::platform::capture_tools::CaptureIntent::Screenshot,
+            );
+        }
+        return LRESULT(0);
+    }
+    if message == crate::platform::capture_tools::WM_CAPTURE_COMPLETE {
+        if let Some(state) = unsafe { state_mut(hwnd) } {
+            state.capture_complete(hwnd);
+        }
+        return LRESULT(0);
+    }
+    if message == windows::Win32::UI::WindowsAndMessaging::WM_HOTKEY {
+        if let Some(state) = unsafe { state_mut(hwnd) } {
+            if wparam.0 >= 5000 {
+                if let Some((index, chord)) = crate::platform::shortcuts::global(wparam.0 as i32)
+                    && !crate::platform::shortcut_settings::capture_global(chord)
+                    && let crate::platform::shortcuts::Target::Shell(command) =
+                        crate::platform::shortcuts::ACTIONS[index].target
+                {
+                    state.shell_command(hwnd, command);
+                }
+            } else {
+                state.shell_command(hwnd, wparam.0 as u32);
+            }
+        }
+        return LRESULT(0);
+    }
+    if message == crate::platform::app_shell::WM_TRAY {
+        if let Some(command) =
+            crate::platform::app_shell::tray_command(hwnd, lparam.0.cast_unsigned() as u32)
+            && let Some(state) = unsafe { state_mut(hwnd) }
+        {
+            state.shell_command(hwnd, command);
+        }
+        return LRESULT(0);
+    }
+    if message == WM_QUIT_WINDOW {
+        // Consume the deferred exit before entering any modal loop. A timer tick must
+        // not post another close while the user is choosing save/discard/cancel.
+        if let Some(state) = unsafe { state_mut(hwnd) } {
+            state.close_when_finished = false;
+        }
+        let Some(_confirmation) = crate::platform::app_shell::begin_close_confirmation() else {
+            return LRESULT(0);
+        };
+        if !crate::platform::capture_tools::prepare_close_pictures(hwnd) {
+            if let Some(state) = unsafe { state_mut(hwnd) } {
+                state.close_when_finished = false;
+            }
+            return LRESULT(0);
+        }
+        unsafe {
+            let _ = DestroyWindow(crate::platform::workspace::window(hwnd));
+        }
+        return LRESULT(0);
+    }
+    if message == WM_CLOSE && crate::platform::app_shell::close_confirmation_open() {
+        return LRESULT(0);
+    }
+    if message == WM_CLOSE
+        && let Some(state) = unsafe { state_mut(hwnd) }
+        && state.hides_on_close()
+    {
+        state.on_close(hwnd);
         return LRESULT(0);
     }
     if (message == WM_CLOSE || (message == WM_KEYDOWN && wparam.0 == usize::from(VK_ESCAPE.0)))
@@ -2277,6 +2996,7 @@ unsafe extern "system" fn window_proc(
             LRESULT(0)
         }
         WM_DPICHANGED => {
+            super::app_icon::apply(hwnd);
             let dpi = u32::try_from((wparam.0 >> 16) & 0xffff)
                 .unwrap_or(96)
                 .max(96);
@@ -2300,6 +3020,7 @@ unsafe extern "system" fn window_proc(
         }
         WM_ERASEBKGND => LRESULT(1),
         WM_DESTROY => {
+            crate::platform::capture_tools::close_all_pictures();
             unsafe {
                 let _ = KillTimer(Some(hwnd), TIMER_ID);
                 PostQuitMessage(0);
@@ -2330,30 +3051,50 @@ unsafe fn state_mut(hwnd: HWND) -> Option<&'static mut WindowState> {
 }
 
 pub(crate) fn choose_project_path(hwnd: HWND) -> Option<PathBuf> {
-    use windows::Win32::UI::Controls::Dialogs::{
-        GetOpenFileNameW, OFN_EXPLORER, OFN_FILEMUSTEXIST, OFN_NOCHANGEDIR, OFN_PATHMUSTEXIST,
-        OPENFILENAMEW,
-    };
-    let mut path = vec![0_u16; 32_768];
-    let mut dialog = OPENFILENAMEW {
-        lStructSize: std::mem::size_of::<OPENFILENAMEW>() as u32,
-        hwndOwner: hwnd,
-        lpstrFilter: w!("Panzo 工程（project.json）\0project.json\0\0"),
-        lpstrFile: windows::core::PWSTR(path.as_mut_ptr()),
-        nMaxFile: path.len() as u32,
-        lpstrTitle: w!("选择 .panzo 文件夹中的 project.json"),
-        Flags: OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST,
-        ..Default::default()
-    };
-    if !unsafe { GetOpenFileNameW(&raw mut dialog) }.as_bool() {
-        return None;
+    let initial = unsafe { state_mut(hwnd) }
+        .map(|s| s.library_root.clone())
+        .unwrap_or_default();
+    match crate::platform::path_field::choose(hwnd, &initial) {
+        Ok(Some(path)) if path.join("project.json").is_file() => Some(path),
+        Ok(Some(_)) => {
+            crate::platform::workspace::notice("所选目录不是 Panzo 工程，请选择 .panzo 工程文件夹");
+            None
+        }
+        Ok(None) => None,
+        Err(e) => {
+            crate::platform::workspace::notice_error(&e);
+            None
+        }
     }
-    let len = path.iter().position(|c| *c == 0).unwrap_or(path.len());
-    PathBuf::from(std::ffi::OsString::from_wide(&path[..len]))
-        .parent()
-        .map(Path::to_path_buf)
+}
+pub(crate) fn workspace_record_setup(hwnd:HWND) {
+    unsafe {let _=windows::Win32::UI::WindowsAndMessaging::PostMessageW(Some(hwnd),crate::platform::recording_setup::MESSAGE,WPARAM(20),LPARAM(0));}
+}
+pub(crate) fn workspace_open(hwnd: HWND, project: bool) {
+    if let Some(s) = unsafe { state_mut(hwnd) } {
+        if project {
+            s.choose_project(hwnd);
+        } else {
+            s.open_image(hwnd);
+        }
+    }
+}
+pub(crate) fn import_workspace_video(hwnd: HWND, path: &Path) -> Result<(), String> {
+    let s = unsafe { state_mut(hwnd) }.ok_or("录制工作区尚未就绪")?;
+    if s.import_job.is_some() || s.phase.is_active() {
+        return Err("请先结束当前录制或视频导入".into());
+    }
+    s.import_job = Some(crate::platform::media_import::ImportJob::start(
+        path.into(),
+        s.library_root.clone(),
+    ));
+    s.status = "正在导入视频，可在录制菜单中取消…".into();
+    s.refresh(hwnd);
+    crate::platform::workspace::switch(1);
+    Ok(())
 }
 
+#[cfg(test)]
 pub(crate) fn recent_project(hwnd: HWND) -> Option<PathBuf> {
     unsafe { state_mut(hwnd) }.and_then(|state| state.last_project.clone())
 }
@@ -2549,14 +3290,37 @@ pub enum RecorderWindowError {
 }
 
 fn post_quit_window(hwnd: HWND) {
-    unsafe {
-        let _ = windows::Win32::UI::WindowsAndMessaging::PostMessageW(
+    if !crate::platform::app_shell::queue_exit() {
+        return;
+    }
+    if unsafe {
+        windows::Win32::UI::WindowsAndMessaging::PostMessageW(
             Some(hwnd),
             WM_QUIT_WINDOW,
             WPARAM(0),
             LPARAM(0),
-        );
+        )
     }
+    .is_err()
+    {
+        crate::platform::app_shell::clear_queued_exit();
+    }
+}
+
+pub(crate) fn apply_workspace_recording(
+    hwnd: HWND,
+    options: crate::platform::recorder::RecordingOptions,
+) -> Result<(), String> {
+    let state = unsafe { state_mut(hwnd) }.ok_or("录制窗口已关闭")?;
+    if state.phase.is_active() {
+        return Err("请在录制结束后修改录制参数".into());
+    }
+    crate::platform::ui_preferences::set_recording_options(options.clone())?;
+    state.camera_enabled = options.camera.enabled;
+    state.recording_options = options;
+    state.status = "录制设置已保存".into();
+    state.refresh(hwnd);
+    Ok(())
 }
 
 #[cfg(test)]
@@ -2585,6 +3349,7 @@ mod tests {
                 |dc, rect| draw_scene(dc, rect, &state),
             );
         }
+        state.home = false;
         state.theme = EditorTheme::for_dpi(96);
         state.phase = RecorderPhase::Recording;
         state.started_at = Instant::now().checked_sub(Duration::from_secs(12));
@@ -2743,6 +3508,60 @@ mod tests {
     }
 
     #[test]
+    fn eight_home_cards_fit_small_windows_and_scale() {
+        let mut state = WindowState::new(
+            PathBuf::from("test-library"),
+            1920,
+            1080,
+            Automation::None,
+            Arc::new(WindowTelemetry::default()),
+        );
+        state.home = true;
+        for dpi in [96, 120, 144, 192] {
+            state.theme = EditorTheme::for_dpi(dpi);
+            for (width, height) in [(640, 440), (900, 470), (1440, 900)] {
+                let client = RECT {
+                    left: 0,
+                    top: 0,
+                    right: state.theme.scale(width),
+                    bottom: state.theme.scale(height),
+                };
+                let mut layout = ControlLayout::new(client, state.theme);
+                layout.apply_home(client, &state);
+                let ids = [
+                    RecorderControlId::Screenshot,
+                    RecorderControlId::NewRecording,
+                    RecorderControlId::Pin,
+                    RecorderControlId::Recent,
+                    RecorderControlId::OpenImage,
+                    RecorderControlId::OpenProject,
+                    RecorderControlId::ImageTools,
+                    RecorderControlId::Ocr,
+                ];
+                for (index, id) in ids.iter().enumerate() {
+                    let a = layout.control_rect(*id).0;
+                    assert!(
+                        a.left >= 0
+                            && a.right <= client.right
+                            && a.top >= 0
+                            && a.bottom <= layout.status.top,
+                        "{dpi} {width}x{height} {id:?}"
+                    );
+                    for other in &ids[index + 1..] {
+                        let b = layout.control_rect(*other).0;
+                        assert!(
+                            a.right <= b.left
+                                || a.left >= b.right
+                                || a.bottom <= b.top
+                                || a.top >= b.bottom
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn every_recorder_control_has_a_unique_accessible_name_and_tooltip() {
         let mut names = std::collections::HashSet::new();
         for id in RecorderControlId::ORDER {
@@ -2752,3 +3571,11 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "workspace_review.rs"]
+mod workspace_review;
+
+#[cfg(test)]
+#[path = "tray_menu_review.rs"]
+mod tray_menu_review;

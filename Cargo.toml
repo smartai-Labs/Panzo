@@ -1,6 +1,9 @@
 [workspace]
 members = [
     "crates/panzo-app",
+    "crates/panzo-plugin-api",
+    "plugins/panzo-image-filters",
+    "plugins/panzo-media-tools",
     "crates/panzo-core",
     "crates/panzo-windows",
 ]
@@ -14,8 +17,11 @@ license = "Proprietary"
 
 [workspace.dependencies]
 anyhow = "1.0"
+base64 = "0.22"
+reqwest = { version = "0.13.4", default-features = false, features = ["native-tls-no-alpn", "json", "system-proxy"] }
+tokio = { version = "1.53", features = ["rt", "time", "net"] }
 crossbeam-queue = "0.3"
-image = { version = "0.25.10", default-features = false, features = ["bmp", "jpeg", "png"] }
+image = { version = "0.25.10", default-features = false, features = ["bmp", "jpeg", "png", "gif"] }
 resvg = { version = "0.48.1", default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -25,6 +31,10 @@ tiny-skia = "0.12.0"
 uuid = { version = "1.0", features = ["serde", "v4"] }
 windows = { version = "0.62", features = [
     "Foundation",
+    "Globalization",
+    "Graphics_Imaging",
+    "Media_Ocr",
+    "Storage_Streams",
     "Graphics_Capture",
     "Graphics_DirectX",
     "Graphics_DirectX_Direct3D11",
@@ -37,11 +47,20 @@ windows = { version = "0.62", features = [
     "Win32_Graphics_Dxgi_Common",
     "Win32_Graphics_Dwm",
     "Win32_Graphics_Gdi",
+    "Win32_Graphics_DirectWrite",
+    "Win32_UI_Controls_RichEdit",
     "Win32_Media_MediaFoundation",
+    "Win32_Media_Audio",
+    "Win32_Devices_FunctionDiscovery",
+    "Win32_UI_Shell_PropertiesSystem",
     "Win32_Security",
+    "Win32_Security_Cryptography",
     "Win32_System_Com",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
     "Win32_System_Com_StructuredStorage",
     "Win32_System_LibraryLoader",
+    "Win32_System_JobObjects",
     "Win32_System_Ole",
     "Win32_System_Variant",
     "Win32_System_Performance",
@@ -54,8 +73,10 @@ windows = { version = "0.62", features = [
     "Win32_UI_HiDpi",
     "Win32_UI_Shell",
     "Win32_UI_Accessibility",
+    "Win32_System_Registry",
     "Win32_UI_Controls_Dialogs",
     "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Input_Ime",
     "Win32_UI_WindowsAndMessaging",
 ] }
 

@@ -1,0 +1,1419 @@
+[
+  {
+    "h": 1031801704,
+    "parent": 865735450,
+    "class": "PanzoRecorderWindow",
+    "visible": false,
+    "rect": [
+      50,
+      162,
+      1150,
+      824
+    ],
+    "title": "Panzo 录屏 — 准备就绪"
+  },
+  {
+    "h": 591991888,
+    "parent": 865735450,
+    "class": "PanzoImageWorkspace",
+    "visible": true,
+    "rect": [
+      50,
+      162,
+      1150,
+      824
+    ],
+    "title": ""
+  },
+  {
+    "h": 4262816,
+    "parent": 591991888,
+    "class": "Static",
+    "visible": true,
+    "rect": [
+      864,
+      214,
+      1058,
+      238
+    ],
+    "title": "文字识别"
+  },
+  {
+    "h": 394925720,
+    "parent": 591991888,
+    "class": "Static",
+    "visible": true,
+    "rect": [
+      864,
+      444,
+      1136,
+      468
+    ],
+    "title": "识别结果 · 可直接校对"
+  },
+  {
+    "h": 102109886,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      864,
+      250,
+      1000,
+      279
+    ],
+    "title": "文字 OCR"
+  },
+  {
+    "h": 16911870,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1000,
+      250,
+      1136,
+      279
+    ],
+    "title": "多模态识图"
+  },
+  {
+    "h": 146605252,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1102,
+      169,
+      1136,
+      199
+    ],
+    "title": "识别面板"
+  },
+  {
+    "h": 36440482,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1060,
+      169,
+      1094,
+      199
+    ],
+    "title": "保存图片"
+  },
+  {
+    "h": 11734904,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      162,
+      51,
+      163
+    ],
+    "title": "更多"
+  },
+  {
+    "h": 262147448,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      396,
+      518,
+      442,
+      554
+    ],
+    "title": "打开图片"
+  },
+  {
+    "h": 223941958,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      458,
+      518,
+      504,
+      554
+    ],
+    "title": "区域截图"
+  },
+  {
+    "h": 57873780,
+    "parent": 591991888,
+    "class": "ComboBox",
+    "visible": false,
+    "rect": [
+      726,
+      209,
+      844,
+      236
+    ],
+    "title": ""
+  },
+  {
+    "h": 103219432,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      60,
+      169,
+      94,
+      199
+    ],
+    "title": "区域截图"
+  },
+  {
+    "h": 8722376,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      100,
+      169,
+      134,
+      199
+    ],
+    "title": "打开"
+  },
+  {
+    "h": 17766338,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      140,
+      169,
+      174,
+      199
+    ],
+    "title": "长截图"
+  },
+  {
+    "h": 11802530,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      180,
+      169,
+      214,
+      199
+    ],
+    "title": "拼图"
+  },
+  {
+    "h": 116791056,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      220,
+      169,
+      254,
+      199
+    ],
+    "title": "批处理"
+  },
+  {
+    "h": 320343032,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      260,
+      169,
+      294,
+      199
+    ],
+    "title": "关闭"
+  },
+  {
+    "h": 300614320,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      300,
+      169,
+      334,
+      199
+    ],
+    "title": "图片插件"
+  },
+  {
+    "h": 85594032,
+    "parent": 591991888,
+    "class": "Static",
+    "visible": false,
+    "rect": [
+      50,
+      162,
+      51,
+      163
+    ],
+    "title": "截图或打开图片\r\n\r\n在这里标注、裁剪、识别文字或理解图片。\r\n切换功能标签会保留当前内容。"
+  },
+  {
+    "h": 3869750,
+    "parent": 591991888,
+    "class": "ComboBox",
+    "visible": false,
+    "rect": [
+      50,
+      162,
+      51,
+      189
+    ],
+    "title": ""
+  },
+  {
+    "h": 31656398,
+    "parent": 591991888,
+    "class": "ComboBox",
+    "visible": true,
+    "rect": [
+      864,
+      295,
+      1136,
+      322
+    ],
+    "title": ""
+  },
+  {
+    "h": 144051540,
+    "parent": 591991888,
+    "class": "ComboBox",
+    "visible": false,
+    "rect": [
+      864,
+      294,
+      1136,
+      321
+    ],
+    "title": ""
+  },
+  {
+    "h": 31724416,
+    "parent": 591991888,
+    "class": "Edit",
+    "visible": false,
+    "rect": [
+      864,
+      366,
+      1136,
+      431
+    ],
+    "title": ""
+  },
+  {
+    "h": 483202098,
+    "parent": 591991888,
+    "class": "Static",
+    "visible": false,
+    "rect": [
+      864,
+      333,
+      1136,
+      358
+    ],
+    "title": "补充要求 / 提问（可选）"
+  },
+  {
+    "h": 20383720,
+    "parent": 591991888,
+    "class": "Edit",
+    "visible": true,
+    "rect": [
+      864,
+      475,
+      1136,
+      769
+    ],
+    "title": ""
+  },
+  {
+    "h": 481563004,
+    "parent": 591991888,
+    "class": "Static",
+    "visible": true,
+    "rect": [
+      864,
+      389,
+      1136,
+      434
+    ],
+    "title": "选择识别方式，然后开始识别。"
+  },
+  {
+    "h": 136255080,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      864,
+      346,
+      1058,
+      376
+    ],
+    "title": "开始识别"
+  },
+  {
+    "h": 2231234,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1064,
+      346,
+      1136,
+      376
+    ],
+    "title": "取消识别"
+  },
+  {
+    "h": 46601748,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1102,
+      784,
+      1136,
+      812
+    ],
+    "title": "复制结果"
+  },
+  {
+    "h": 294786852,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1102,
+      212,
+      1136,
+      238
+    ],
+    "title": "服务设置"
+  },
+  {
+    "h": 66917030,
+    "parent": 591991888,
+    "class": "PanzoPicture",
+    "visible": true,
+    "rect": [
+      50,
+      240,
+      850,
+      754
+    ],
+    "title": "Panzo · 截图与标注"
+  },
+  {
+    "h": 37554862,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      282,
+      89,
+      313
+    ],
+    "title": "选择"
+  },
+  {
+    "h": 19928272,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      384,
+      89,
+      415
+    ],
+    "title": "矩形"
+  },
+  {
+    "h": 498601342,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "椭圆"
+  },
+  {
+    "h": 244584356,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "直线"
+  },
+  {
+    "h": 239079642,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      418,
+      89,
+      449
+    ],
+    "title": "箭头"
+  },
+  {
+    "h": 57608584,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      350,
+      89,
+      381
+    ],
+    "title": "画笔"
+  },
+  {
+    "h": 71766000,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "荧光"
+  },
+  {
+    "h": 6031882,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      452,
+      89,
+      483
+    ],
+    "title": "文字"
+  },
+  {
+    "h": 370610404,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "序号"
+  },
+  {
+    "h": 343479008,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      486,
+      89,
+      517
+    ],
+    "title": "马赛克"
+  },
+  {
+    "h": 4134960,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "模糊"
+  },
+  {
+    "h": 344982474,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "遮挡"
+  },
+  {
+    "h": 70061610,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      316,
+      89,
+      347
+    ],
+    "title": "裁剪"
+  },
+  {
+    "h": 513611466,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      520,
+      89,
+      551
+    ],
+    "title": "撤销"
+  },
+  {
+    "h": 90968846,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "重做"
+  },
+  {
+    "h": 311691790,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "删除"
+  },
+  {
+    "h": 1379142044,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      106,
+      245,
+      136,
+      270
+    ],
+    "title": "颜色…"
+  },
+  {
+    "h": 15604686,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "应用样式"
+  },
+  {
+    "h": 1192889758,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "旋转"
+  },
+  {
+    "h": 81528094,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "左右翻转"
+  },
+  {
+    "h": 6035610,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "上下翻转"
+  },
+  {
+    "h": 268440894,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "取消裁剪"
+  },
+  {
+    "h": 4331580,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "复制"
+  },
+  {
+    "h": 291639282,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "快速保存"
+  },
+  {
+    "h": 733155870,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "另存为…"
+  },
+  {
+    "h": 581899202,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      554,
+      89,
+      585
+    ],
+    "title": "贴到桌面"
+  },
+  {
+    "h": 50793658,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "更新文字"
+  },
+  {
+    "h": 23202546,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "文字识图"
+  },
+  {
+    "h": 6690886,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      55,
+      588,
+      89,
+      619
+    ],
+    "title": "更多工具"
+  },
+  {
+    "h": 3151720,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "确认裁剪 (Enter)"
+  },
+  {
+    "h": 461705320,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "取消裁剪 (Esc)"
+  },
+  {
+    "h": 275254388,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      710,
+      729,
+      740,
+      753
+    ],
+    "title": "适应窗口"
+  },
+  {
+    "h": 29887588,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      742,
+      729,
+      772,
+      753
+    ],
+    "title": "实际大小 (100%)"
+  },
+  {
+    "h": 677188664,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      774,
+      729,
+      804,
+      753
+    ],
+    "title": "缩小"
+  },
+  {
+    "h": 509088764,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      806,
+      729,
+      836,
+      753
+    ],
+    "title": "放大"
+  },
+  {
+    "h": 158796852,
+    "parent": 66917030,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": "应用裁剪尺寸"
+  },
+  {
+    "h": 5380078,
+    "parent": 66917030,
+    "class": "ComboBox",
+    "visible": true,
+    "rect": [
+      142,
+      245,
+      242,
+      272
+    ],
+    "title": ""
+  },
+  {
+    "h": 31396582,
+    "parent": 66917030,
+    "class": "ComboBox",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      150,
+      267
+    ],
+    "title": ""
+  },
+  {
+    "h": 76617328,
+    "parent": 66917030,
+    "class": "ComboBox",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      150,
+      267
+    ],
+    "title": ""
+  },
+  {
+    "h": 6166396,
+    "parent": 66917030,
+    "class": "Edit",
+    "visible": false,
+    "rect": [
+      106,
+      277,
+      838,
+      317
+    ],
+    "title": "输入标注文字，可换行"
+  },
+  {
+    "h": 146015646,
+    "parent": 66917030,
+    "class": "Edit",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": ""
+  },
+  {
+    "h": 3479610,
+    "parent": 66917030,
+    "class": "Edit",
+    "visible": false,
+    "rect": [
+      50,
+      240,
+      51,
+      241
+    ],
+    "title": ""
+  },
+  {
+    "h": 146937152,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      58,
+      208,
+      196,
+      238
+    ],
+    "title": "图片 1"
+  },
+  {
+    "h": 1101534870,
+    "parent": 591991888,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      62,
+      763,
+      224,
+      815
+    ],
+    "title": "图片 1\r\n4000 × 2500"
+  },
+  {
+    "h": 111678678,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      62,
+      124,
+      166,
+      156
+    ],
+    "title": "图片工具"
+  },
+  {
+    "h": 267062652,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      172,
+      124,
+      300,
+      156
+    ],
+    "title": "录制与视频"
+  },
+  {
+    "h": 458757568,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      306,
+      124,
+      410,
+      156
+    ],
+    "title": "素材"
+  },
+  {
+    "h": 436014724,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      58,
+      86,
+      108,
+      114
+    ],
+    "title": "文件"
+  },
+  {
+    "h": 4920786,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      110,
+      86,
+      160,
+      114
+    ],
+    "title": "编辑"
+  },
+  {
+    "h": 177018854,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      162,
+      86,
+      212,
+      114
+    ],
+    "title": "视图"
+  },
+  {
+    "h": 37099720,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      214,
+      86,
+      264,
+      114
+    ],
+    "title": "帮助"
+  },
+  {
+    "h": 502009824,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      266,
+      86,
+      316,
+      114
+    ],
+    "title": "插件"
+  },
+  {
+    "h": 323949308,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      318,
+      86,
+      368,
+      114
+    ],
+    "title": "设置"
+  },
+  {
+    "h": 13635474,
+    "parent": 865735450,
+    "class": "Button",
+    "visible": true,
+    "rect": [
+      1104,
+      86,
+      1138,
+      114
+    ],
+    "title": "切换为浅色主题"
+  },
+  {
+    "h": 44111550,
+    "parent": 865735450,
+    "class": "Static",
+    "visible": true,
+    "rect": [
+      62,
+      827,
+      1138,
+      847
+    ],
+    "title": ""
+  },
+  {
+    "h": 1135412726,
+    "parent": 865735450,
+    "class": "PanzoCaptureHistory",
+    "visible": false,
+    "rect": [
+      50,
+      162,
+      1150,
+      824
+    ],
+    "title": "Panzo · 素材"
+  },
+  {
+    "h": 4789588,
+    "parent": 1135412726,
+    "class": "Edit",
+    "visible": false,
+    "rect": [
+      210,
+      174,
+      752,
+      204
+    ],
+    "title": ""
+  },
+  {
+    "h": 767038596,
+    "parent": 1135412726,
+    "class": "ListBox",
+    "visible": false,
+    "rect": [
+      210,
+      220,
+      590,
+      810
+    ],
+    "title": "素材列表"
+  },
+  {
+    "h": 949160512,
+    "parent": 1135412726,
+    "class": "PanzoAssetPreview",
+    "visible": false,
+    "rect": [
+      602,
+      212,
+      1138,
+      810
+    ],
+    "title": "素材预览"
+  },
+  {
+    "h": 274664766,
+    "parent": 949160512,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      614,
+      768,
+      644,
+      796
+    ],
+    "title": "播放 / 暂停"
+  },
+  {
+    "h": 5641744,
+    "parent": 949160512,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      648,
+      768,
+      678,
+      796
+    ],
+    "title": "缩小"
+  },
+  {
+    "h": 17175528,
+    "parent": 949160512,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      682,
+      768,
+      712,
+      796
+    ],
+    "title": "放大"
+  },
+  {
+    "h": 96733400,
+    "parent": 949160512,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      716,
+      768,
+      746,
+      796
+    ],
+    "title": "适应窗口"
+  },
+  {
+    "h": 2037736,
+    "parent": 949160512,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      750,
+      768,
+      780,
+      796
+    ],
+    "title": "实际大小 100%"
+  },
+  {
+    "h": 72946124,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      1000,
+      174,
+      1030,
+      203
+    ],
+    "title": "进入编辑"
+  },
+  {
+    "h": 17242356,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      1035,
+      174,
+      1065,
+      203
+    ],
+    "title": "复制图片"
+  },
+  {
+    "h": 1027411224,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      1070,
+      174,
+      1100,
+      203
+    ],
+    "title": "贴到桌面"
+  },
+  {
+    "h": 5770284,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      1105,
+      174,
+      1135,
+      203
+    ],
+    "title": "在资源管理器中显示"
+  },
+  {
+    "h": 924078,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      62,
+      780,
+      92,
+      809
+    ],
+    "title": "恢复全部贴图交互"
+  },
+  {
+    "h": 380177810,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      94,
+      780,
+      124,
+      809
+    ],
+    "title": "刷新素材"
+  },
+  {
+    "h": 340792386,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      126,
+      780,
+      156,
+      809
+    ],
+    "title": "清理已关闭贴图的恢复记录"
+  },
+  {
+    "h": 40637220,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      158,
+      780,
+      188,
+      809
+    ],
+    "title": "贴图分组"
+  },
+  {
+    "h": 12327350,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      965,
+      174,
+      995,
+      203
+    ],
+    "title": "展开 / 收起预览（空格）"
+  },
+  {
+    "h": 136778680,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      58,
+      222,
+      190,
+      253
+    ],
+    "title": "全部素材"
+  },
+  {
+    "h": 5379508,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      58,
+      260,
+      190,
+      291
+    ],
+    "title": "图片与动图"
+  },
+  {
+    "h": 530844308,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      58,
+      298,
+      190,
+      329
+    ],
+    "title": "视频与工程"
+  },
+  {
+    "h": 34542968,
+    "parent": 1135412726,
+    "class": "Button",
+    "visible": false,
+    "rect": [
+      58,
+      336,
+      190,
+      367
+    ],
+    "title": "桌面贴图"
+  }
+]

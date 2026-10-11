@@ -36,7 +36,7 @@ impl PreparedEditorLoad {
         let recovery_notice = if restore_draft {
             match editor.restore_recovery_draft() {
                 Ok(true) => {
-                    Some("已恢复上次未保存的修改。\nCtrl+S 保存，Ctrl+Z 撤销这次恢复。".into())
+                    Some("已恢复上次未保存的修改。\n保存，可撤销这次恢复。".into())
                 }
                 Ok(false) => None,
                 Err(_) => Some("恢复副本未能载入，已保留副本并打开上次保存的工程。".into()),

@@ -235,7 +235,9 @@ fn navigate(hwnd: HWND, intent: NavigationIntent) -> Result<(), String> {
                 state.post_navigation();
             }
             NavigationIntent::Quit => state.on_close(hwnd),
-            NavigationIntent::NewRecording => return Err("already in recording preparation".into()),
+            NavigationIntent::Home | NavigationIntent::NewRecording | NavigationIntent::StartRecording => {
+                return Err("already in recording preparation".into());
+            }
         }
     }
     Ok(())

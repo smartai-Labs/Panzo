@@ -1,16 +1,17 @@
 use super::{
-    CameraSegment, ControlId, DT_LEFT, DT_SINGLELINE, DT_VCENTER, HWND, HitRect, Instant,
-    NormalizedPoint, PCWSTR, RECT, TICKS_PER_SECOND, TextStyle, TimeTick, WindowState, border,
-    draw_text_styled, fill, mem, rounded_surface, timeline_x, w, wide,
+    CameraSegment, ControlId, ControlLayout, DT_LEFT, DT_SINGLELINE, DT_VCENTER, HWND, HitRect,
+    Instant, NormalizedPoint, PCWSTR, RECT, TICKS_PER_SECOND, TextStyle, TimeTick, WindowState,
+    border, draw_text_styled, mem, rounded_surface, timeline_x, w, wide,
 };
 use crate::platform::{
     editor_dialog,
     editor_tasks::ExportTask,
     export::{ExportRequest, ExportSnapshot},
 };
-use windows::Win32::UI::WindowsAndMessaging::{MB_ICONWARNING, MB_OK, MessageBoxW};
+use windows::Win32::UI::WindowsAndMessaging::{MB_ICONWARNING, MB_OK};
 
 impl WindowState {
+    #[cfg(test)]
     pub(super) fn application_menu(&mut self, hwnd: HWND) {
         use crate::platform::app_menu::{self, Action, Availability};
         let recent = crate::platform::recorder_window::recent_project(hwnd)
@@ -27,6 +28,21 @@ impl WindowState {
             .control_rect(ControlId::Menu)
             .0;
         match app_menu::show(hwnd, anchor, self.theme, available) {
+            Ok(Some(action @ (Action::Audio | Action::Subtitles))) => {
+                self.activate_control(
+                    hwnd,
+                    if action == Action::Audio {
+                        ControlId::AudioPanel
+                    } else {
+                        ControlId::SubtitlePanel
+                    },
+                );
+            }
+            Ok(Some(Action::MediaEffects)) => self.media_effects(hwnd, anchor),
+            Ok(Some(Action::Home)) if crate::platform::workspace::active() => {
+                crate::platform::workspace::switch(0);
+            }
+            Ok(Some(Action::Home)) => self.request_navigation(hwnd, super::NavigationIntent::Home),
             Ok(Some(Action::ContinueRecent)) => {
                 if let Some(path) = recent {
                     self.request_navigation(hwnd, super::NavigationIntent::OpenProject(path));
@@ -39,7 +55,11 @@ impl WindowState {
                     Action::Save => ControlId::Save,
                     Action::Export => ControlId::Export,
                     Action::OpenLocation => ControlId::Location,
-                    Action::ContinueRecent => unreachable!(),
+                    Action::Audio
+                    | Action::Subtitles
+                    | Action::MediaEffects
+                    | Action::ContinueRecent
+                    | Action::Home => unreachable!(),
                 };
                 if self.control_enabled(control) {
                     self.activate_control(hwnd, control);
@@ -154,83 +174,6 @@ impl WindowState {
         }
     }
 
-    #[allow(clippy::too_many_lines)] // Menu command IDs and their dispatch stay together.
-    pub(super) fn appearance_menu(&mut self, hwnd: HWND) {
-        use crate::platform::app_menu::{self, Row};
-        use crate::platform::editor_ui::IconKind;
-        let mut rows = app_menu::theme_rows(self.theme);
-        rows.push(Row::heading("诊断"));
-        rows.push(Row::command(
-            1002,
-            "切换镜头诊断（D）",
-            IconKind::Diagnostics,
-            true,
-        ));
-        rows.push(Row::command(
-            1003,
-            "诊断详情（Ctrl+C 复制）",
-            IconKind::Log,
-            true,
-        ));
-        let controls = self.control_layout(super::client_rect(hwnd));
-        let choice = match app_menu::show_rows(hwnd, controls.diagnostics.0, self.theme, rows, true)
-        {
-            Ok(Some(choice)) => choice,
-            Ok(None) => return,
-            Err(error) => {
-                self.note_problem(
-                    "设置操作未完成，请再次打开设置重试",
-                    format!("无法打开设置：{error}"),
-                );
-                self.refresh(hwnd, true);
-                return;
-            }
-        };
-        if let Some(result) = crate::platform::editor_ui::theme_command(choice) {
-            if let Err(error) = result {
-                self.note_problem(
-                    "设置操作未完成，请再次打开设置重试",
-                    format!("错误：设置未保存：{error}"),
-                );
-            }
-            crate::platform::editor_ui::sync_window_theme(&mut self.theme, hwnd);
-            self.refresh(hwnd, true);
-            return;
-        }
-        match choice {
-            1002 => {
-                self.session.toggle_camera_diagnostics();
-            }
-            1003 => {
-                let text = wide(&format!(
-                    "{}\n{}\n\n工程：{}\n当前时间：{}\n编辑时长：{}\n保存修订：{}\n视频尺寸：{}×{}\n\n可按 Ctrl+C 复制此对话框。",
-                    format_args!(
-                        "{}\n\n最近诊断：\n{}",
-                        self.status_message().0,
-                        self.feedback.details()
-                    ),
-                    self.scrub_preview.proxy_status().unwrap_or_default(),
-                    self.editor.project_root().display(),
-                    super::format_tick(self.session.snapshot().project_tick),
-                    super::format_tick(self.editor.project_duration()),
-                    self.editor.settings().revision,
-                    self.frame.evaluation.output.width,
-                    self.frame.evaluation.output.height
-                ));
-                unsafe {
-                    MessageBoxW(
-                        Some(hwnd),
-                        PCWSTR(text.as_ptr()),
-                        w!("Panzo 诊断详情"),
-                        MB_OK,
-                    );
-                }
-            }
-            _ => {}
-        }
-        self.refresh(hwnd, true);
-    }
-
     pub(super) fn split_video(&mut self) {
         if !self.control_enabled(ControlId::Split) {
             self.set_status(
@@ -244,7 +187,7 @@ impl WindowState {
         }
         let result = self
             .editor
-            .split_video(self.session.snapshot().project_tick);
+            .split_video(self.session.project_playhead());
         match result {
             Ok(id) => {
                 self.selected_video = Some(id);
@@ -252,7 +195,7 @@ impl WindowState {
                 self.inspector_video_tab = true;
                 self.inspector_scroll = 0;
                 let result = self.apply_editor_state();
-                self.record_editor_result(result, "视频已分割 · Ctrl+Z 撤销");
+                self.record_editor_result(result, "视频已分割 · 可撤销");
             }
             Err(error) => {
                 let message = self.edit_error(&error);
@@ -286,14 +229,7 @@ impl WindowState {
                 ]
             }
             ControlId::VideoTrim => {
-                let video = self.editor.video_edit();
-                let Some(clip) = video
-                    .clips
-                    .iter()
-                    .find(|clip| Some(&clip.id) == self.selected_video.as_ref())
-                else {
-                    return;
-                };
+                let Some(clip)=self.selected_video_clip() else{return;};
                 vec![
                     ("源入点（秒）", seconds(clip.source_in_tick)),
                     ("源出点（秒）", seconds(clip.source_out_tick)),
@@ -314,7 +250,7 @@ impl WindowState {
                     match self.apply_property_values(control, &values) {
                         Ok(()) => {
                             let result = self.apply_editor_state();
-                            self.record_editor_result(result, "属性已更新 · Ctrl+Z 撤销");
+                            self.record_editor_result(result, "属性已更新 · 可撤销");
                             break;
                         }
                         Err(error) => {
@@ -422,6 +358,7 @@ impl WindowState {
         &mut self,
         output: std::path::PathBuf,
         preset: crate::platform::export::ExportPreset,
+        options: crate::platform::export::ExportOptions,
     ) {
         if let Some(hwnd) = self.host_hwnd
             && !self.finish_inline_input(hwnd, true)
@@ -450,7 +387,7 @@ impl WindowState {
             output_path: output,
             maximum_duration: None,
         };
-        match ExportTask::start(request, snapshot, preset) {
+        match ExportTask::start_with_options(request, snapshot, preset, options) {
             Ok(task) => {
                 if let Some(panel) = &mut self.export_panel {
                     panel.mark_started();
@@ -506,8 +443,12 @@ impl WindowState {
                     );
                 }
             }
-            Some(ExportAction::Start { output, preset }) if self.export_task.is_none() => {
-                self.start_export_snapshot(output, preset);
+            Some(ExportAction::Start {
+                output,
+                preset,
+                options,
+            }) if self.export_task.is_none() => {
+                self.start_export_snapshot(output, preset, options);
             }
             _ => {}
         }
@@ -519,6 +460,10 @@ impl WindowState {
             let success = result.is_ok();
             match result {
                 Ok(report) => {
+                    let _ = crate::platform::asset_index::register(
+                        &crate::platform::workspace::library_path(),
+                        &report.output_path,
+                    );
                     self.resolve_problem(crate::platform::editor_ui::StatusScope::Export);
                     self.set_status(
                         crate::platform::editor_ui::StatusSeverity::Success,
@@ -558,40 +503,27 @@ impl WindowState {
     }
 
     pub(super) fn show_export_location(&mut self) {
-        use std::os::windows::process::CommandExt;
-        use windows::Win32::Graphics::Gdi::ClientToScreen;
-        use windows::Win32::UI::WindowsAndMessaging::{
-            AppendMenuW, CreatePopupMenu, DestroyMenu, MF_STRING, TPM_RETURNCMD, TrackPopupMenu,
+        use crate::platform::{
+            app_menu::{self, Row},
+            editor_ui::IconKind,
         };
+        use std::os::windows::process::CommandExt;
         let mut open_video = false;
         let mut project_folder = false;
         if self.export_output.is_some()
             && let Some(hwnd) = self.host_hwnd
         {
-            let Ok(menu) = (unsafe { CreatePopupMenu() }) else {
-                return;
-            };
             let layout = self.control_layout(super::client_rect(hwnd));
-            let rect = layout.control_rect(ControlId::Location);
-            let mut point = windows::Win32::Foundation::POINT {
-                x: rect.left,
-                y: rect.bottom,
-            };
-            unsafe {
-                let _ = AppendMenuW(menu, MF_STRING, 1, w!("打开导出视频"));
-                let _ = AppendMenuW(menu, MF_STRING, 2, w!("打开导出文件位置"));
-                let _ = AppendMenuW(menu, MF_STRING, 3, w!("打开工程文件夹"));
-                let _ = ClientToScreen(hwnd, &raw mut point);
-            }
-            let choice =
-                unsafe { TrackPopupMenu(menu, TPM_RETURNCMD, point.x, point.y, None, hwnd, None) }
-                    .0;
-            unsafe {
-                let _ = DestroyMenu(menu);
-            }
-            if choice == 0 {
+            let anchor = layout.control_rect(ControlId::Location).0;
+            let rows = vec![
+                Row::command(1, "打开导出视频", IconKind::Play, true),
+                Row::command(2, "打开导出文件位置", IconKind::Folder, true),
+                Row::command(3, "打开工程文件夹", IconKind::Folder, true),
+            ];
+            let Ok(Some(choice)) = app_menu::show_rows(hwnd, anchor, self.theme, rows, false)
+            else {
                 return;
-            }
+            };
             open_video = choice == 1;
             project_folder = choice == 3;
         }
@@ -614,16 +546,14 @@ impl WindowState {
     }
 
     pub(super) fn display_segments(&self) -> Vec<CameraSegment> {
-        let video = self.editor.video_edit();
         self.editor
             .camera()
             .segments
             .iter()
             .flat_map(|segment| {
-                video
-                    .project_ranges(segment.start_tick, segment.end_tick)
+                self.editor.settings().follow_positions.get(&segment.id).map_or_else(||self.editor.settings().source_ranges(self.editor.duration(),segment.start_tick, segment.end_tick),|r|vec![*r])
                     .into_iter()
-                    .map(|(_, start, end)| {
+                    .map(|(start, end)| {
                         let mut display = segment.clone();
                         display.start_tick = start;
                         display.end_tick = end;
@@ -635,14 +565,17 @@ impl WindowState {
     }
 
     pub(super) fn draw_video_track(&self, hdc: windows::Win32::Graphics::Gdi::HDC, track: HitRect) {
+        use crate::platform::editor_ui::{track_clip, track_grips};
         let palette = self.theme.palette;
+        let compact = !ControlLayout::video_thumbnails_visible(track, self.theme);
         rounded_surface(
             hdc,
             track.0,
             palette.track,
-            palette.divider,
-            self.theme.scale(6),
+            palette.track,
+            self.theme.scale(4),
         );
+        let tiles = self.visible_thumbnails(track);
         for span in self.editor.video_edit().spans() {
             let left = timeline_x(track, span.project_in, self.timeline).max(track.left);
             let right = timeline_x(track, span.project_out, self.timeline).min(track.right);
@@ -652,87 +585,61 @@ impl WindowState {
             let rect = RECT {
                 left,
                 right,
-                top: track.top + 3,
-                bottom: track.bottom - 3,
+                top: track.top + self.theme.scale(2),
+                bottom: track.bottom - self.theme.scale(2),
             };
             let selected = self.selected_video.as_deref() == Some(span.clip.id.as_str());
-            rounded_surface(
+            track_clip(
                 hdc,
                 rect,
                 palette.video_clip,
-                if selected {
-                    palette.accent
-                } else {
-                    palette.video_border
-                },
-                self.theme.scale(4),
+                palette.video_border,
+                selected,
+                self.theme,
             );
-            for (tile, tick) in self
-                .visible_thumbnails(track)
-                .into_iter()
+            for (tile, tick) in tiles
+                .iter()
                 .filter(|(tile, _)| tile.left >= left && tile.left < right)
             {
-                if let Some(frame) = self.thumbnails.get(tick) {
+                if let Some(frame) = self.thumbnails.get(*tick) {
                     use windows::Win32::Graphics::Gdi::{IntersectClipRect, RestoreDC, SaveDC};
                     let saved = unsafe { SaveDC(hdc) };
                     unsafe {
                         IntersectClipRect(
                             hdc,
-                            left + 3,
-                            track.top + 4,
-                            right - 3,
-                            track.bottom - 4,
+                            left + self.theme.scale(3),
+                            tile.top,
+                            right - self.theme.scale(3),
+                            track.bottom - self.theme.scale(4),
                         );
                     }
-                    draw_thumbnail(hdc, tile, frame);
+                    draw_thumbnail(hdc, *tile, frame);
                     unsafe {
                         let _ = RestoreDC(hdc, saved);
                     }
                 }
             }
-            if selected {
-                border(hdc, rect, palette.accent, 2);
-            }
-            if right - left >= self.theme.scale(96) {
+            if right - left >= self.theme.scale(56) {
                 let label = RECT {
-                    left: left + self.theme.scale(7),
-                    right: (left + self.theme.scale(125)).min(right - self.theme.scale(7)),
-                    top: rect.top + self.theme.scale(3),
-                    bottom: (rect.top + self.theme.scale(25))
-                        .min(rect.bottom - self.theme.scale(3)),
+                    left: left + self.theme.scale(10),
+                    right: right - self.theme.scale(10),
+                    top: rect.top,
+                    bottom: if compact {
+                        rect.bottom
+                    } else {
+                        (rect.top + self.theme.scale(20)).min(rect.bottom)
+                    },
                 };
-                rounded_surface(
-                    hdc,
-                    label,
-                    palette.raised,
-                    palette.raised,
-                    self.theme.scale(4),
-                );
                 draw_text_styled(
                     hdc,
-                    RECT {
-                        left: label.left + self.theme.scale(5),
-                        right: label.right - self.theme.scale(5),
-                        ..label
-                    },
+                    label,
                     &format!("视频 · {}", seconds(span.clip.duration())),
                     palette.text_secondary,
                     DT_LEFT | DT_SINGLELINE | DT_VCENTER,
                     TextStyle::Caption,
                 );
             }
-            for x in [left + 4, right - 6] {
-                fill(
-                    hdc,
-                    &RECT {
-                        left: x,
-                        right: x + 2,
-                        top: rect.top + 10,
-                        bottom: rect.bottom - 10,
-                    },
-                    palette.accent,
-                );
-            }
+            track_grips(hdc, rect, palette.video_border, selected, self.theme);
         }
     }
 
@@ -753,7 +660,7 @@ impl WindowState {
     }
 
     pub(super) fn draw_scrollbar(&self, hdc: windows::Win32::Graphics::Gdi::HDC, track: HitRect) {
-        if self.timeline.is_fit() {
+        if !self.timeline.can_pan() {
             return;
         }
         rounded_surface(
@@ -778,6 +685,9 @@ impl WindowState {
 
     pub(super) fn visible_thumbnails(&self, track: HitRect) -> Vec<(RECT, TimeTick)> {
         use panzo_core::TimeMapping;
+        if !ControlLayout::video_thumbnails_visible(track, self.theme) {
+            return Vec::new();
+        }
         let video = self.editor.video_edit();
         let mut tiles = Vec::new();
         let tile_width = i32::try_from(self.thumbnail_size(track).0).unwrap_or(1) + 2;
@@ -794,8 +704,8 @@ impl WindowState {
                         RECT {
                             left: x,
                             right: x + tile_width - 2,
-                            top: track.top + 4,
-                            bottom: track.bottom - 4,
+                            top: track.top + self.theme.scale(24),
+                            bottom: track.bottom - self.theme.scale(4),
                         },
                         source,
                     ));
@@ -807,7 +717,7 @@ impl WindowState {
     }
 
     pub(super) fn thumbnail_size(&self, track: HitRect) -> (u32, u32) {
-        let height = (track.bottom - track.top - 8).max(1);
+        let height = (track.bottom - track.top - self.theme.scale(28)).max(1);
         let source = self.session.output();
         let width = i64::from(height) * i64::from(source.width) / i64::from(source.height);
         (
@@ -868,11 +778,131 @@ fn seconds(tick: TimeTick) -> String {
 fn warning(hwnd: HWND, text: &str) {
     let text = wide(text);
     unsafe {
-        MessageBoxW(
+        crate::platform::app_dialog::message(
             Some(hwnd),
             PCWSTR(text.as_ptr()),
             w!("请检查输入"),
             MB_OK | MB_ICONWARNING,
         );
+    }
+}
+
+impl WindowState {
+    #[allow(clippy::too_many_lines)] // Keep inspector creation and its validated callback together.
+    pub(super) fn media_effects(&mut self, hwnd: HWND, anchor: RECT) {
+        use crate::platform::app_menu::{self, Row};
+        use crate::platform::editor_ui::IconKind;
+        let imported = panzo_core::ProjectLayout::open(self.editor.project_root())
+            .and_then(|layout| layout.load_manifest())
+            .is_ok_and(|m| m.capture.kind == panzo_core::project::CaptureKind::Imported);
+        let rows = vec![
+            Row::heading(if imported {
+                "导入视频：没有鼠标轨迹"
+            } else {
+                "鼠标跟随"
+            }),
+            Row::command(1, "整段跟随与手工镜头…", IconKind::Camera, !imported),
+            Row::command(2, "指定素材区间的跟随…", IconKind::Camera, !imported),
+            Row::command(3, "声音与音量…", IconKind::Settings, true),
+            Row::command(4, "当前帧截图", IconKind::Image, true),
+            Row::command(5, "视频标注…", IconKind::Edit, true),
+            Row::command(6, "声音与旁白", IconKind::Record, true),
+            Row::command(7, "字幕与 AI 自动字幕", IconKind::Text, true),
+        ];
+        let action = match app_menu::show_rows(hwnd, anchor, self.theme, rows, false) {
+            Ok(Some(a)) => a,
+            Ok(None) => return,
+            Err(e) => {
+                self.note_problem("设置未打开", e);
+                return;
+            }
+        };
+        self.session.pause();
+        if action == 6 || action == 7 {
+            if let Err(e) = crate::platform::media_panel::open(hwnd, usize::from(action == 7)) {
+                self.note_problem("媒体面板未打开", e);
+            }
+            return;
+        }
+        if action == 4 {
+            let result = self
+                .session
+                .render_current()
+                .map_err(|e| e.to_string())
+                .and_then(|frame| {
+                    let f = frame.composited;
+                    crate::platform::capture_tools::show_image(
+                        crate::platform::capture_tools::Raster {
+                            width: f.width,
+                            height: f.height,
+                            pixels: f.pixels,
+                        },
+                        self.editor
+                            .project_root()
+                            .parent()
+                            .unwrap_or(self.editor.project_root()),
+                        false,
+                    )
+                    .map(|_| ())
+                });
+            if let Err(e) = result {
+                self.note_problem("帧截图失败", e);
+            }
+            return;
+        }
+        if crate::platform::workspace::active() {
+            let source = panzo_core::TimeMapping::source_time(
+                &self.editor.video_edit(),
+                self.session.snapshot().project_tick,
+            )
+            .unwrap_or(TimeTick::ZERO);
+            let result = crate::platform::media_settings::effects_async(
+                hwnd,
+                self.editor.project_root().to_path_buf(),
+                self.editor.settings().clone(),
+                self.editor.duration(),
+                source,
+                action,
+            );
+            if let Err(e) = result {
+                self.note_problem("设置未打开", e);
+            }
+            return;
+        }
+        let mut settings = self.editor.settings().clone();
+        let result = if action == 5 {
+            let source = panzo_core::TimeMapping::source_time(
+                &self.editor.video_edit(),
+                self.session.snapshot().project_tick,
+            )
+            .unwrap_or(TimeTick::ZERO);
+            crate::platform::video_annotations::edit(
+                hwnd,
+                &mut settings,
+                self.editor.duration(),
+                source,
+            )
+        } else if action == 3 {
+            crate::platform::media_settings::edit_audio(hwnd, &mut settings)
+        } else {
+            crate::platform::media_settings::edit_camera(
+                hwnd,
+                &mut settings,
+                self.editor.duration(),
+                action == 2,
+            )
+        };
+        match result {
+            Ok(true) => {
+                let result = self
+                    .editor
+                    .replace_media_settings(settings)
+                    .map_err(super::PreviewWindowError::from)
+                    .and_then(|()| self.apply_editor_state());
+                self.record_editor_result(result, "设置已应用 · 可撤销，保存");
+            }
+            Ok(false) => {}
+            Err(e) => self.note_problem("设置未应用", e),
+        }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "id": "org.panzo.image-filters",
+  "name": "图片滤镜",
+  "version": "0.1.0",
+  "publisher": "Panzo 项目",
+  "description": "独立图片处理插件：灰度和反色，输出新图片并保留原图。",
+  "protocol": 1,
+  "target": "x86_64-windows",
+  "commands": [
+    {"id": "grayscale", "name": "灰度"},
+    {"id": "invert", "name": "反色"}
+  ],
+  "executable_sha256": ""
+}

@@ -28,7 +28,7 @@ thread_local! {
     static HOT_BUTTON: RefCell<HashMap<isize, u32>> = RefCell::new(HashMap::new());
 }
 
-/// Only visuals are client-painted. DWM still owns hit testing and system commands.
+/// Painting and non-client hit testing share client coordinates; Windows owns commands.
 pub(crate) fn paint_system_buttons(hwnd: HWND, dc: HDC, theme: EditorTheme) {
     let Some(bounds) = caption_bounds(hwnd) else {
         return;
@@ -121,6 +121,9 @@ fn update_caption_visuals(hwnd: HWND, message: u32, wparam: WPARAM) {
 }
 
 pub(crate) fn initialize(hwnd: HWND) {
+    if crate::platform::workspace::window(hwnd) != hwnd {
+        return;
+    }
     extend_frame(hwnd);
     unsafe {
         let _ = SetWindowPos(
@@ -137,9 +140,13 @@ pub(crate) fn initialize(hwnd: HWND) {
 
 fn extend_frame(hwnd: HWND) {
     let margins = MARGINS {
-        cyTopHeight: EditorTheme::current(window_dpi(hwnd))
-            .metrics
-            .toolbar_height,
+        cyTopHeight: if crate::platform::workspace::custom_caption(hwnd) {
+            crate::platform::workspace::caption_height(hwnd)
+        } else {
+            EditorTheme::current(window_dpi(hwnd))
+                .metrics
+                .toolbar_height
+        },
         ..MARGINS::default()
     };
     unsafe {
@@ -148,6 +155,15 @@ fn extend_frame(hwnd: HWND) {
 }
 
 pub(crate) fn caption_bounds(hwnd: HWND) -> Option<RECT> {
+    if crate::platform::workspace::window(hwnd) != hwnd {
+        return None;
+    }
+    if crate::platform::workspace::custom_caption(hwnd) {
+        return Some(custom_caption_bounds(
+            client_rect(hwnd),
+            EditorTheme::current(window_dpi(hwnd)),
+        ));
+    }
     let mut buttons = RECT::default();
     let mut window = RECT::default();
     unsafe {
@@ -179,6 +195,31 @@ pub(crate) fn caption_bounds(hwnd: HWND) -> Option<RECT> {
     })
 }
 
+fn custom_caption_bounds(client: RECT, theme: EditorTheme) -> RECT {
+    RECT {
+        left: (client.right - theme.scale(138)).max(client.left),
+        right: client.right,
+        top: client.top,
+        bottom: client.top + theme.scale(32),
+    }
+}
+
+fn caption_button_hit(bounds: RECT, point: POINT) -> Option<u32> {
+    if !HitRect(bounds).contains(point.x, point.y) {
+        return None;
+    }
+    let width = bounds.right - bounds.left;
+    [HTMINBUTTON, HTMAXBUTTON, HTCLOSE]
+        .into_iter()
+        .enumerate()
+        .find_map(|(index, code)| {
+            let index = index as i32;
+            (point.x >= bounds.left + width * index / 3
+                && point.x < bounds.left + width * (index + 1) / 3)
+                .then_some(code)
+        })
+}
+
 #[allow(clippy::too_many_lines)] // Native non-client routing and resize hit testing share one dispatch.
 pub(crate) fn window_message(
     hwnd: HWND,
@@ -186,16 +227,40 @@ pub(crate) fn window_message(
     wparam: WPARAM,
     lparam: LPARAM,
 ) -> Option<LRESULT> {
-    update_caption_visuals(hwnd, message, wparam);
     if let Some(result) = crate::platform::app_menu::window_message(message, lparam) {
         return Some(result);
     }
+    if crate::platform::workspace::window(hwnd) != hwnd {
+        return None;
+    }
+    update_caption_visuals(hwnd, message, wparam);
+    let custom = crate::platform::workspace::custom_caption(hwnd);
     if message == WM_NCCALCSIZE && wparam.0 != 0 {
+        // Keep the workspace inside the work area when the invisible resize frame
+        // extends past the monitor after maximizing.
+        if crate::platform::workspace::custom_caption(hwnd) && unsafe { IsZoomed(hwnd) }.as_bool() {
+            let dpi = window_dpi(hwnd);
+            let edge = unsafe {
+                GetSystemMetricsForDpi(SM_CYFRAME, dpi)
+                    + GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)
+            };
+            let params = unsafe {
+                &mut *(lparam.0 as *mut windows::Win32::UI::WindowsAndMessaging::NCCALCSIZE_PARAMS)
+            };
+            params.rgrc[0].left += edge;
+            params.rgrc[0].top += edge;
+            params.rgrc[0].right -= edge;
+            params.rgrc[0].bottom -= edge;
+        }
         // The caption and resize border become client area; native window commands remain.
         return Some(LRESULT(0));
     }
     let mut result = LRESULT(0);
-    if unsafe { DwmDefWindowProc(hwnd, message, wparam, lparam, &raw mut result) }.as_bool() {
+    // DWM reports window-relative button bounds, which move above the client when
+    // maximized. Use our painted client rectangles for all custom-caption hits.
+    if !(custom && message == WM_NCHITTEST)
+        && unsafe { DwmDefWindowProc(hwnd, message, wparam, lparam, &raw mut result) }.as_bool()
+    {
         return Some(result);
     }
     if [
@@ -211,7 +276,11 @@ pub(crate) fn window_message(
     if message != WM_NCHITTEST {
         return None;
     }
-    let native = unsafe { DefWindowProcW(hwnd, message, wparam, lparam) };
+    let native = if custom {
+        LRESULT(HTCLIENT as isize)
+    } else {
+        unsafe { DefWindowProcW(hwnd, message, wparam, lparam) }
+    };
     if native.0 != HTCLIENT as isize {
         return Some(native);
     }
@@ -223,13 +292,21 @@ pub(crate) fn window_message(
     unsafe {
         let _ = ScreenToClient(hwnd, &raw mut point);
     }
+    if custom && let Some(code) = caption_bounds(hwnd).and_then(|r| caption_button_hit(r, point)) {
+        return Some(LRESULT(code as isize));
+    }
+    if crate::platform::workspace::caption_control_at(hwnd, point) {
+        return Some(LRESULT(HTCLIENT as isize));
+    }
     let layout = HeaderLayout::new(client_rect(hwnd), theme, caption_bounds(hwnd));
-    if layout.hit_action(point.x, point.y).is_some_and(|action| {
-        !matches!(
-            action,
-            HeaderAction::Minimize | HeaderAction::Maximize | HeaderAction::Close
-        )
-    }) {
+    if !crate::platform::workspace::custom_caption(hwnd)
+        && layout.hit_action(point.x, point.y).is_some_and(|action| {
+            !matches!(
+                action,
+                HeaderAction::Minimize | HeaderAction::Maximize | HeaderAction::Close
+            )
+        })
+    {
         return Some(LRESULT(HTCLIENT as isize));
     }
     if !unsafe { IsZoomed(hwnd) }.as_bool() {
@@ -257,7 +334,15 @@ pub(crate) fn window_message(
             return Some(LRESULT(code as isize));
         }
     }
-    Some(if HitRect(layout.bar).contains(point.x, point.y) {
+    let caption = if crate::platform::workspace::custom_caption(hwnd) {
+        RECT {
+            bottom: crate::platform::workspace::caption_height(hwnd),
+            ..client_rect(hwnd)
+        }
+    } else {
+        layout.bar
+    };
+    Some(if HitRect(caption).contains(point.x, point.y) {
         LRESULT(HTCAPTION as isize)
     } else {
         native
@@ -307,16 +392,15 @@ pub(crate) fn review_activation_colors(hwnd: HWND, output: &std::path::Path, lab
 
 #[cfg(test)]
 mod tests {
-    use super::super::{ControlId, state_mut};
-    use super::super::{PreviewWindow, SmokeAction};
+    use super::super::{ControlId, PreviewWindow, SmokeAction, state_mut};
     use super::*;
+    use crate::platform::{capture_tools, ui_preferences, workspace};
     use std::fmt::Write as _;
     use std::time::Duration;
     use windows::Win32::Graphics::Gdi::ClientToScreen;
-    use windows::Win32::Storage::Xps::{PRINT_WINDOW_FLAGS, PrintWindow};
     use windows::Win32::UI::WindowsAndMessaging::{
-        HTCLOSE, HTMAXBUTTON, HTMINBUTTON, IsIconic, SC_MINIMIZE, SC_RESTORE, SW_MAXIMIZE,
-        SW_RESTORE, SendMessageW, ShowWindow, WM_SYSCOMMAND,
+        GetDlgItem, IsIconic, SC_MINIMIZE, SC_RESTORE, SW_MAXIMIZE, SW_RESTORE, SendMessageW,
+        ShowWindow, WM_SYSCOMMAND,
     };
 
     fn hit(hwnd: HWND, x: i32, y: i32) -> isize {
@@ -328,108 +412,146 @@ mod tests {
         unsafe { SendMessageW(hwnd, WM_NCHITTEST, None, Some(LPARAM(packed as isize))) }.0
     }
 
+    fn settle() {
+        use windows::Win32::UI::WindowsAndMessaging::{
+            DispatchMessageW, MSG, PM_REMOVE, PeekMessageW, TranslateMessage,
+        };
+        let deadline = std::time::Instant::now() + Duration::from_millis(150);
+        while std::time::Instant::now() < deadline {
+            let mut msg = MSG::default();
+            unsafe {
+                while PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE).as_bool() {
+                    let _ = TranslateMessage(&msg);
+                    DispatchMessageW(&msg);
+                }
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+
     #[test]
-    #[ignore = "explicit disposable project and native window required"]
-    #[allow(clippy::too_many_lines)]
+    fn custom_caption_paint_and_hit_bounds_match_at_each_dpi() {
+        for dpi in [96, 120, 144, 168, 192] {
+            let theme = EditorTheme::for_dpi(dpi);
+            for width in [960, 1280, 1919] {
+                let client = RECT {
+                    right: width,
+                    bottom: 900,
+                    ..RECT::default()
+                };
+                let r = custom_caption_bounds(client, theme);
+                assert_eq!(r.top, 0);
+                assert_eq!(r.bottom, theme.scale(32));
+                assert_eq!(r.right, width);
+                for (i, code) in [HTMINBUTTON, HTMAXBUTTON, HTCLOSE].into_iter().enumerate() {
+                    let x = r.left + (r.right - r.left) * (i as i32 * 2 + 1) / 6;
+                    for y in [r.top, (r.top + r.bottom) / 2, r.bottom - 1] {
+                        assert_eq!(caption_button_hit(r, POINT { x, y }), Some(code));
+                    }
+                }
+                for p in [
+                    POINT {
+                        x: r.left - 1,
+                        y: 16,
+                    },
+                    POINT { x: r.right, y: 16 },
+                    POINT {
+                        x: r.left,
+                        y: r.top - 1,
+                    },
+                    POINT {
+                        x: r.left,
+                        y: r.bottom,
+                    },
+                ] {
+                    assert_eq!(caption_button_hit(r, p), None);
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "explicit disposable project/profile and native window required"]
     fn native_titlebar_ui_review() {
         let project =
             std::path::PathBuf::from(std::env::var_os("PANZO_UI_REVIEW_PROJECT").unwrap());
         let output = std::path::PathBuf::from(std::env::var_os("PANZO_UI_REVIEW_DIR").unwrap());
-        let report = PreviewWindow::run_internal_notifying(&project, Some(Duration::from_secs(3)), SmokeAction::None,
+        assert!(
+            std::path::PathBuf::from(std::env::var_os("LOCALAPPDATA").unwrap())
+                .starts_with(&output)
+        );
+        assert!(unsafe { windows::Win32::UI::Input::Ime::ImmDisableIME(0) }.as_bool());
+        workspace::enable_review();
+        ui_preferences::set_theme(ui_preferences::ThemeMode::Dark).unwrap();
+        let report = PreviewWindow::run_internal_notifying(&project, Some(Duration::from_secs(30)), SmokeAction::None,
             Some(Box::new(move |raw| {
-                let hwnd = HWND(raw as *mut std::ffi::c_void);
+                let editor = HWND(raw as *mut std::ffi::c_void);
+                let root = workspace::window(editor);
+                assert_ne!(root, editor, "exercise the actual application title bar");
                 let mut notes = String::new();
-                for (label, mode) in [("normal", SW_RESTORE), ("maximized", SW_MAXIMIZE), ("restored", SW_RESTORE)] {
-                    unsafe { let _ = ShowWindow(hwnd, mode); }
-                    let settling = std::time::Instant::now();
-                    while settling.elapsed() < Duration::from_millis(350) {
-                        use windows::Win32::UI::WindowsAndMessaging::{PeekMessageW, PM_REMOVE, MSG, DispatchMessageW, TranslateMessage};
-                        let mut msg = MSG::default();
-                        unsafe { while PeekMessageW(&raw mut msg, None, 0, 0, PM_REMOVE).as_bool() { let _ = TranslateMessage(&raw const msg); DispatchMessageW(&raw const msg); } }
-                        std::thread::sleep(Duration::from_millis(10));
+                for (label, mode, light) in [("normal-dark", SW_RESTORE, false),
+                    ("maximized-dark", SW_MAXIMIZE, false), ("restored-light", SW_RESTORE, true)] {
+                    if light {
+                        unsafe { SendMessageW(root, windows::Win32::UI::WindowsAndMessaging::WM_COMMAND,
+                            Some(WPARAM(110)), Some(LPARAM(0))); }
                     }
-                    unsafe { let _ = windows::Win32::Graphics::Gdi::UpdateWindow(hwnd); let _ = windows::Win32::Graphics::Dwm::DwmFlush(); }
-                    let state = unsafe { state_mut(hwnd) }.unwrap();
-                    state.resize_preview_surface(hwnd);
-                    let theme = state.theme;
-                    let layout = state.control_layout(client_rect(hwnd));
-                    let end = caption_bounds(hwnd).expect("DWM caption bounds");
-                    assert!(layout.diagnostics.right <= end.left);
-                    assert_eq!(layout.back.left, layout.back.right);
-                    assert_eq!(layout.preview_card.top, theme.metrics.toolbar_height + theme.metrics.outer_margin);
-                    assert_eq!(layout.command_title, RECT::default());
-                    assert!(layout.window_buttons.iter().all(|r| r.0 == RECT::default()));
-                    for id in [ControlId::Menu, ControlId::Diagnostics] {
-                        let r = layout.control_rect(id);
-                        let x = i32::midpoint(r.left, r.right);
-                        let y = i32::midpoint(r.top, r.bottom);
-                        assert!((y - i32::midpoint(end.top, end.bottom)).abs() <= 1);
-                        assert_eq!(hit(hwnd, x, y), HTCLIENT as isize, "{label}: {id:?}");
-                        let state = unsafe { state_mut(hwnd) }.unwrap();
-                        assert_eq!(state.control_layout(client_rect(hwnd)).hit_control(x, y), Some(id));
-                        state.on_mouse_move(hwnd, x, y);
-                        assert_eq!(state.hot_control, Some(id));
-                        assert!(state.tooltip_deadline.is_some());
-                        state.on_mouse_leave(hwnd);
+                    unsafe { let _ = ShowWindow(root, mode); }
+                    settle();
+                    capture_tools::review_present(root);
+                    let state = unsafe { state_mut(editor) }.unwrap();
+                    assert_eq!(state.theme.mode, if light { ui_preferences::ThemeMode::Light } else { ui_preferences::ThemeMode::Dark });
+                    state.resize_preview_surface(editor);
+                    let c = state.control_layout(client_rect(editor));
+                    let menu = c.control_rect(ControlId::Menu);
+                    assert_eq!((menu.top, menu.bottom), (c.status.top, c.status.bottom));
+                    assert_eq!((menu.top, menu.bottom), (c.preview_fit.top, c.preview_fit.bottom));
+                    assert_eq!(c.status.left, menu.right + state.theme.scale(8));
+                    assert_eq!(c.diagnostics.0, RECT::default());
+                    assert_eq!(c.preview_well.top, c.preview_card.top);
+                    assert!(state.preview_surface.is_some());
+                    assert_eq!(state.preview_surface.as_ref().unwrap().well, c.preview_well);
+                    assert!(!state.editor.is_dirty());
+                    let bounds = caption_bounds(root).unwrap();
+                    let caption_center = i32::midpoint(bounds.top, bounds.bottom);
+                    for id in [110, 111, 112, 113, 114, 115, 116] {
+                        let child = unsafe { GetDlgItem(Some(root), id) }.unwrap();
+                        let mut r = RECT::default();
+                        unsafe { GetWindowRect(child, &mut r).unwrap(); }
+                        let mut center = POINT { x: i32::midpoint(r.left, r.right), y: i32::midpoint(r.top, r.bottom) };
+                        unsafe { let _ = ScreenToClient(root, &mut center); }
+                        assert!((center.y - caption_center).abs() <= 1, "{label}: control {id} must align");
+                        assert_eq!(hit(root, center.x, center.y), HTCLIENT as isize);
                     }
-                    assert_eq!(hit(hwnd, theme.scale(300), theme.scale(16)), HTCAPTION as isize);
-                    if label != "maximized" {
-                        assert_eq!(hit(hwnd, theme.scale(300), 1), HTTOP as isize);
+                    for (i, code) in [HTMINBUTTON, HTMAXBUTTON, HTCLOSE].into_iter().enumerate() {
+                        let x = bounds.left + (bounds.right - bounds.left) * (i as i32 * 2 + 1) / 6;
+                        for y in [bounds.top + 2, caption_center, bounds.bottom - 2] {
+                            assert_eq!(hit(root, x, y), code as isize, "{label} button {i}");
+                        }
                     }
-                    let width = (end.right - end.left) / 3;
-                    let mut window = RECT::default();
-                    unsafe { GetWindowRect(hwnd, &raw mut window).unwrap(); }
-                    crate::platform::editor_ui::render_review_png(&output.join(format!("native-titlebar-{label}.png")), window.right - window.left, theme.scale(110), |dc, _| {
-                        assert!(unsafe { PrintWindow(hwnd, dc, PRINT_WINDOW_FLAGS(2)) }.as_bool());
-                    });
-                    let pixels = image::open(output.join(format!("native-titlebar-{label}.png"))).unwrap().to_rgb8();
-                    for (i, code) in [HTMINBUTTON, HTMAXBUTTON, HTCLOSE].iter().enumerate() {
-                        let x = end.left + width * i32::try_from(i).unwrap() + width / 2;
-                        let y = i32::midpoint(end.top, end.bottom);
-                        assert_eq!(hit(hwnd, x, y), *code as isize, "{label}: system button {i}");
-                        let background = pixels.get_pixel((x - width / 2 + theme.scale(3)).cast_unsigned(), (end.top + theme.scale(3)).cast_unsigned()).0;
-                        assert_eq!(background, pixels.get_pixel(theme.scale(300).cast_unsigned(), (end.top + theme.scale(3)).cast_unsigned()).0, "{label}: caption button {i} must share the header background");
-                        assert!((y - theme.scale(9)..y + theme.scale(9)).any(|py| {
-                            (x - theme.scale(12)..x + theme.scale(12)).any(|px| {
-                                pixels.get_pixel(px.cast_unsigned(), py.cast_unsigned()).0.iter().zip(background).any(|(a, b)| a.abs_diff(b) > 24)
-                            })
-                        }), "{label}: native button {i} must be visible, not just hit-testable");
-                    }
-                    writeln!(notes, "{label}: window {window:?}, caption bounds {end:?}, action hover/tooltip + HTCLIENT, caption drag + native min/max/close hit tests and visible glyph checks passed").unwrap();
-                    review_activation_colors(hwnd, &output, label);
+                    assert_eq!(hit(root, bounds.left - state.theme.scale(100), caption_center), HTCAPTION as isize);
+                    capture_tools::review_present(root);
+                    capture_tools::review_window_png(root, &output.join(format!("{label}.png")));
+                    writeln!(notes, "{label}: menu/theme/system buttons center y={caption_center}; matching native hit tests; page menu/status/fit aligned; no gear or extra project row; GPU bounds follow enlarged well.").unwrap();
                 }
-                unsafe { SendMessageW(hwnd, WM_SYSCOMMAND, Some(WPARAM(SC_MINIMIZE as usize)), Some(LPARAM(0))); }
-                assert!(unsafe { IsIconic(hwnd) }.as_bool());
-                unsafe { SendMessageW(hwnd, WM_SYSCOMMAND, Some(WPARAM(SC_RESTORE as usize)), Some(LPARAM(0))); }
-                assert!(!unsafe { IsIconic(hwnd) }.as_bool());
-                let state = unsafe { state_mut(hwnd) }.unwrap();
+                unsafe { SendMessageW(root, WM_SYSCOMMAND, Some(WPARAM(SC_MINIMIZE as usize)), Some(LPARAM(0))); }
+                assert!(unsafe { IsIconic(root) }.as_bool());
+                unsafe { SendMessageW(root, WM_SYSCOMMAND, Some(WPARAM(SC_RESTORE as usize)), Some(LPARAM(0))); }
+                assert!(!unsafe { IsIconic(root) }.as_bool());
+                // Dirty state is rendered in the same compact row; restore the fixture before closing.
+                let state = unsafe { state_mut(editor) }.unwrap();
+                let settings = state.editor.settings().cursor.clone();
+                state.editor.set_cursor_style(!settings.visible, settings.scale).unwrap();
+                assert!(state.editor.is_dirty());
+                state.set_status(editor_ui::StatusSeverity::Information, "已选择视频 · B 分割 · Delete 删除 · 拖动两端裁剪".into());
+                state.refresh(editor, true);
+                capture_tools::review_present(root);
+                capture_tools::review_window_png(root, &output.join("unsaved-light.png"));
+                let state = unsafe { state_mut(editor) }.unwrap();
+                state.undo();
                 assert!(!state.editor.is_dirty());
-                for mode in [crate::platform::ui_preferences::ThemeMode::Dark, crate::platform::ui_preferences::ThemeMode::Light] {
-                    state.theme.set_mode(mode);
-                    let menu_image = output.join(format!("native-main-menu-{mode:?}.png"));
-                    crate::platform::app_menu::review::next_popup(menu_image.clone());
-                    state.activate_control(hwnd, ControlId::Menu);
-                    assert!(menu_image.is_file(), "native menu must enter its message loop and draw");
-                    let settings_image = output.join(format!("native-settings-menu-{mode:?}.png"));
-                    // The real timer may restore the persisted theme during the first popup.
-                    state.theme.set_mode(mode);
-                    crate::platform::app_menu::review::next_popup(settings_image.clone());
-                    state.activate_control(hwnd, ControlId::Diagnostics);
-                    assert!(settings_image.is_file(), "settings must use the same native themed popup");
-                    assert!(!crate::platform::app_menu::is_open());
-                    assert!(state.pending_navigation.is_none());
-                }
-                // Release over a different button must cancel without opening a dialog.
-                let c = state.control_layout(client_rect(hwnd));
-                let menu = c.control_rect(ControlId::Menu);
-                state.on_mouse_down(hwnd, menu.left + 10, menu.top + 10);
-                state.on_mouse_up(hwnd, c.diagnostics.left + 10, c.diagnostics.top + 10);
-                assert!(state.export_panel.is_none());
-                state.activate_control(hwnd, ControlId::Export);
-                assert!(state.export_panel.is_some());
-                drop(state.export_panel.take());
-                notes.push_str("Native main-menu open/draw/cancel in both themes, programmatic minimize/restore, canceled pointer release and existing export command passed; physical native button clicks were not exercised by this test. Project unchanged.\n");
-                std::fs::write(output.join("native-titlebar-review.txt"), notes).unwrap();
+                state.close_at = Some(std::time::Instant::now() + Duration::from_millis(200));
+                notes.push_str("Programmatic minimize/restore passed; dirty state then undo passed. Physical native button clicks and cross-monitor DPI switching were not exercised. Project left unchanged.\n");
+                std::fs::write(output.join("review.txt"), notes).unwrap();
             }))).unwrap();
         assert!(report.graceful_close);
         assert_eq!(report.media_errors, 0);

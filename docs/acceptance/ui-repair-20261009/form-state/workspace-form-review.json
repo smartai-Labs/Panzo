@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "settings close/reopen keeps the same window and form",
+    "unsaved URL/model/key drafts retained",
+    "Target::Form job remains attached while settings hidden",
+    "completion updates hidden form without opening a window",
+    "reopened form retains completion result and cancel state clears"
+  ],
+  "networkRequests": 0,
+  "passed": true,
+  "savedSecrets": 0
+}

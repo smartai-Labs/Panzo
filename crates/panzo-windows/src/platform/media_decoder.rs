@@ -676,7 +676,7 @@ fn read_frame_size(media_type: &IMFMediaType) -> Result<(u32, u32), MediaDecoder
     Ok((width, height))
 }
 
-fn preview_geometry(width: u32, height: u32, longest_side: Option<u32>) -> (u32, u32) {
+pub(crate) fn preview_geometry(width: u32, height: u32, longest_side: Option<u32>) -> (u32, u32) {
     let Some(limit) = longest_side else {
         return (width, height);
     };

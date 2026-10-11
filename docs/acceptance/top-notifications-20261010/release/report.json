@@ -1,0 +1,25 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-top-notifications\\release\\panzo.exe",
+  "sha256": "332146f28223e468f150bf536957be7fcd690057e81cb40e2945e78286d70c81",
+  "passed": true,
+  "isolatedPid": 2296,
+  "message": "离线 OCR已完成",
+  "toastRect": [
+    580,
+    172,
+    760,
+    212
+  ],
+  "rootClient": [
+    80,
+    80,
+    1180,
+    850
+  ],
+  "horizontalCenterDelta": 0.0,
+  "recognizedText": "PANZO OCR TEST\r\nText stays available",
+  "messageLifetimeSeconds": 2.51326049992349,
+  "resultPreserved": true,
+  "hiddenOnMinimize": true,
+  "hung": false
+}

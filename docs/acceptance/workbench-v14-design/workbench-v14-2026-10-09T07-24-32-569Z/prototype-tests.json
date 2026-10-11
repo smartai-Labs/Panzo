@@ -1,0 +1,56 @@
+{
+  "runId": "workbench-v14-2026-10-09T07-24-32-569Z",
+  "status": "Pass",
+  "scope": "design-prototype-not-native-app",
+  "checks": [
+    {
+      "name": "video-shell-alignment-and-native-theme",
+      "status": "Pass"
+    },
+    {
+      "name": "selected-clips-route-properties-split-delete-undo",
+      "status": "Pass"
+    },
+    {
+      "name": "preview-wheel-pan-center-and-inspector-resize",
+      "status": "Pass"
+    },
+    {
+      "name": "fixed-voice-controls-and-hidden-task-return",
+      "status": "Pass"
+    },
+    {
+      "name": "subtitle-workflow-and-independent-plugin-state",
+      "status": "Pass"
+    },
+    {
+      "name": "timeline-keeps-capped-rows-and-compact-hides-preview",
+      "status": "Pass"
+    },
+    {
+      "name": "image-context-crop-and-inline-recognition",
+      "status": "Pass"
+    },
+    {
+      "name": "collage-aligned-grid-ratio-and-preview-transform",
+      "status": "Pass"
+    },
+    {
+      "name": "asset-search-preview-and-editor-handoff",
+      "status": "Pass"
+    },
+    {
+      "name": "settings-dialog-draft-and-theme",
+      "status": "Pass"
+    },
+    {
+      "name": "record-and-export-dialogs",
+      "status": "Pass"
+    },
+    {
+      "name": "compact-960x720-no-global-overflow-and-visible-actions",
+      "status": "Pass"
+    }
+  ],
+  "javascriptErrors": []
+}

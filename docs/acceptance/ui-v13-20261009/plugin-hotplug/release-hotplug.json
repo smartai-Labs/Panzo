@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v13\\release\\panzo.exe",
+  "binarySha256": "8e13aff05f7f03b64acc3a9b1c3825528c27235bf3f68286d6dbe458ccbb8def",
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\plugin-hotplug-c919921f-71f8-400f-83e9-688467b5406b",
+  "checks": [
+    "UI uninstall removes only alpha; host HWND/PID and beta process handle remain alive",
+    "Unrelated beta task completes successfully and adds a new image after alpha uninstall",
+    "Finished beta uninstalls without host restart; original and generated images retained"
+  ],
+  "hostPidBefore": 67620,
+  "hostHwnd": 925390,
+  "workerPidBefore": 80668,
+  "hostPidAfterUninstall": 67620,
+  "workerPidAfterUninstall": 80668,
+  "outputs": [
+    "synthetic-original.png",
+    "截图-1791525581-44eaf979-85e1-4391-873d-a12e33026fac.png"
+  ],
+  "exitCode": 0
+}

@@ -6,6 +6,10 @@ rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
+panzo-plugin-api = { path = "../panzo-plugin-api" }
+base64.workspace = true
+reqwest.workspace = true
+tokio.workspace = true
 crossbeam-queue.workspace = true
 image.workspace = true
 panzo-core = { path = "../panzo-core" }

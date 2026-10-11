@@ -26,6 +26,7 @@ impl TimelineThumbnails {
         idle: bool,
     ) -> bool {
         if self.worker.is_none()
+            && !visible.is_empty()
             && let Some(proxy) = ready
             && let Ok(worker) = DecodeWorker::thumbnails(&proxy.path)
         {

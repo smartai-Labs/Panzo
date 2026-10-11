@@ -1,0 +1,19 @@
+
+running 1 test
+test platform::preview_window::workbench_v14_review::workbench_v14_native_review ... FAILED
+
+failures:
+
+failures:
+    platform::preview_window::workbench_v14_review::workbench_v14_native_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 303 filtered out; finished in 3.16s
+
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.78s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-33132446dff7cc1a.exe)
+
+thread 'platform::preview_window::workbench_v14_review::workbench_v14_native_review' (47000) panicked at crates\panzo-windows\src\platform\workbench_v14_review.rs:176:181:
+target_point=POINT { x: 149, y: 116 } pointer=POINT { x: 846, y: 388 } hit=HWND(0x24ab1666) root_handle=HWND(0x18b40b58) no tip owner=HWND(0x24ab1666) visible=true root=RECT { left: 0, top: 0, right: 1440, bottom: 900 } anchor=RECT { left: 114, top: 6, right: 144, bottom: 34 } hot=None visible_tip=false deadline=None foreground=HWND(0x18b40b58)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p panzo-windows --lib`

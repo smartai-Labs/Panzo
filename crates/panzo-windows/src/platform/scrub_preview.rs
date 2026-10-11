@@ -24,6 +24,8 @@ impl ScrubPreviewWorker {
             .map_err(ScrubPreviewWorkerError)
     }
 
+    pub fn set_preview_limit(&self,limit:Option<u32>){self.0.set_preview_limit(limit);}
+
     pub fn cancel(&self) {
         self.0.cancel();
     }

@@ -12,11 +12,10 @@ use windows::Win32::Graphics::Dwm::{
 use windows::Win32::Graphics::Gdi::{
     AC_SRC_ALPHA, AC_SRC_OVER, AlphaBlend, BI_RGB, BITMAPINFO, BITMAPINFOHEADER, BLENDFUNCTION,
     CLEARTYPE_QUALITY, CLIP_DEFAULT_PRECIS, CreateCompatibleDC, CreateDIBSection, CreateFontW,
-    CreatePen, CreateSolidBrush, DEFAULT_CHARSET, DEFAULT_PITCH, DIB_RGB_COLORS, DT_END_ELLIPSIS,
-    DT_LEFT, DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER, DeleteDC, DeleteObject, DrawTextW,
-    FF_DONTCARE, FW_NORMAL, FW_SEMIBOLD, FillRect, GetDeviceCaps, GetStockObject,
-    GetTextExtentPoint32W, HGDIOBJ, LOGPIXELSY, NULL_BRUSH, OUT_DEFAULT_PRECIS, PS_SOLID,
-    RoundRect, SelectObject, SetBkMode, SetTextColor, TRANSPARENT,
+    CreateSolidBrush, DEFAULT_CHARSET, DEFAULT_PITCH, DIB_RGB_COLORS, DT_END_ELLIPSIS, DT_LEFT,
+    DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER, DeleteDC, DeleteObject, DrawTextW, FF_DONTCARE,
+    FW_NORMAL, FW_SEMIBOLD, FillRect, GetDeviceCaps, GetTextExtentPoint32W, HGDIOBJ, LOGPIXELSY,
+    OUT_DEFAULT_PRECIS, SelectObject, SetBkMode, SetTextColor, TRANSPARENT,
 };
 use windows::Win32::UI::HiDpi::{
     DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, GetDpiForSystem, GetDpiForWindow,
@@ -70,49 +69,51 @@ pub struct EditorTheme {
     pub metrics: EditorMetrics,
     pub dpi: u32,
     pub mode: ThemeMode,
+    pub text_scale: u32,
 }
 
 impl EditorTheme {
     pub const fn light() -> Self {
         Self {
             palette: EditorPalette {
-                window: rgb(243, 242, 238),
-                toolbar: rgb(253, 252, 249),
-                panel: rgb(253, 252, 249),
-                raised: rgb(235, 233, 227),
-                hover: rgb(226, 223, 215),
-                pressed: rgb(214, 209, 198),
-                border: rgb(207, 204, 196),
-                divider: rgb(226, 224, 218),
-                text: rgb(39, 39, 35),
-                text_secondary: rgb(94, 93, 86),
-                text_muted: rgb(112, 110, 102),
-                accent: rgb(64, 62, 53),
-                accent_hover: rgb(84, 80, 66),
-                accent_pressed: rgb(45, 44, 38),
-                danger: rgb(255, 69, 58),
-                warning: rgb(255, 159, 10),
-                track: rgb(253, 252, 249),
-                track_alt: rgb(253, 252, 249),
-                video_clip: rgb(217, 224, 218),
-                video_border: rgb(150, 165, 151),
+                window: rgb(255, 255, 255),
+                toolbar: rgb(255, 255, 255),
+                panel: rgb(255, 255, 255),
+                raised: rgb(244, 245, 247),
+                hover: rgb(232, 235, 239),
+                pressed: rgb(219, 224, 231),
+                border: rgb(228, 230, 234),
+                divider: rgb(224, 228, 234),
+                text: rgb(35, 39, 45),
+                text_secondary: rgb(91, 98, 108),
+                text_muted: rgb(103, 110, 121),
+                accent: rgb(58, 101, 164),
+                accent_hover: rgb(49, 89, 147),
+                accent_pressed: rgb(39, 73, 123),
+                danger: rgb(184, 42, 35),
+                warning: rgb(139, 82, 0),
+                track: rgb(246, 247, 249),
+                track_alt: rgb(246, 247, 249),
+                video_clip: rgb(217, 227, 242),
+                video_border: rgb(157, 177, 204),
                 camera_clip: rgb(228, 220, 204),
                 camera_selected: rgb(216, 203, 178),
                 camera_border: rgb(151, 131, 93),
-                slider_thumb: rgb(253, 252, 249),
+                slider_thumb: rgb(246, 247, 249),
             },
             metrics: EditorMetrics {
-                outer_margin: 8,
+                outer_margin: 0,
                 gap: 6,
-                toolbar_height: 32,
-                timeline_height: 264,
-                inspector_width: 288,
+                toolbar_height: super::workbench_layout::CONTEXT,
+                timeline_height: super::workbench_layout::TIMELINE,
+                inspector_width: super::workbench_layout::INSPECTOR,
                 button_height: 32,
                 radius_small: 7,
                 radius_panel: 6,
             },
             dpi: 96,
             mode: ThemeMode::Light,
+            text_scale: 100,
         }
     }
 
@@ -120,6 +121,7 @@ impl EditorTheme {
         let dpi = dpi.clamp(96, 384);
         let mut theme = Self::light();
         theme.dpi = dpi;
+        theme.text_scale = super::system_preferences::text_scale();
         theme.metrics = EditorMetrics {
             outer_margin: scale_dip(theme.metrics.outer_margin, dpi),
             gap: scale_dip(theme.metrics.gap, dpi),
@@ -149,41 +151,68 @@ impl EditorTheme {
             Self::light().palette
         } else {
             EditorPalette {
-                window: rgb(28, 28, 26),
-                toolbar: rgb(38, 38, 36),
-                panel: rgb(38, 38, 36),
-                raised: rgb(47, 47, 43),
-                hover: rgb(53, 53, 48),
-                pressed: rgb(65, 64, 57),
-                border: rgb(71, 70, 63),
-                divider: rgb(49, 49, 44),
-                text: rgb(235, 234, 230),
-                text_secondary: rgb(181, 179, 170),
-                text_muted: rgb(158, 156, 146),
-                accent: rgb(221, 217, 207),
-                accent_hover: rgb(239, 235, 225),
-                accent_pressed: rgb(194, 187, 172),
+                window: rgb(48, 50, 53),
+                toolbar: rgb(48, 50, 53),
+                panel: rgb(48, 50, 53),
+                raised: rgb(37, 40, 44),
+                hover: rgb(65, 69, 76),
+                pressed: rgb(40, 43, 49),
+                border: rgb(40, 43, 48),
+                divider: rgb(66, 70, 77),
+                text: rgb(229, 231, 235),
+                text_secondary: rgb(186, 193, 204),
+                text_muted: rgb(159, 166, 177),
+                accent: rgb(168, 192, 227),
+                accent_hover: rgb(190, 207, 234),
+                accent_pressed: rgb(149, 177, 216),
                 danger: rgb(255, 129, 126),
                 warning: rgb(255, 192, 103),
-                track: rgb(38, 38, 36),
-                track_alt: rgb(38, 38, 36),
-                video_clip: rgb(66, 74, 69),
-                video_border: rgb(108, 128, 114),
+                track: rgb(38, 40, 44),
+                track_alt: rgb(38, 40, 44),
+                video_clip: rgb(59, 71, 91),
+                video_border: rgb(98, 121, 151),
                 camera_clip: rgb(91, 84, 71),
                 camera_selected: rgb(111, 99, 76),
                 camera_border: rgb(170, 151, 112),
-                slider_thumb: rgb(226, 223, 214),
+                slider_thumb: rgb(217, 223, 232),
             }
         };
+        if super::system_preferences::high_contrast() {
+            use windows::Win32::Graphics::Gdi::*;
+            let bg = COLORREF(unsafe { GetSysColor(COLOR_WINDOW) });
+            let fg = COLORREF(unsafe { GetSysColor(COLOR_WINDOWTEXT) });
+            let selection = COLORREF(unsafe { GetSysColor(COLOR_HIGHLIGHT) });
+            self.palette.window = bg;
+            self.palette.toolbar = bg;
+            self.palette.panel = bg;
+            self.palette.raised = bg;
+            self.palette.track = bg;
+            self.palette.track_alt = bg;
+            self.palette.text = fg;
+            self.palette.text_secondary = fg;
+            self.palette.text_muted = fg;
+            self.palette.danger = fg;
+            self.palette.warning = fg;
+            self.palette.accent = fg;
+            self.palette.border = fg;
+            self.palette.divider = bg;
+            self.palette.hover = bg;
+            self.palette.pressed = selection;
+            self.palette.video_clip = bg;
+            self.palette.camera_clip = bg;
+            self.palette.video_border = fg;
+            self.palette.camera_border = fg;
+        }
     }
 
-    pub const fn scale(self, value: i32) -> i32 {
+    pub fn scale(self, value: i32) -> i32 {
         scale_dip(value, self.dpi)
     }
 }
 
-pub const fn scale_dip(value: i32, dpi: u32) -> i32 {
-    ((value as i64 * dpi as i64 + 48) / 96) as i32
+pub fn scale_dip(value: i32, dpi: u32) -> i32 {
+    ((value as i64 * dpi as i64 * i64::from(super::system_preferences::text_scale()) + 4800) / 9600)
+        as i32
 }
 
 pub fn enable_per_monitor_dpi_awareness() {
@@ -225,15 +254,24 @@ pub fn available_window_size(width: i32, height: i32) -> (i32, i32) {
 }
 
 pub fn apply_window_chrome(hwnd: HWND) {
+    super::app_icon::apply(hwnd);
     let dark_mode = i32::from(ui_preferences::theme() == ThemeMode::Dark);
     let corner_preference = DWMWCP_ROUND;
-    let caption_color = header_background(EditorTheme::current(window_dpi(hwnd)));
+    let theme = EditorTheme::current(window_dpi(hwnd));
+    let caption_color = header_background(theme);
+    let text_color = theme.palette.text;
     unsafe {
         let _ = DwmSetWindowAttribute(
             hwnd,
             windows::Win32::Graphics::Dwm::DWMWA_CAPTION_COLOR,
             (&raw const caption_color).cast::<c_void>(),
             mem::size_of_val(&caption_color) as u32,
+        );
+        let _ = DwmSetWindowAttribute(
+            hwnd,
+            windows::Win32::Graphics::Dwm::DWMWA_TEXT_COLOR,
+            (&raw const text_color).cast::<c_void>(),
+            mem::size_of_val(&text_color) as u32,
         );
         let _ = DwmSetWindowAttribute(
             hwnd,
@@ -252,10 +290,28 @@ pub fn apply_window_chrome(hwnd: HWND) {
 
 pub fn sync_window_theme(theme: &mut EditorTheme, hwnd: HWND) -> bool {
     let mode = ui_preferences::theme();
-    if theme.mode == mode {
+    let mut next = *theme;
+    next.set_mode(mode);
+    let text_scale = super::system_preferences::text_scale();
+    if text_scale != next.text_scale {
+        let scale = |value: i32| {
+            ((i64::from(value) * i64::from(text_scale)) / i64::from(next.text_scale.max(1))) as i32
+        };
+        let m = &mut next.metrics;
+        m.outer_margin = scale(m.outer_margin);
+        m.gap = scale(m.gap);
+        m.toolbar_height = scale(m.toolbar_height);
+        m.timeline_height = scale(m.timeline_height);
+        m.inspector_width = scale(m.inspector_width);
+        m.button_height = scale(m.button_height);
+        m.radius_small = scale(m.radius_small);
+        m.radius_panel = scale(m.radius_panel);
+        next.text_scale = text_scale;
+    }
+    if *theme == next {
         return false;
     }
-    theme.set_mode(mode);
+    *theme = next;
     apply_window_chrome(hwnd);
     unsafe {
         let _ = windows::Win32::Graphics::Gdi::InvalidateRect(Some(hwnd), None, false);
@@ -331,6 +387,35 @@ pub enum ControlInteraction {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IconKind {
+    /// Approved image-workspace SVG, separate from other workspaces.
+    Prototype(&'static str),
+    Panel,
+    Vision,
+    Waveform,
+    Music,
+    Sound,
+    Muted,
+    Eye,
+    Microphone,
+    Subtitles,
+    StrokeDot,
+    Panzo,
+    Cut,
+    Paste,
+    Copy,
+    Sun,
+    Moon,
+    Capture,
+    ScrollCapture,
+    Collage,
+    Batch,
+    Rectangle,
+    Text,
+    Pen,
+    Pin,
+    Palette,
+    Check,
+    OneToOne,
     Lock,
     PreviousFrame,
     NextFrame,
@@ -366,8 +451,12 @@ pub enum IconKind {
     ArrowUp,
     ArrowDown,
     ChevronDown,
+    ChevronUp,
+    Search,
+    More,
     ChevronRight,
     Record,
+    RecordOutline,
     Stop,
     Export,
     Edit,
@@ -470,6 +559,7 @@ impl StatusFeedback {
         self.problems.first().map(|(_, message)| message)
     }
 
+    #[cfg(test)]
     pub(crate) fn details(&self) -> String {
         self.diagnostics
             .iter()
@@ -539,18 +629,11 @@ pub struct HeaderLayout {
 }
 
 impl HeaderLayout {
-    pub fn new(client: RECT, theme: EditorTheme, caption_bounds: Option<RECT>) -> Self {
+    pub fn new(client: RECT, theme: EditorTheme, _caption_bounds: Option<RECT>) -> Self {
         let s = |n| theme.scale(n);
-        let right = client.right.max(client.left);
-        let native = caption_bounds.unwrap_or(RECT {
-            left: right - s(138),
-            right,
-            top: client.top,
-            bottom: client.top + s(32),
-        });
-        let end = native.left.clamp(client.left, right);
-        let height = s(28).min((native.bottom - native.top).max(s(20)));
-        let top = i32::midpoint(native.top, native.bottom) - height / 2;
+        // Page tools share one client row, independent of the native window frame.
+        let height = s(28);
+        let top = client.top + (theme.metrics.toolbar_height - height) / 2;
         let button = |left| RECT {
             left,
             right: left + s(28),
@@ -559,7 +642,6 @@ impl HeaderLayout {
         };
         let mut buttons = [RECT::default(); 9];
         buttons[HeaderAction::Menu.index()] = button(client.left + s(8));
-        buttons[HeaderAction::Settings.index()] = button(end - s(36));
         Self {
             bar: RECT {
                 bottom: client.top + theme.metrics.toolbar_height,
@@ -613,11 +695,7 @@ pub fn draw_header(
 }
 
 pub fn header_background(theme: EditorTheme) -> COLORREF {
-    if theme.mode == ThemeMode::Dark {
-        rgb(43, 43, 43)
-    } else {
-        rgb(238, 237, 233)
-    }
+    theme.palette.toolbar
 }
 
 pub fn fill_opaque_rect(dc: windows::Win32::Graphics::Gdi::HDC, rect: RECT, color: COLORREF) {
@@ -712,10 +790,14 @@ pub fn complete_pointer_activation<T: Copy + Eq>(
 }
 
 pub fn fill_rect(hdc: windows::Win32::Graphics::Gdi::HDC, rect: &RECT, color: COLORREF) {
-    let brush = unsafe { CreateSolidBrush(color) };
     unsafe {
+        let previous = windows::Win32::Graphics::Gdi::SetDCBrushColor(hdc, color);
+        let brush = windows::Win32::Graphics::Gdi::HBRUSH(
+            windows::Win32::Graphics::Gdi::GetStockObject(windows::Win32::Graphics::Gdi::DC_BRUSH)
+                .0,
+        );
         FillRect(hdc, rect, brush);
-        let _ = DeleteObject(HGDIOBJ(brush.0));
+        windows::Win32::Graphics::Gdi::SetDCBrushColor(hdc, previous);
     }
 }
 
@@ -851,29 +933,42 @@ fn rounded_corner_pixels(radius: i32, fill: COLORREF, stroke: COLORREF) -> Arc<V
     pixels
 }
 
+/// Keyboard focus uses an inset outline, never an underline beneath a button.
 pub fn focus_ring(
     hdc: windows::Win32::Graphics::Gdi::HDC,
     rect: RECT,
     color: COLORREF,
-    radius: i32,
+    _radius: i32,
 ) {
-    let pen = unsafe { CreatePen(PS_SOLID, 2, color) };
-    let null_brush = unsafe { GetStockObject(NULL_BRUSH) };
-    let previous_brush = unsafe { SelectObject(hdc, null_brush) };
-    let previous_pen = unsafe { SelectObject(hdc, HGDIOBJ(pen.0)) };
-    unsafe {
-        let _ = RoundRect(
-            hdc,
-            rect.left + 2,
-            rect.top + 2,
-            rect.right - 2,
-            rect.bottom - 2,
-            radius * 2,
-            radius * 2,
-        );
-        SelectObject(hdc, previous_brush);
-        SelectObject(hdc, previous_pen);
-        let _ = DeleteObject(HGDIOBJ(pen.0));
+    let inset = 2;
+    let rect = RECT { left: rect.left + inset, top: rect.top + inset,
+        right: rect.right - inset, bottom: rect.bottom - inset };
+    if rect.right > rect.left && rect.bottom > rect.top {
+        selection_outline(hdc, rect, color);
+    }
+}
+
+/// Discrete selected objects and keyboard focus use a one-pixel outline.
+pub fn selection_outline(hdc: windows::Win32::Graphics::Gdi::HDC, r: RECT, color: COLORREF) {
+    for edge in [
+        RECT {
+            bottom: r.top + 1,
+            ..r
+        },
+        RECT {
+            top: r.bottom - 1,
+            ..r
+        },
+        RECT {
+            right: r.left + 1,
+            ..r
+        },
+        RECT {
+            left: r.right - 1,
+            ..r
+        },
+    ] {
+        fill_rect(hdc, &edge, color);
     }
 }
 
@@ -907,7 +1002,12 @@ fn icon_pixels(icon: IconKind, size: u16, color: COLORREF) -> Option<Vec<u8>> {
     }
 
     let source = format!(
-        r#"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">{}</svg>"#,
+        r#"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="{}" stroke-linecap="round" stroke-linejoin="round">{}</svg>"#,
+        if matches!(icon, IconKind::Prototype(_)) {
+            "1.55"
+        } else {
+            "1.65"
+        },
         icon_svg_body(icon)
     );
     let tree = resvg::usvg::Tree::from_str(&source, &resvg::usvg::Options::default()).ok()?;
@@ -999,6 +1099,18 @@ pub fn draw_alpha_image(hdc: windows::Win32::Graphics::Gdi::HDC, rect: RECT, pix
     });
 }
 
+type AlphaEntry = ((i32, i32, u64), Vec<u8>, super::capture_tools::Surface);
+thread_local! {
+    static ALPHA_BITMAPS: std::cell::RefCell<std::collections::VecDeque<AlphaEntry>> =
+        const { std::cell::RefCell::new(std::collections::VecDeque::new()) };
+}
+
+// GDI thread state can already be gone when Windows runs TLS destructors.
+// PaintSession explicitly releases these handles while the message loop is alive.
+pub(crate) fn clear_alpha_cache() {
+    ALPHA_BITMAPS.with(|cache| cache.borrow_mut().clear());
+}
+
 fn with_alpha_pixels(
     hdc: windows::Win32::Graphics::Gdi::HDC,
     width: i32,
@@ -1006,6 +1118,41 @@ fn with_alpha_pixels(
     pixels: &[u8],
     draw: impl FnOnce(windows::Win32::Graphics::Gdi::HDC),
 ) {
+    // Small immutable icon/corner bitmaps are uploaded once, not once per control
+    // per frame. The bounded UI-thread cache owns and releases every GDI handle.
+    if width <= 128
+        && height <= 128
+        && width > 0
+        && height > 0
+        && super::desktop_ui::has_paint_session()
+    {
+        use std::hash::{Hash, Hasher};
+        let mut hash = std::collections::hash_map::DefaultHasher::new();
+        pixels.hash(&mut hash);
+        let key = (width, height, hash.finish());
+        ALPHA_BITMAPS.with(|cache| {
+            let mut cache = cache.borrow_mut();
+            let index = cache
+                .iter()
+                .position(|(k, data, _)| *k == key && data.as_slice() == pixels);
+            let entry = if let Some(index) = index {
+                cache.remove(index).unwrap()
+            } else {
+                let Ok(surface) = super::capture_tools::Surface::new(width as u32, height as u32)
+                else {
+                    return;
+                };
+                surface.write_pixels(pixels);
+                (key, pixels.to_vec(), surface)
+            };
+            draw(entry.2.dc);
+            cache.push_back(entry);
+            if cache.len() > 192 {
+                cache.pop_front();
+            }
+        });
+        return;
+    }
     let bitmap_info = BITMAPINFO {
         bmiHeader: BITMAPINFOHEADER {
             biSize: mem::size_of::<BITMAPINFOHEADER>() as u32,
@@ -1058,6 +1205,55 @@ fn with_alpha_pixels(
 
 const fn icon_svg_body(icon: IconKind) -> &'static str {
     match icon {
+        IconKind::Prototype(svg) => svg,
+        IconKind::Panel => "<rect x='3' y='4' width='18' height='16' rx='1'/><path d='M15 4v16'/>",
+        IconKind::Vision => {
+            "<path d='m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4zM20 2v4M18 4h4'/>"
+        }
+        IconKind::Cut => {
+            "<circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><path d='m8 8 12 12M8 16 20 4'/>"
+        }
+        IconKind::Paste => {
+            "<rect x='5' y='5' width='14' height='16' rx='1'/><rect x='9' y='3' width='6' height='4' rx='1'/><path d='M9 12h6M9 16h6'/>"
+        }
+        IconKind::Copy => {
+            "<rect x='8' y='8' width='13' height='13' rx='1'/><path d='M16 8V3H3v13h5'/>"
+        }
+        IconKind::Sun => {
+            "<circle cx='12' cy='12' r='4'/><path d='M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5'/>"
+        }
+        IconKind::Moon => "<path d='M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11z'/>",
+        IconKind::Capture => {
+            "<path d='M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5'/><rect x='7' y='7' width='10' height='10' rx='1'/>"
+        }
+        IconKind::ScrollCapture => {
+            "<path d='M7 3H4v18h3M17 3h3v18h-3M12 4v16M9 7l3-3 3 3M9 17l3 3 3-3'/>"
+        }
+        IconKind::Collage => {
+            "<rect x='3' y='3' width='18' height='18' rx='1'/><path d='M11 3v18M11 12h10'/>"
+        }
+        IconKind::Batch => {
+            "<rect x='7' y='7' width='14' height='14' rx='1'/><path d='M17 7V3H3v14h4M11 11h6M11 15h6'/>"
+        }
+        IconKind::Rectangle => "<rect x='4' y='5' width='16' height='14' rx='1'/>",
+        IconKind::Panzo => {
+            "<path d='M4 10V7a3 3 0 013-3h11a3 3 0 013 3v7a3 3 0 01-3 3h-6l-5 5V13h11V7H8v3H4Z' fill='currentColor' stroke='none'/><path d='M4 13h3v9H4zM11 8.5l4 2-4 2z' fill='currentColor' stroke='none'/>"
+        }
+        IconKind::StrokeDot => "<circle cx='12' cy='12' r='4' fill='currentColor'/>",
+        IconKind::Microphone => {
+            "<rect x='8' y='2' width='8' height='13' rx='4'/><path d='M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8'/>"
+        }
+        IconKind::Subtitles => {
+            "<rect x='3' y='4' width='18' height='16' rx='3'/><path d='M6 12h5m3 0h4M6 16h3m3 0h6'/>"
+        }
+        IconKind::Text => "<path d='M4 6V3h16v3M12 3v18M8 21h8'/>",
+        IconKind::Pen => "<path d='m16 3 5 5-12 12-6 1 1-6zM13 6l5 5M4 15l5 5'/>",
+        IconKind::Pin => "<path d='m15 3 6 6-3 1-3 4v3l-3-3-6 7 4-9-3-3h3l4-3z'/>",
+        IconKind::Palette => {
+            "<path d='M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h3a3 3 0 0 0 3-3c0-4-4-7-9-7z'/><circle cx='7' cy='9' r='1'/><circle cx='11' cy='6' r='1'/><circle cx='16' cy='7' r='1'/><circle cx='6' cy='14' r='1'/>"
+        }
+        IconKind::Check => "<path d='m4 12 5 5L20 6'/>",
+        IconKind::OneToOne => "<path d='m3 8 3-2v12M15 8l3-2v12M11 9v1M11 14v1'/>",
         IconKind::Menu => "<path d='M4 6h16M4 12h16M4 18h16'/>",
         IconKind::Minimize => "<path d='M5 12h14'/>",
         IconKind::Maximize => "<rect x='5' y='5' width='14' height='14'/>",
@@ -1116,8 +1312,25 @@ const fn icon_svg_body(icon: IconKind) -> &'static str {
         IconKind::ArrowRight => r#"<path d="m14 6 6 6-6 6M4 12h16"/>"#,
         IconKind::ArrowUp => r#"<path d="m6 10 6-6 6 6M12 4v16"/>"#,
         IconKind::ArrowDown => r#"<path d="m6 14 6 6 6-6M12 4v16"/>"#,
+        IconKind::Search => "<circle cx='10.5' cy='10.5' r='6.5'/><path d='m16 16 5 5'/>",
+        IconKind::More => "<circle cx='5' cy='12' r='1'/><circle cx='12' cy='12' r='1'/><circle cx='19' cy='12' r='1'/>",
+        IconKind::ChevronUp => "<path d='m6 15 6-6 6 6'/>",
         IconKind::ChevronRight => "<path d='m9 6 6 6-6 6'/>",
         IconKind::ChevronDown => r#"<path d="m6 9 6 6 6-6"/>"#,
+        IconKind::Waveform => {
+            r#"<path d="M2 9v6M5 6v12M8 3v18M11 7v10M14 5v14M17 8v8M20 4v16M23 9v6"/>"#
+        }
+        IconKind::Music => {
+            r#"<path d="M9 18V5l11-2v13M9 9l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/>"#
+        }
+        IconKind::Sound => {
+            r#"<path d="M4 9h4l5-4v14l-5-4H4zM16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/>"#
+        }
+        IconKind::Muted => r#"<path d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6M22 9l-5 6"/>"#,
+        IconKind::Eye => {
+            r#"<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>"#
+        }
+        IconKind::RecordOutline => r#"<circle cx="12" cy="12" r="7"/>"#,
         IconKind::Record => r#"<circle cx="12" cy="12" r="7" fill="white" stroke="none"/>"#,
         IconKind::Stop => {
             r#"<rect x="6" y="6" width="12" height="12" rx="2" fill="white" stroke="none"/>"#
@@ -1195,7 +1408,7 @@ pub fn button_colors(
         ControlInteraction::Disabled => unreachable!(),
     };
     // Flat command buttons use fill changes for hover/selection. Keyboard focus
-    // remains a separate visible ring, rather than a permanent bright outline.
+    // uses a short inner marker without enclosing the control.
     let stroke = if matches!(role, ButtonRole::Primary | ButtonRole::Toolbar) {
         fill
     } else {
@@ -1264,7 +1477,7 @@ pub fn draw_button(
     }
 }
 
-fn draw_single_line(
+pub(crate) fn draw_single_line(
     dc: windows::Win32::Graphics::Gdi::HDC,
     mut rect: RECT,
     value: &str,
@@ -1289,79 +1502,11 @@ fn draw_single_line(
     }
 }
 
-pub fn tooltip_rect(
-    client: RECT,
-    anchor: RECT,
-    text_width: i32,
-    theme: EditorTheme,
-) -> Option<RECT> {
-    let edge = theme.scale(8);
-    let available_width = client.right - client.left - edge * 2;
-    let available_height = client.bottom - client.top - edge * 2;
-    if available_width <= 0 || available_height <= 0 {
-        return None;
-    }
-    let width = (text_width.saturating_add(theme.scale(24)))
-        .clamp(theme.scale(120), theme.scale(380))
-        .min(available_width);
-    let height = theme.scale(32).min(available_height);
-    let left = anchor
-        .left
-        .clamp(client.left + edge, client.right - edge - width);
-    let below = anchor.bottom + theme.scale(7);
-    let preferred_top = if below + height <= client.bottom - edge {
-        below
-    } else {
-        anchor.top - theme.scale(7) - height
-    };
-    let top = preferred_top.clamp(client.top + edge, client.bottom - edge - height);
-    Some(RECT {
-        left,
-        top,
-        right: left + width,
-        bottom: top + height,
-    })
-}
-
-pub fn draw_tooltip(
-    dc: windows::Win32::Graphics::Gdi::HDC,
-    client: RECT,
-    anchor: RECT,
-    text: &str,
-    theme: EditorTheme,
-) {
-    let Some(rect) = tooltip_rect(
-        client,
-        anchor,
-        measure_text_width(dc, text, TextStyle::Caption),
-        theme,
-    ) else {
-        return;
-    };
-    rounded_surface(
-        dc,
-        rect,
-        theme.palette.raised,
-        theme.palette.border,
-        theme.metrics.radius_small,
-    );
-    let padding = theme.scale(10).min((rect.right - rect.left) / 2);
-    draw_single_line(
-        dc,
-        RECT {
-            left: rect.left + padding,
-            right: rect.right - padding,
-            ..rect
-        },
-        text,
-        theme.palette.text,
-        TextStyle::Caption,
-    );
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TextStyle {
+    Menu,
     Caption,
+    Micro,
     Body,
     Button,
     Heading,
@@ -1398,19 +1543,21 @@ pub fn select_font(
 }
 
 pub fn font_handle(style: TextStyle, dpi: u32) -> HGDIOBJ {
-    type FontCache = HashMap<(TextStyle, u32), usize>;
+    type FontCache = HashMap<(TextStyle, u32, u32), usize>;
     static FONTS: OnceLock<Mutex<FontCache>> = OnceLock::new();
     let dpi = dpi.clamp(96, 384);
     let (height, weight) = match style {
-        TextStyle::Caption => (13, FW_NORMAL.0.cast_signed()),
-        TextStyle::Body => (14, 500),
-        TextStyle::Button => (14, FW_SEMIBOLD.0.cast_signed()),
-        TextStyle::Heading => (15, FW_SEMIBOLD.0.cast_signed()),
+        TextStyle::Menu => (12, FW_NORMAL.0.cast_signed()),
+        TextStyle::Micro => (10, FW_NORMAL.0.cast_signed()),
+        TextStyle::Caption => (11, FW_NORMAL.0.cast_signed()),
+        TextStyle::Body => (13, FW_NORMAL.0.cast_signed()),
+        TextStyle::Button => (13, FW_NORMAL.0.cast_signed()),
+        TextStyle::Heading => (14, FW_NORMAL.0.cast_signed()),
         TextStyle::Hero => (36, FW_SEMIBOLD.0.cast_signed()),
         TextStyle::HeroCompact => (30, FW_SEMIBOLD.0.cast_signed()),
         TextStyle::Title => (21, FW_SEMIBOLD.0.cast_signed()),
     };
-    let key = (style, dpi);
+    let key = (style, dpi, super::system_preferences::text_scale());
     let mut fonts = FONTS
         .get_or_init(|| Mutex::new(HashMap::new()))
         .lock()
@@ -1638,96 +1785,41 @@ mod tests {
     }
 
     #[test]
-    fn tooltips_stay_within_small_physical_clients_and_flip_above_bottom_controls() {
-        for dpi in [96, 120, 144, 192, 288, 384] {
-            let theme = EditorTheme::for_dpi(dpi);
-            for (width, height) in [(320, 240), (640, 470), (1280, 900)] {
-                let client = RECT {
-                    left: 20,
-                    top: 30,
-                    right: 20 + width,
-                    bottom: 30 + height,
-                };
-                for (x, y) in [
-                    (client.left, client.top),
-                    (client.right - 20, client.top),
-                    (client.left, client.bottom - 20),
-                    (client.right - 20, client.bottom - 20),
-                ] {
-                    let anchor = RECT {
-                        left: x,
-                        top: y,
-                        right: x + 20,
-                        bottom: y + 20,
-                    };
-                    let rect = tooltip_rect(client, anchor, theme.scale(500), theme).unwrap();
-                    assert!(rect.left >= client.left && rect.right <= client.right);
-                    assert!(rect.top >= client.top && rect.bottom <= client.bottom);
-                    if y == client.bottom - 20 {
-                        assert!(rect.bottom < anchor.top);
-                    }
-                }
-            }
-        }
-        assert!(
-            tooltip_rect(RECT::default(), RECT::default(), 100, EditorTheme::light()).is_none()
-        );
-    }
-
-    #[test]
-    fn header_aligns_with_native_caption_and_leaves_system_buttons_uncovered() {
+    fn page_header_ignores_native_frame_offsets_and_has_no_settings_button() {
         for dpi in [96, 120, 144, 192] {
             let theme = EditorTheme::for_dpi(dpi);
-            for physical_width in [1280, 1920] {
+            for width in [1280, 1920] {
                 let client = RECT {
-                    right: physical_width,
+                    right: width,
                     bottom: 900,
                     ..RECT::default()
                 };
-                for top in [0, theme.scale(7)] {
+                for top in [-theme.scale(8), 0, theme.scale(7)] {
                     let native = RECT {
-                        left: physical_width - theme.scale(138),
-                        right: physical_width,
+                        left: width - theme.scale(138),
+                        right: width,
                         top,
                         bottom: top + theme.scale(30),
                     };
                     let layout = HeaderLayout::new(client, theme, Some(native));
-                    assert_eq!(layout.title, RECT::default());
-                    for action in [HeaderAction::Menu, HeaderAction::Settings] {
-                        let r = layout.rect(action);
-                        assert!(r.right <= native.left);
-                        assert!(
-                            (i32::midpoint(r.top, r.bottom)
-                                - i32::midpoint(native.top, native.bottom))
+                    let menu = layout.rect(HeaderAction::Menu);
+                    assert!(
+                        (i32::midpoint(menu.top, menu.bottom) - theme.metrics.toolbar_height / 2)
                             .abs()
-                                <= 1
-                        );
-                        assert_eq!(
-                            layout.hit_action(
-                                i32::midpoint(r.left, r.right),
-                                i32::midpoint(r.top, r.bottom)
-                            ),
-                            Some(action)
-                        );
-                    }
-                    for action in [
-                        HeaderAction::NewRecording,
-                        HeaderAction::OpenProject,
-                        HeaderAction::Save,
-                        HeaderAction::Export,
-                        HeaderAction::Minimize,
-                        HeaderAction::Maximize,
-                        HeaderAction::Close,
-                    ] {
-                        assert_eq!(layout.rect(action), RECT::default());
-                    }
+                            <= 1
+                    );
                     assert_eq!(
                         layout.hit_action(
-                            i32::midpoint(native.left, native.right),
-                            i32::midpoint(native.top, native.bottom)
+                            i32::midpoint(menu.left, menu.right),
+                            i32::midpoint(menu.top, menu.bottom)
                         ),
-                        None
+                        Some(HeaderAction::Menu)
                     );
+                    for action in HeaderAction::ALL {
+                        if action != HeaderAction::Menu {
+                            assert_eq!(layout.rect(action), RECT::default());
+                        }
+                    }
                 }
             }
         }
@@ -1786,6 +1878,22 @@ mod tests {
         theme.set_mode(ThemeMode::Light);
         assert_eq!(theme.metrics, metrics);
         assert_eq!(theme.palette, EditorTheme::light().palette);
+        for mode in [ThemeMode::Light, ThemeMode::Dark] {
+            let theme = EditorTheme::for_mode(96, mode);
+            for fill in [
+                theme.palette.window,
+                theme.palette.panel,
+                theme.palette.raised,
+            ] {
+                for ink in [
+                    theme.palette.text_muted,
+                    theme.palette.danger,
+                    theme.palette.warning,
+                ] {
+                    assert!(contrast(ink, fill) >= 4.5, "status contrast: {mode:?}");
+                }
+            }
+        }
     }
 
     #[test]
@@ -1899,10 +2007,10 @@ mod tests {
     #[test]
     fn theme_metrics_scale_with_per_monitor_dpi() {
         let theme = EditorTheme::for_dpi(144);
-        assert_eq!(theme.metrics.outer_margin, 12);
+        assert_eq!(theme.metrics.outer_margin, 0);
         assert_eq!(theme.metrics.gap, 9);
         assert_eq!(theme.metrics.button_height, 48);
-        assert_eq!(theme.metrics.inspector_width, 432);
+        assert_eq!(theme.metrics.inspector_width, 456);
     }
 
     #[test]
@@ -1950,5 +2058,89 @@ mod tests {
             let pixels = icon_pixels(icon, 24, rgb(255, 255, 255)).expect("icon raster");
             assert!(pixels.chunks_exact(4).any(|pixel| pixel[3] > 0), "{icon:?}");
         }
+    }
+}
+
+/// Shared clip surface for video, camera, audio and subtitles.
+pub(crate) fn track_clip(
+    hdc: windows::Win32::Graphics::Gdi::HDC,
+    rect: RECT,
+    color: COLORREF,
+    edge: COLORREF,
+    selected: bool,
+    theme: EditorTheme,
+) {
+    rounded_surface(
+        hdc,
+        rect,
+        color,
+        if selected { edge } else { color },
+        theme.scale(4),
+    );
+}
+pub(crate) fn track_grips(
+    hdc: windows::Win32::Graphics::Gdi::HDC,
+    rect: RECT,
+    color: COLORREF,
+    selected: bool,
+    theme: EditorTheme,
+) {
+    if !selected { return; }
+    let edge=theme.scale(2).max(1).min((rect.right-rect.left).max(1));
+    for r in [
+        RECT { bottom:rect.top+edge,..rect }, RECT { top:rect.bottom-edge,..rect },
+        RECT { right:rect.left+edge,..rect }, RECT { left:rect.right-edge,..rect },
+    ] { fill_rect(hdc,&r,theme.palette.accent); }
+    if rect.right-rect.left < theme.scale(28) { return; }
+    let half = theme
+        .scale(6)
+        .min((rect.bottom - rect.top - theme.scale(6)).max(0) / 2);
+    let y = (rect.top + rect.bottom) / 2;
+    if half > 0 {
+        for x in [rect.left + theme.scale(4), rect.right - theme.scale(6)] {
+            rounded_surface(
+                hdc,
+                RECT {
+                    left: x,
+                    right: x + theme.scale(2),
+                    top: y - half,
+                    bottom: y + half,
+                },
+                color,
+                color,
+                theme.scale(1),
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod alpha_cache_lifetime_tests {
+    use super::*;
+
+    #[test]
+    fn cached_gdi_handles_end_with_last_paint_session() {
+        std::thread::spawn(|| {
+            let target = super::super::capture_tools::Surface::new(2, 2).unwrap();
+            let pixels = [255; 16];
+            // Standalone drawing without an owner must not retain GDI handles.
+            with_alpha_pixels(target.dc, 2, 2, &pixels, |_| {});
+            assert!(ALPHA_BITMAPS.with(|cache| cache.borrow().is_empty()));
+            let outer = super::super::desktop_ui::PaintSession::new();
+            let inner = super::super::desktop_ui::PaintSession::new();
+            with_alpha_pixels(target.dc, 2, 2, &pixels, |_| {});
+            assert_eq!(ALPHA_BITMAPS.with(|cache| cache.borrow().len()), 1);
+            drop(inner);
+            assert_eq!(ALPHA_BITMAPS.with(|cache| cache.borrow().len()), 1);
+            drop(outer);
+            assert!(ALPHA_BITMAPS.with(|cache| cache.borrow().is_empty()));
+            // Reopening a session gets a fresh cache and cleans it again.
+            let restarted = super::super::desktop_ui::PaintSession::new();
+            with_alpha_pixels(target.dc, 2, 2, &pixels, |_| {});
+            drop(restarted);
+            assert!(ALPHA_BITMAPS.with(|cache| cache.borrow().is_empty()));
+        })
+        .join()
+        .unwrap();
     }
 }

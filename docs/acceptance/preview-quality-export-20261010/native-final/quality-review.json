@@ -1,0 +1,96 @@
+{
+  "frames": [
+    {
+      "decoded": [
+        640,
+        360
+      ],
+      "path": "project-source",
+      "quality": "quarter"
+    },
+    {
+      "decoded": [
+        1280,
+        720
+      ],
+      "path": "project-source",
+      "quality": "half"
+    },
+    {
+      "decoded": [
+        2560,
+        1440
+      ],
+      "path": "project-source",
+      "quality": "original"
+    },
+    {
+      "decoded": [
+        640,
+        360
+      ],
+      "path": "project-source",
+      "quality": "quarter"
+    },
+    {
+      "decoded": [
+        2560,
+        1440
+      ],
+      "path": "project-source",
+      "quality": "original"
+    },
+    {
+      "decoded": [
+        640,
+        360
+      ],
+      "path": "timeline-placed",
+      "quality": "quarter"
+    },
+    {
+      "decoded": [
+        1280,
+        720
+      ],
+      "path": "timeline-placed",
+      "quality": "half"
+    },
+    {
+      "decoded": [
+        2560,
+        1440
+      ],
+      "path": "timeline-placed",
+      "quality": "original"
+    },
+    {
+      "decoded": [
+        640,
+        360
+      ],
+      "path": "asset-preview",
+      "quality": "quarter"
+    },
+    {
+      "decoded": [
+        1280,
+        720
+      ],
+      "path": "asset-preview",
+      "quality": "half"
+    },
+    {
+      "decoded": [
+        2560,
+        1440
+      ],
+      "path": "asset-preview",
+      "quality": "original"
+    }
+  ],
+  "gpuReadbacks": 0,
+  "passed": true,
+  "playbackAndScrub": true,
+  "sameGpuWindow": true
+}

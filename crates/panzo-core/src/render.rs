@@ -39,9 +39,14 @@ pub struct CameraTransform {
     pub center_x: f64,
     pub center_y: f64,
     pub scale: f64,
+    /// Scale of the fitted video frame, independent of camera zoom.
+    #[serde(default = "unit_content_scale")]
+    pub content_scale: f64,
     #[serde(default, skip_serializing_if = "crate::VideoCrop::is_full")]
     pub crop: crate::VideoCrop,
 }
+
+const fn unit_content_scale() -> f64 { 1.0 }
 
 impl From<CameraState> for CameraTransform {
     fn from(state: CameraState) -> Self {
@@ -49,6 +54,7 @@ impl From<CameraState> for CameraTransform {
             center_x: state.center_x,
             center_y: state.center_y,
             scale: state.scale,
+            content_scale: 1.0,
             crop: crate::VideoCrop::default(),
         }
     }
@@ -193,6 +199,7 @@ pub struct CursorRenderState {
 #[derive(Debug, Clone, PartialEq)]
 pub struct CursorTimeline {
     events: Vec<CursorEvent>,
+    follow: std::cell::RefCell<crate::camera_policy::FollowCache>,
 }
 
 impl CursorTimeline {
@@ -222,7 +229,10 @@ impl CursorTimeline {
             }
             previous = Some(event.time_tick);
         }
-        Ok(Self { events })
+        Ok(Self {
+            events,
+            follow: std::cell::RefCell::default(),
+        })
     }
 
     pub fn events(&self) -> &[CursorEvent] {
@@ -288,9 +298,11 @@ impl FrameEvaluation {
         let h = f64::from(source.1) * self.camera_transform.crop.height();
         let ow = f64::from(self.output.width);
         let oh = f64::from(self.output.height);
-        let fit = (ow * (1.0 - 2.0 * inset) / w)
-            .min(oh * (1.0 - 2.0 * inset) / h)
-            .min(1.0);
+        // The UI stores pixels normalized by the shorter output dimension.
+        let margin = inset * ow.min(oh);
+        let fit = ((ow - 2.0 * margin) / w)
+            .min((oh - 2.0 * margin) / h)
+            .min(1.0) * self.camera_transform.content_scale;
         let width = w * fit / ow;
         let height = h * fit / oh;
         SourceRect {
@@ -352,11 +364,35 @@ impl<'a> FrameEvaluator<'a> {
         output: OutputDescriptor,
         settings: &crate::WorkbenchSettings,
     ) -> Result<FrameEvaluation, RenderEvaluationError> {
-        let mut frame = if let Some(video) = &settings.video {
-            self.evaluate(project_tick, output, video)?
+        let filtered;
+        let camera=if settings.follow_positions.is_empty()&&!settings.tracks.iter().any(|t|t.kind==crate::timeline::TrackKind::Follow&&t.muted){self.camera}else{filtered={let mut c=self.camera.clone();c.segments.retain(|s|!settings.follow_positions.contains_key(&s.id)&&!settings.track_muted(settings.clip_tracks.get(&s.id).map_or("follow",String::as_str)));c};&filtered};
+        let base=FrameEvaluator{source_frames:self.source_frames,camera,cursor:self.cursor};
+        let placed_source=settings.visual_clips.iter().rev().find(|c|c.asset_id=="__source__"&&c.active(project_tick));
+        let mut frame = if let Some(c)=placed_source{base.evaluate(c.source_tick(project_tick),output,&crate::IdentityTimeMapping)?}else if let Some(video) = &settings.video {
+            base.evaluate(project_tick.min(TimeTick(video.duration().0 - 1)), output, video)?
         } else {
-            self.evaluate(project_tick, output, &crate::IdentityTimeMapping)?
+            base.evaluate(project_tick, output, &crate::IdentityTimeMapping)?
         };
+        frame.project_tick = project_tick;
+        if let Some(automatic) = &settings.automatic_camera {
+            if !(settings.manual_camera_enabled
+                && crate::camera_policy::manual_active(camera, frame.source_tick))
+            {
+                frame.camera_state = automatic.evaluate(
+                    frame.source_tick,
+                    camera,
+                    self.cursor.events(),
+                    &mut self.cursor.follow.borrow_mut(),
+                );
+            }
+            frame.camera_transform = frame.camera_state.into();
+            frame.cursor = self
+                .cursor
+                .evaluate(frame.source_tick, frame.camera_transform);
+        }
+        if let Some((segment,(a,b)))=self.camera.segments.iter().filter(|s|!settings.track_muted(settings.clip_tracks.get(&s.id).map_or("follow",String::as_str))).filter_map(|s|settings.follow_positions.get(&s.id).filter(|(a,b)|project_tick>=*a&&project_tick<*b).map(|r|(s,*r))).max_by_key(|(s,_)|settings.tracks.iter().position(|t|Some(&t.id)==settings.clip_tracks.get(&s.id)).unwrap_or(0)){
+            let mut s=segment.clone();s.start_tick=a;s.end_tick=b;frame.camera_state=s.evaluate(project_tick);frame.camera_transform=frame.camera_state.into();frame.cursor=self.cursor.evaluate(frame.source_tick,frame.camera_transform);
+        }
         if !settings.camera_enabled {
             frame.camera_state = CameraState::BASE;
             frame.camera_transform = frame.camera_state.into();
@@ -364,16 +400,25 @@ impl<'a> FrameEvaluator<'a> {
                 .cursor
                 .evaluate(frame.source_tick, frame.camera_transform);
         }
-        let crop = settings
+        let crop = placed_source.map(|c|c.crop).unwrap_or_else(||settings
             .video
             .as_ref()
             .and_then(|video| video.clip_at(project_tick.min(TimeTick(video.duration().0 - 1))))
-            .map_or_else(crate::VideoCrop::default, |span| span.clip.crop);
+            .map_or_else(crate::VideoCrop::default, |span| span.clip.crop));
         if !crop.is_full() {
             frame.camera_transform = frame.camera_transform.with_crop(crop);
             frame.cursor = self
                 .cursor
                 .evaluate(frame.source_tick, frame.camera_transform);
+        }
+        // Placed visual clips apply their own transform in the compositor.
+        if placed_source.is_none() {
+            frame.camera_transform.content_scale = settings.video.as_ref()
+                .and_then(|v| v.clip_at(project_tick.min(TimeTick(v.duration().0 - 1))))
+                .map_or(1.0, |s| f64::from(s.clip.scale_per_mille) / 1000.0);
+        }
+        if placed_source.is_none() && (!settings.source_video_enabled || !settings.tracks.iter().any(|t|t.id=="video") || settings.video.as_ref().is_some_and(|v|project_tick>v.duration() || (project_tick==v.duration() && settings.project_duration(v.source_duration_tick)>v.duration()))) {
+            frame.source_tick=TimeTick(-1);frame.cursor=None;
         }
         Ok(frame)
     }
@@ -474,6 +519,153 @@ mod tests {
         }
     }
 
+    #[test]
+    fn crop_fits_inside_equal_pixel_margins_then_applies_clip_scale() {
+        let frames=SourceFrameTimeline::new(vec![TimeTick::ZERO]).unwrap();
+        let camera=camera_track();let cursor=CursorTimeline::new(vec![]).unwrap();
+        let evaluator=FrameEvaluator::new(&frames,&camera,&cursor).unwrap();
+        for (ow,oh) in [(1920,1080),(1080,1920),(1080,1080)] {
+            let output=OutputDescriptor::bgra8(ow,oh).unwrap();
+            let mut settings=crate::WorkbenchSettings::default();
+            settings.video=Some(crate::VideoEdit::full(TimeTick(1000)).unwrap());
+            settings.canvas.inset=100.0/f64::from(ow.min(oh));
+            let crop=crate::VideoCrop{left:100,top:50,right:200,bottom:150};
+            settings.video.as_mut().unwrap().set_crop("source-0",crop).unwrap();
+            let frame=evaluator.evaluate_edit(TimeTick::ZERO,output,&settings).unwrap();
+            let rect=frame.content_rect((2560,1440),settings.canvas.inset);
+            let horizontal=rect.left*f64::from(ow);let vertical=rect.top*f64::from(oh);
+            assert!(horizontal>=100.0-1e-9 && vertical>=100.0-1e-9);
+            assert!((horizontal.min(vertical)-100.0).abs()<1e-9);
+            assert!(((rect.right-rect.left)*f64::from(ow)/((rect.bottom-rect.top)*f64::from(oh)) - 2560.0*0.7/(1440.0*0.8)).abs()<1e-9);
+            settings.video.as_mut().unwrap().set_scale("source-0",1500).unwrap();
+            let enlarged=evaluator.evaluate_edit(TimeTick::ZERO,output,&settings).unwrap();
+            let enlarged=enlarged.content_rect((2560,1440),settings.canvas.inset);
+            assert!(((enlarged.right-enlarged.left)/(rect.right-rect.left)-1.5).abs()<1e-9);
+            assert_eq!(frame.camera_transform.crop,crop);
+            // Camera zoom changes source sampling without changing canvas margins.
+            let mut zoomed=frame;zoomed.camera_transform.scale=2.0;
+            assert_eq!(zoomed.content_rect((2560,1440),settings.canvas.inset),rect);
+        }
+    }
+
+    #[test]
+    fn moved_follow_evaluates_at_project_position_and_track_mute_is_local(){
+        let frames=SourceFrameTimeline::new(vec![TimeTick::ZERO,TimeTick::from_millis(5000)]).unwrap();let camera=camera_track();let cursor=CursorTimeline::new(vec![]).unwrap();let eval=FrameEvaluator::new(&frames,&camera,&cursor).unwrap();let mut settings=crate::WorkbenchSettings::default();settings.video=Some(crate::VideoEdit::full(TimeTick::from_millis(6000)).unwrap());settings.follow_positions.insert("zoom".into(),(TimeTick::from_millis(3000),TimeTick::from_millis(4000)));let output=OutputDescriptor::bgra8(640,360).unwrap();
+        assert_eq!(eval.evaluate_edit(TimeTick::from_millis(1500),output,&settings).unwrap().camera_state,CameraState::BASE);
+        assert!(eval.evaluate_edit(TimeTick::from_millis(3500),output,&settings).unwrap().camera_state.scale>1.1);
+        settings.tracks.iter_mut().find(|t|t.id=="follow").unwrap().muted=true;
+        assert_eq!(eval.evaluate_edit(TimeTick::from_millis(3500),output,&settings).unwrap().camera_state,CameraState::BASE);
+    }
+
+    #[test]
+    fn automatic_ranges_survive_trim_speed_and_manual_priority() {
+        use crate::camera_policy::{AutoCameraConfig, AutoCameraSettings, FollowMode};
+        let frames =
+            SourceFrameTimeline::new(vec![TimeTick::ZERO, TimeTick::from_millis(3000)]).unwrap();
+        let mut camera = camera_track();
+        camera.segments[0].origin = SegmentOrigin::Manual;
+        let cursor = CursorTimeline::new(vec![
+            cursor(1, 0, 0.8, 0.6, true),
+            cursor(2, 3000, 0.8, 0.6, true),
+        ])
+        .unwrap();
+        let mut settings = crate::WorkbenchSettings {
+            automatic_camera: Some(AutoCameraSettings::default()),
+            ..crate::WorkbenchSettings::default()
+        };
+        let descriptor = OutputDescriptor::bgra8(320, 180).unwrap();
+        let eval = FrameEvaluator::new(&frames, &camera, &cursor).unwrap();
+        let at = TimeTick::from_millis(2200);
+        assert_eq!(
+            eval.evaluate_edit(at, descriptor, &settings)
+                .unwrap()
+                .camera_state
+                .scale,
+            2.0
+        );
+        settings.manual_camera_enabled = false;
+        settings.automatic_camera.as_mut().unwrap().default = AutoCameraConfig {
+            enabled: true,
+            mode: FollowMode::Click,
+            ..Default::default()
+        };
+        assert_eq!(
+            eval.evaluate_edit(at, descriptor, &settings)
+                .unwrap()
+                .camera_state,
+            CameraState::BASE
+        );
+        let policy = settings.automatic_camera.as_mut().unwrap();
+        policy.default = AutoCameraConfig {
+            enabled: true,
+            ..Default::default()
+        };
+        policy.set_range(
+            TimeTick::from_millis(2000),
+            TimeTick::from_millis(2500),
+            AutoCameraConfig::default(),
+        );
+        let mut video = crate::VideoEdit::full(TimeTick::from_millis(3000)).unwrap();
+        let id = video.clips[0].id.clone();
+        video
+            .trim(
+                &id,
+                TimeTick::from_millis(1000),
+                TimeTick::from_millis(3000),
+            )
+            .unwrap();
+        video.set_speed_percent(&id, 200).unwrap();
+        settings.video = Some(video);
+        let frame = eval
+            .evaluate_edit(TimeTick::from_millis(650), descriptor, &settings)
+            .unwrap();
+        assert_eq!(frame.source_tick, TimeTick::from_millis(2300));
+        assert_eq!(frame.camera_state, CameraState::BASE);
+        let frame = eval
+            .evaluate_edit(TimeTick::from_millis(900), descriptor, &settings)
+            .unwrap();
+        assert!(frame.camera_state.scale > 1.4);
+        settings.camera_enabled = false;
+        assert_eq!(
+            eval.evaluate_edit(TimeTick::from_millis(900), descriptor, &settings)
+                .unwrap()
+                .camera_state,
+            CameraState::BASE
+        );
+    }
+
+    #[test]
+    fn rapid_camera_switches_are_continuous_and_do_not_change_prior_frames() {
+        use crate::camera_policy::{AutoCameraConfig, AutoCameraSettings, FollowCache};
+        let camera = camera_track();
+        let events = vec![
+            cursor(1, 0, 0.8, 0.6, true),
+            cursor(2, 3000, 0.8, 0.6, true),
+        ];
+        let mut cache = FollowCache::default();
+        let mut policy = AutoCameraSettings {
+            default: AutoCameraConfig {
+                enabled: true,
+                ..Default::default()
+            },
+            ranges: Vec::new(),
+        };
+        let before = policy.evaluate(TimeTick::from_millis(900), &camera, &events, &mut cache);
+        policy.set_range(
+            TimeTick::from_millis(1000),
+            TimeTick::from_millis(1100),
+            AutoCameraConfig::default(),
+        );
+        assert_eq!(
+            before,
+            policy.evaluate(TimeTick::from_millis(900), &camera, &events, &mut cache)
+        );
+        for boundary in [10_000_000, 11_000_000] {
+            let a = policy.evaluate(TimeTick(boundary - 1), &camera, &events, &mut cache);
+            let b = policy.evaluate(TimeTick(boundary), &camera, &events, &mut cache);
+            assert!((a.scale - b.scale).abs() < 0.00001);
+        }
+    }
     #[test]
     fn crop_preserves_aspect_and_maps_cursor_and_camera_inside_remaining_image() {
         let crop = crate::VideoCrop {

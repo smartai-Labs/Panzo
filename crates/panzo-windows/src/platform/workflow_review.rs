@@ -29,7 +29,11 @@ fn workflow_ui_review() {
             assert!(state.crop_editing);
             assert!(state.frame.evaluation.camera_transform.crop.is_full());
             let overlay = state.crop_overlay(&state.frame).unwrap();
-            let video = preview_video_rect(client_rect(hwnd), &state.frame, state.theme);
+            let video = preview_video_rect(
+                state.control_layout(client_rect(hwnd)),
+                &state.frame,
+                state.theme,
+            );
             let x = video.left + (overlay[0] * f64::from(video.right - video.left)).round() as i32;
             let y = video.top
                 + (f64::midpoint(overlay[1], overlay[3]) * f64::from(video.bottom - video.top))

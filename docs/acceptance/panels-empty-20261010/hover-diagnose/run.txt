@@ -1,0 +1,21 @@
+
+running 1 test
+test platform::preview_window::workbench_v14_review::workbench_v14_native_review ... FAILED
+
+failures:
+
+failures:
+    platform::preview_window::workbench_v14_review::workbench_v14_native_review
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 303 filtered out; finished in 4.26s
+
+   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.55s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-33132446dff7cc1a.exe)
+before timer: visible=true owner_visible=true root=HWND(0x3770c2a) fg=HWND(0x1ba0f54) fg_root=HWND(0x1ba0f54) root_owner=HWND(0x3770c2a) iconic=false anchor=RECT { left: 134, top: 102, right: 164, bottom: 130 } actual=RECT { left: 134, top: 102, right: 164, bottom: 130 } age=1.1202798s label="新录制"
+after timer: visible=false owner_visible=true root=HWND(0x3770c2a) fg=HWND(0x1ba0f54) fg_root=HWND(0x1ba0f54) root_owner=HWND(0x3770c2a) iconic=false anchor=RECT { left: 134, top: 102, right: 164, bottom: 130 } actual=RECT { left: 134, top: 102, right: 164, bottom: 130 } age=1.1209842s label="新录制"
+
+thread 'platform::preview_window::workbench_v14_review::workbench_v14_native_review' (79644) panicked at crates\panzo-windows\src\platform\workbench_v14_review.rs:206:5:
+stationary hover must survive popup timer and redundant show messages
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p panzo-windows --lib`

@@ -123,9 +123,12 @@ function Invoke-PanzoProcess {
 function Get-PanzoSourceIdentity {
     param([Parameter(Mandatory=$true)][string]$Workspace)
     $paths = @(Get-ChildItem -LiteralPath (Join-Path $Workspace 'crates') -Recurse -File | ForEach-Object { $_.FullName })
+    if (Test-Path -LiteralPath (Join-Path $Workspace 'plugins')) { $paths += @(Get-ChildItem -LiteralPath (Join-Path $Workspace 'plugins') -Recurse -File | ForEach-Object { $_.FullName }) }
     foreach ($name in @('Cargo.toml','Cargo.lock','rust-toolchain.toml','rustfmt.toml')) { $paths += Join-Path $Workspace $name }
     $lines = foreach ($path in ($paths | Sort-Object)) {
         $relative = $path.Substring($Workspace.TrimEnd('\','/').Length + 1).Replace('\','/')
+        # Native review fixtures are generated evidence, not candidate source.
+        if ($relative -match '(^|/)\.tmp(/|$)') { continue }
         '{0}  {1}' -f (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash,$relative
     }
     $sha = [Security.Cryptography.SHA256]::Create()

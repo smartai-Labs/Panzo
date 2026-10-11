@@ -1,0 +1,24 @@
+{
+  "binary": "target/desktop-v13/release/panzo.exe",
+  "binarySha256": "5bafa52dc84c2c9178b3c598b9883c2d77d7c97bed4b414aaaf4e8376b02cf3f",
+  "baseline": false,
+  "passed": true,
+  "checks": [
+    "single combined two-image confirmation survives 80 repeated exit/close requests; Cancel preserves both pictures and stops automatic retries",
+    "individual picture confirmation cannot reenter or start nested application exits",
+    "Discard exits once, writes no screenshots and leaves source files untouched",
+    "Save All writes both edited images with rotated dimensions and exits successfully",
+    "Save failure cancels exit, reports inline without extra dialogs, retains all documents and permits a later successful retry",
+    "clean workspace exits without a confirmation",
+    "all test processes exit without new crash dumps, including normal painting teardown"
+  ],
+  "processIds": [
+    75184,
+    55820,
+    5292,
+    20992
+  ],
+  "newCrashDumps": [],
+  "lastProcessId": 20992,
+  "exitCode": 0
+}

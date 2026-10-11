@@ -1,0 +1,12 @@
+Prior Panzo 42868 exited normally
+Prior Panzo 49780 exited normally
+
+   Id Path                                                            MainWindowTitle Responding
+   -- ----                                                            --------------- ----------
+61380 D:\ChatGPT\Panzo\target\selection-flicker-fix\release\panzo.exe Panzo · 功能菜单          True
+{
+    "sourceIdentityMatches":  true,
+    "sourceSha256":  "8F56B1E532373E8239179BA5ED8A26A34AEED619FCDEC67242FEE64271B60AAF"
+}
+
+

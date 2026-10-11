@@ -1,0 +1,18 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:25 字符: 1
++ cargo test --locked --offline -p panzo-windows capture_selection -- - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.25s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-052854940c115477.exe)
+
+running 4 tests
+test platform::capture_tools::capture_selection::tests::buffered_frames_restore_moved_and_resized_selections_without_ghosts ... ok
+test platform::capture_tools::capture_selection::tests::partial_exposure_presents_only_the_invalid_rectangle ... ok
+test platform::capture_tools::capture_selection::tests::snap_intersection_uses_physical_negative_desktop_coordinates ... ok
+test platform::capture_tools::capture_selection::tests::stationary_mouse_messages_do_not_schedule_more_paints ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 1.62s
+

@@ -82,7 +82,7 @@ impl WindowState {
         if let Some(notice) = self.recovery_notice.take() {
             let message = wide(&notice);
             unsafe {
-                windows::Win32::UI::WindowsAndMessaging::MessageBoxW(
+                crate::platform::app_dialog::message(
                     Some(hwnd),
                     PCWSTR(message.as_ptr()),
                     w!("编辑恢复"),
@@ -104,6 +104,10 @@ impl WindowState {
     }
 
     pub(crate) fn take_navigation(&mut self) -> Option<NavigationIntent> {
+        if self.host_hwnd.is_some_and(|h|crate::platform::media_panel::task_for(h).is_some()) || self.project_bin.as_ref().is_some_and(super::project_bin::busy) {
+            self.navigation_authorized=false;return None;
+        }
+
         if self.navigation_authorized
             && self.save_task.is_none()
             && self.export_task.is_none()
@@ -152,6 +156,7 @@ impl WindowState {
                 let _ = RemovePropW(hwnd, w!("PanzoEditorState"));
             }
         }
+        self.clear_inspector_panel();
         self.accessibility.detach();
         self.session.pause();
         self.deferred_playback.cancel();
@@ -176,9 +181,14 @@ impl WindowState {
         self.request_navigation(hwnd, NavigationIntent::Quit);
     }
 
-    pub(super) fn request_navigation(&mut self, hwnd: HWND, intent: NavigationIntent) {
+    pub(crate) fn request_navigation(&mut self, hwnd: HWND, intent: NavigationIntent) {
         // One intent only: repeated clicks during a save/finalization never queue exits.
         if self.pending_navigation.is_some() || !self.finish_inline_input(hwnd, true) {
+            return;
+        }
+        if crate::platform::media_panel::task_for(hwnd) == Some(true) {
+            self.set_status(crate::platform::editor_ui::StatusSeverity::Information, "请先结束旁白录制，再切换或关闭工程".into());
+            self.refresh(hwnd, false);
             return;
         }
         self.cancel_gesture(hwnd);
@@ -188,11 +198,9 @@ impl WindowState {
         self.session.pause();
         self.deferred_playback.cancel();
         if let Some(task) = &self.export_task {
-            use windows::Win32::UI::WindowsAndMessaging::{
-                IDYES, MB_ICONQUESTION, MB_YESNO, MessageBoxW,
-            };
+            use windows::Win32::UI::WindowsAndMessaging::{IDYES, MB_ICONQUESTION, MB_YESNO};
             let answer = unsafe {
-                MessageBoxW(
+                crate::platform::app_dialog::message(
                     Some(hwnd),
                     w!("导出尚未完成。取消导出并离开当前工程？"),
                     w!("正在导出"),
@@ -216,6 +224,8 @@ impl WindowState {
             return;
         }
         if self.save_task.is_some() || self.export_task.is_some() || self.background_task.is_some()
+            || crate::platform::media_panel::task_for(hwnd).is_some()
+            || self.project_bin.as_ref().is_some_and(super::project_bin::busy)
         {
             self.set_status(
                 crate::platform::editor_ui::StatusSeverity::Information,
@@ -226,7 +236,7 @@ impl WindowState {
         if !self.navigation_authorized {
             if self.editor.is_dirty() {
                 use windows::Win32::UI::WindowsAndMessaging::{
-                    IDNO, IDYES, MB_ICONQUESTION, MB_YESNOCANCEL, MessageBoxW,
+                    IDNO, IDYES, MB_ICONQUESTION, MB_YESNOCANCEL,
                 };
                 self.navigation_prompt_open = true;
                 #[cfg(test)]
@@ -239,11 +249,9 @@ impl WindowState {
                     IDYES
                 } else {
                     unsafe {
-                        MessageBoxW(
+                        crate::platform::app_dialog::message(
                             Some(hwnd),
-                            w!(
-                                "是否保存当前修改？\n是：保存后继续\n否：不保存\n取消：留在当前工程"
-                            ),
+                            w!("是否保存当前修改后继续？选择“不保存”会放弃本次修改。"),
                             w!("未保存的修改"),
                             MB_YESNOCANCEL | MB_ICONQUESTION,
                         )
@@ -405,7 +413,11 @@ impl WindowState {
         if self.selected_segment.is_none() {
             return Err("wheel positive control needs a camera segment".into());
         }
-        let video = super::preview_video_rect(super::client_rect(hwnd), &self.frame, self.theme);
+        let video = super::preview_video_rect(
+            self.control_layout(super::client_rect(hwnd)),
+            &self.frame,
+            self.theme,
+        );
         let (x, y) = (
             i32::midpoint(video.left, video.right),
             i32::midpoint(video.top, video.bottom),

@@ -1,0 +1,104 @@
+{
+  "test": "synthetic image drawing sampling",
+  "imageSize": [
+    4000,
+    2500
+  ],
+  "sampled": true,
+  "uniqueProfile": "D:\\ChatGPT\\Panzo\\.tmp\\ui-audit-37a8e328-b00a-418a-a313-3adf25bc3af3",
+  "unchangedPixel": [
+    450,
+    407
+  ],
+  "expectedColorRef": 15657704,
+  "samples": 280,
+  "changedSamples": 217,
+  "observedColors": [
+    2105886,
+    15657704
+  ],
+  "firstChanges": [
+    [
+      0.002,
+      2105886
+    ],
+    [
+      203.236,
+      2105886
+    ],
+    [
+      213.224,
+      2105886
+    ],
+    [
+      222.405,
+      2105886
+    ],
+    [
+      232.411,
+      2105886
+    ],
+    [
+      243.408,
+      2105886
+    ],
+    [
+      252.678,
+      2105886
+    ],
+    [
+      262.681,
+      2105886
+    ],
+    [
+      272.844,
+      2105886
+    ],
+    [
+      282.855,
+      2105886
+    ],
+    [
+      292.899,
+      2105886
+    ],
+    [
+      303.337,
+      2105886
+    ],
+    [
+      312.362,
+      2105886
+    ],
+    [
+      322.86,
+      2105886
+    ],
+    [
+      331.867,
+      2105886
+    ],
+    [
+      343.865,
+      2105886
+    ],
+    [
+      351.868,
+      2105886
+    ],
+    [
+      362.62,
+      2105886
+    ],
+    [
+      373.138,
+      2105886
+    ],
+    [
+      382.135,
+      2105886
+    ]
+  ],
+  "samplingMilliseconds": 2793.163,
+  "limit": "Pixel sampling only; counts are not display frame counts. A zero count cannot exclude shorter flashes."
+}

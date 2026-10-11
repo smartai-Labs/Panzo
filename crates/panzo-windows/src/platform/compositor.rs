@@ -25,6 +25,7 @@ use windows::Win32::Graphics::Direct3D::{
     D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, ID3DBlob, ID3DInclude,
 };
 use windows::Win32::Graphics::Direct3D11::{
+    D3D11_BLEND_DESC,D3D11_BLEND_ONE,D3D11_BLEND_INV_SRC_ALPHA,D3D11_BLEND_OP_ADD,D3D11_COLOR_WRITE_ENABLE_ALL,ID3D11BlendState,
     D3D11_BIND_CONSTANT_BUFFER, D3D11_BIND_RENDER_TARGET, D3D11_BIND_SHADER_RESOURCE,
     D3D11_BUFFER_DESC, D3D11_COMPARISON_NEVER, D3D11_CPU_ACCESS_READ,
     D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_MAP_READ, D3D11_MAPPED_SUBRESOURCE, D3D11_SAMPLER_DESC,
@@ -46,6 +47,7 @@ use windows::core::{Interface, PCSTR};
 const COMPOSITOR_SHADER: &str = r"
 Texture2D SourceTexture : register(t0);
 Texture2D BackgroundTexture : register(t1);
+Texture2D AnnotationTexture : register(t2);
 SamplerState SourceSampler : register(s0);
 
 cbuffer RenderParameters : register(b0) {
@@ -93,6 +95,11 @@ float cursor_distance(float2 p) {
 }
 
 float4 pixel_main(VertexOutput input) : SV_Target {
+    if (SourceRect.z < 0.0) {
+        float4 blank=float4(0,0,0,SourceRect.z < -1.5 ? 0:1);
+        if (OverlayParameters.w > 0.5) {float4 mark=AnnotationTexture.Sample(SourceSampler,input.uv);blank.rgb=lerp(blank.rgb,mark.rgb,mark.a);blank.a=mark.a+blank.a*(1.0-mark.a);}
+        return blank;
+    }
     float2 pixel = input.position.xy;
     float2 canvas_min = CanvasRect.xy;
     float2 canvas_size = CanvasRect.zw;
@@ -113,11 +120,12 @@ float4 pixel_main(VertexOutput input) : SV_Target {
     float spread = max(StyleParameters.z, 1.0);
     float shadow = StyleParameters.y * exp(-max(distance_to_canvas, 0.0) / spread) * 0.35;
     float4 outside = lerp(background, float4(0.0, 0.0, 0.0, 1.0), shadow);
-    if (coverage <= 0.0 && OverlayParameters.z <= 0.5 && CropRect.z <= CropRect.x) return outside;
+    if (coverage <= 0.0 && OverlayParameters.z <= 0.5 && CropRect.z <= CropRect.x && OverlayParameters.w <= 0.5) return outside;
 
     float2 canvas_uv = saturate((pixel - canvas_min) / canvas_size);
     float2 source_uv = SourceRect.xy + canvas_uv * SourceRect.zw;
     float4 color = SourceTexture.Sample(SourceSampler, source_uv);
+    if (StyleParameters.w < -0.5) color.rgb *= color.a;
 
     if (CursorParameters.w > 0.5) {
         float2 cursor_point = input.position.xy - CursorParameters.xy;
@@ -132,6 +140,11 @@ float4 pixel_main(VertexOutput input) : SV_Target {
     }
     // Editor handles belong above the finished canvas, including its rounded corners.
     color = lerp(outside, color, coverage);
+    if (OverlayParameters.w > 0.5) {
+        float4 mark = AnnotationTexture.Sample(SourceSampler, input.uv);
+        color.rgb = lerp(color.rgb, mark.rgb, mark.a);
+        color.a = mark.a + color.a * (1.0-mark.a);
+    }
     if (OverlayParameters.z > 0.5) {
         float2 delta = abs(pixel - OverlayParameters.xy);
         float cross_mask = max(
@@ -337,12 +350,18 @@ fn decode_selected_frame(
 }
 
 pub struct D3d11Compositor {
+    visuals:RefCell<Option<super::timeline_visual::Visuals>>,
+    layer_blend:RefCell<Option<ID3D11BlendState>>,
     graphics: D3d11Device,
     vertex_shader: ID3D11VertexShader,
     pixel_shader: ID3D11PixelShader,
     sampler: ID3D11SamplerState,
     source_cache: RefCell<Option<CachedInputTexture>>,
+    visual_source_caches: RefCell<std::collections::HashMap<String, RefCell<Option<CachedInputTexture>>>>,
     background_cache: RefCell<Option<CachedInputTexture>>,
+    annotation_cache: RefCell<Option<CachedInputTexture>>,
+    annotation_rasterizations: Cell<u64>,
+    annotation_raster: RefCell<Option<(Vec<u8>, crate::platform::capture_tools::Raster)>>,
     output_cache: RefCell<Option<CachedOutputTextures>>,
     source_uploads: Cell<u64>,
     background_uploads: Cell<u64>,
@@ -351,6 +370,7 @@ pub struct D3d11Compositor {
     presentations: Cell<u64>,
     slow_presentations_logged: Cell<u8>,
     crop_overlay: Cell<Option<[f64; 4]>>,
+    crop_target: RefCell<Option<String>>,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -367,7 +387,7 @@ pub struct CompositorCacheStats {
 /// memory merely to hand the same pixels back to the desktop compositor.
 pub struct GpuPreviewPresenter {
     swap_chain: IDXGISwapChain1,
-    render_target: ID3D11RenderTargetView,
+    render_target: Option<ID3D11RenderTargetView>,
     width: u32,
     height: u32,
 }
@@ -395,9 +415,14 @@ struct CachedOutputTextures {
 }
 
 impl D3d11Compositor {
+    pub fn set_crop_target(&self,id:Option<String>){*self.crop_target.borrow_mut()=id;}
     pub fn set_crop_overlay(&self, rect: Option<[f64; 4]>) {
         self.crop_overlay.set(rect);
     }
+    pub fn set_project_root_with_cancel(&self,root:&Path,cancel:std::sync::Arc<std::sync::atomic::AtomicBool>){*self.visuals.borrow_mut()=Some(super::timeline_visual::Visuals::with_cancel(root.into(),false,cancel));}
+    pub fn set_project_root(&self,root:&Path,interactive:bool){*self.visuals.borrow_mut()=Some(super::timeline_visual::Visuals::new(root.into(),interactive));}
+    pub fn set_preview_quality(&self,q:super::preview_quality::PreviewQuality){if let Some(v)=self.visuals.borrow_mut().as_mut(){v.set_quality(q);}}
+    pub fn set_asset_ready_callback(&self,cb:std::sync::Arc<dyn Fn()+Send+Sync>){if let Some(v)=self.visuals.borrow().as_ref(){v.callback(cb);}}
     pub fn create() -> Result<Self, CompositorError> {
         let graphics = stage("D3D11 hardware device", D3d11Device::create_hardware())?;
         let vertex_bytecode = compile_shader(b"vertex_main\0", b"vs_5_0\0")?;
@@ -441,12 +466,17 @@ impl D3d11Compositor {
         let sampler = sampler.ok_or(CompositorError::NullInterface("sampler state"))?;
 
         Ok(Self {
+            visuals:RefCell::new(None),layer_blend:RefCell::new(None),
             graphics,
             vertex_shader,
             pixel_shader,
             sampler,
             source_cache: RefCell::new(None),
+            visual_source_caches: RefCell::new(Default::default()),
             background_cache: RefCell::new(None),
+            annotation_cache: RefCell::new(None),
+            annotation_raster: RefCell::new(None),
+            annotation_rasterizations: Cell::new(0),
             output_cache: RefCell::new(None),
             source_uploads: Cell::new(0),
             background_uploads: Cell::new(0),
@@ -455,6 +485,7 @@ impl D3d11Compositor {
             presentations: Cell::new(0),
             slow_presentations_logged: Cell::new(0),
             crop_overlay: Cell::new(None),
+            crop_target: RefCell::new(None),
         })
     }
 
@@ -530,11 +561,22 @@ impl D3d11Compositor {
         })?;
         Ok(GpuPreviewPresenter {
             swap_chain,
-            render_target: render_target
-                .ok_or(CompositorError::NullInterface("swap-chain render target"))?,
+            render_target: Some(render_target
+                .ok_or(CompositorError::NullInterface("swap-chain render target"))?),
             width,
             height,
         })
+    }
+
+    pub fn resize_presenter(&self,p:&mut GpuPreviewPresenter,width:u32,height:u32)->Result<(),CompositorError>{
+        if p.width==width && p.height==height {return Ok(());}
+        pixel_length(width,height)?;
+        unsafe{self.graphics.immediate_context().OMSetRenderTargets(None,None);}
+        p.render_target=None;
+        stage("Resize preview buffers",unsafe{p.swap_chain.ResizeBuffers(2,width,height,DXGI_FORMAT_B8G8R8A8_UNORM,windows::Win32::Graphics::Dxgi::DXGI_SWAP_CHAIN_FLAG(0))})?;
+        let buffer:ID3D11Texture2D=stage("Get resized preview buffer",unsafe{p.swap_chain.GetBuffer(0)})?;
+        stage("Create resized preview target",unsafe{self.graphics.native_device().CreateRenderTargetView(&buffer,None,Some(&mut p.render_target))})?;
+        p.width=width;p.height=height;Ok(())
     }
 
     pub fn compose(
@@ -628,7 +670,7 @@ impl D3d11Compositor {
             evaluation,
             settings,
             background,
-            &presenter.render_target,
+            presenter.render_target.as_ref().ok_or(CompositorError::NullInterface("swap-chain render target"))?,
             focus_overlay,
         )?;
         let render_us = render_started.elapsed().as_micros();
@@ -653,7 +695,7 @@ impl D3d11Compositor {
         Ok(())
     }
 
-    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments, clippy::too_many_lines)] // One draw binds the shared preview/export scene and its cached resources.
     fn render_to_target(
         &self,
         source: &DecodedBgraFrame,
@@ -663,9 +705,23 @@ impl D3d11Compositor {
         output_view: &ID3D11RenderTargetView,
         focus_overlay: Option<[f64; 2]>,
     ) -> Result<(), CompositorError> {
+        let mut clips=settings.visual_clips.iter().filter(|c|c.active(evaluation.project_tick)).collect::<Vec<_>>();
+        let slots = clips.iter().map(|c| c.id.as_str()).collect::<Vec<_>>();
+        self.visual_source_caches.borrow_mut().retain(|id, _| slots.contains(&id.as_str()));
+        if let Some(v) = self.visuals.borrow_mut().as_mut() { v.retain_slots(&slots); }
+        clips.sort_by_key(|c|settings.tracks.iter().position(|t|t.id==c.track_id).unwrap_or(0));
+        if clips.is_empty(){return self.render_layer(source,evaluation,settings,background,output_view,focus_overlay,None,true,false);}
+        self.render_layer(source,evaluation,settings,background,output_view,focus_overlay,None,false,false)?;
+        for clip in clips {
+            let frame=if let Some(asset)=settings.visual_assets.iter().find(|a|a.id==clip.asset_id){if let Some(v)=self.visuals.borrow_mut().as_mut(){v.frame(&clip.id,asset,clip.source_tick(evaluation.project_tick)).map_err(CompositorError::Annotation)?}else{None}}else{None};
+            if let Some(frame)=frame {let mut e=*evaluation;e.camera_transform.content_scale=1.0;if clip.asset_id!="__source__"{if !settings.camera_enabled||!settings.follow_positions.iter().any(|(id,(a,b))|evaluation.project_tick>=*a&&evaluation.project_tick<*b&&!settings.track_muted(settings.clip_tracks.get(id).map_or("follow",String::as_str))){e.camera_state=panzo_core::CameraState::BASE;e.camera_transform=panzo_core::CameraState::BASE.into();}if self.crop_target.borrow().as_deref()!=Some(clip.id.as_str()){e.camera_transform=e.camera_transform.with_crop(clip.crop);}else{e.camera_transform=panzo_core::CameraState::BASE.into();}e.cursor=None;}e.source_tick=clip.source_tick(evaluation.project_tick);self.render_layer(&frame,&e,settings,None,output_view,None,Some(clip),false,false)?;}
+        }
+        self.render_layer(source,evaluation,settings,background,output_view,focus_overlay,None,true,true)
+    }
+    fn render_layer(&self,source:&DecodedBgraFrame,evaluation:&FrameEvaluation,settings:&WorkbenchSettings,background:Option<&DecodedBackgroundImage>,output_view:&ID3D11RenderTargetView,focus_overlay:Option<[f64;2]>,visual:Option<&panzo_core::timeline::VisualClip>,annotations:bool,overlay_only:bool)->Result<(),CompositorError>{
         validate_source(source)?;
         settings.validate()?;
-        if settings.background.kind == panzo_core::BackgroundKind::Image && background.is_none() {
+        if settings.background.kind == panzo_core::BackgroundKind::Image && background.is_none() && visual.is_none() {
             return Err(CompositorError::MissingBackgroundImageData);
         }
         if evaluation.output.pixel_format != OutputPixelFormat::Bgra8 {
@@ -674,8 +730,11 @@ impl D3d11Compositor {
         let output_width = evaluation.output.width;
         let output_height = evaluation.output.height;
         pixel_length(output_width, output_height)?;
-        let (source_view, source_created) = cached_input_view(
-            &self.source_cache,
+        let (source_view, source_created) = {
+        let mut layers = self.visual_source_caches.borrow_mut();
+        let cache = if let Some(clip) = visual { layers.entry(clip.id.clone()).or_default() } else { &self.source_cache };
+        cached_input_view(
+            cache,
             self.graphics.native_device(),
             InputTextureKey {
                 identity: source.pts.as_i64(),
@@ -685,7 +744,7 @@ impl D3d11Compositor {
             },
             &source.pixels,
             "source",
-        )?;
+        )? };
         self.source_uploads
             .set(self.source_uploads.get() + u64::from(source_created));
         let background_view = background
@@ -722,6 +781,10 @@ impl D3d11Compositor {
             focus_overlay,
             source.native_size.unwrap_or((source.width, source.height)),
         )?;
+        if (evaluation.source_tick.0 < 0 || !settings.source_video_enabled) && visual.is_none() {parameters.source_rect=[0.0,0.0,-1.0,-1.0];parameters.cursor[3]=0.0;}
+        if let Some(clip)=visual {let w=parameters.canvas_rect[2]*clip.scale as f32;let h=parameters.canvas_rect[3]*clip.scale as f32;parameters.canvas_rect=[output_width as f32*clip.x as f32-w/2.0,output_height as f32*clip.y as f32-h/2.0,w,h];}
+        if visual.is_some(){parameters.background=[0.0;4];parameters.style[3]=-1.0;}
+        if overlay_only{parameters.source_rect=[0.0,0.0,-2.0,-2.0];}
         parameters.crop_rect = self.crop_overlay.get().map_or([0.0; 4], |r| {
             [
                 r[0] as f32 * output_width as f32,
@@ -730,6 +793,68 @@ impl D3d11Compositor {
                 r[3] as f32 * output_height as f32,
             ]
         });
+        let source_size = source.native_size.unwrap_or((source.width, source.height));
+        let active = settings
+            .annotations
+            .iter()
+            .filter(|a| annotations && a.active(evaluation.source_tick))
+            .collect::<Vec<_>>();
+        let subtitles = settings.subtitles.iter().filter(|c| annotations && settings.subtitle_style_for(&c.id).enabled && !settings.track_muted(settings.subtitle_track(&c.id)) && c.active(evaluation.project_tick,evaluation.source_tick)).collect::<Vec<_>>();
+        let annotation_view = if active.is_empty() && subtitles.is_empty() {
+            if annotations {
+                self.annotation_cache.borrow_mut().take();
+                self.annotation_raster.borrow_mut().take();
+            }
+            None
+        } else {
+            let mut key = serde_json::to_vec(&(&active, &subtitles, &settings.subtitle_style, &settings.subtitle_styles))
+                .map_err(|e| CompositorError::Annotation(e.to_string()))?;
+            key.extend_from_slice(&output_width.to_le_bytes());
+            key.extend_from_slice(&output_height.to_le_bytes());
+            if active
+                .iter()
+                .any(|a| a.anchor == panzo_core::AnnotationAnchor::Source)
+            {
+                let r = evaluation.camera_transform.source_rect();
+                let c = evaluation.content_rect(source_size, settings.canvas.inset);
+                for value in [
+                    r.left, r.top, r.right, r.bottom, c.left, c.top, c.right, c.bottom,
+                ] {
+                    key.extend_from_slice(&value.to_bits().to_le_bytes());
+                }
+            }
+            let mut cache = self.annotation_raster.borrow_mut();
+            if cache.as_ref().is_none_or(|(old, _)| old != &key) {
+                self.annotation_rasterizations.set(self.annotation_rasterizations.get()+1);
+                let mut image = crate::platform::capture_tools::render_annotations(
+                    &active,
+                    evaluation,
+                    settings,
+                    source_size,
+                )
+                .map_err(CompositorError::Annotation)?;
+                for cue in &subtitles { crate::platform::capture_tools::render_subtitles(&mut image, &[*cue], settings.subtitle_style_for(&cue.id)).map_err(CompositorError::Annotation)?; }
+                *cache = Some((key, image));
+                self.annotation_cache.borrow_mut().take();
+            }
+            let image = &cache.as_ref().expect("annotation raster exists").1;
+            Some(
+                cached_input_view(
+                    &self.annotation_cache,
+                    self.graphics.native_device(),
+                    InputTextureKey {
+                        identity: 0,
+                        width: output_width,
+                        height: output_height,
+                        data_address: image.pixels.as_ptr() as usize,
+                    },
+                    &image.pixels,
+                    "annotation",
+                )?
+                .0,
+            )
+        };
+        parameters.overlay[3] = f32::from(annotation_view.is_some());
         let parameter_buffer = create_parameter_buffer(self.graphics.native_device(), &parameters)?;
 
         let context = self.graphics.immediate_context();
@@ -741,14 +866,22 @@ impl D3d11Compositor {
             MinDepth: 0.0,
             MaxDepth: 1.0,
         };
+        let blend=if visual.is_some()||overlay_only {
+            let mut cache=self.layer_blend.borrow_mut();if cache.is_none(){let mut d=D3D11_BLEND_DESC::default();let r=&mut d.RenderTarget[0];r.BlendEnable=true.into();r.SrcBlend=D3D11_BLEND_ONE;r.DestBlend=D3D11_BLEND_INV_SRC_ALPHA;r.BlendOp=D3D11_BLEND_OP_ADD;r.SrcBlendAlpha=D3D11_BLEND_ONE;r.DestBlendAlpha=D3D11_BLEND_INV_SRC_ALPHA;r.BlendOpAlpha=D3D11_BLEND_OP_ADD;r.RenderTargetWriteMask=D3D11_COLOR_WRITE_ENABLE_ALL.0 as u8;stage("Create timeline blend",unsafe{self.graphics.native_device().CreateBlendState(&d,Some(&mut *cache))})?;}cache.clone()
+        }else{None};
         unsafe {
+            context.OMSetBlendState(blend.as_ref(),None,u32::MAX);
             context.IASetInputLayout(None::<&ID3D11InputLayout>);
             context.IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             context.VSSetShader(&self.vertex_shader, None);
             context.PSSetShader(&self.pixel_shader, None);
             context.PSSetShaderResources(
                 0,
-                Some(&[Some(source_view.clone()), background_view.clone()]),
+                Some(&[
+                    Some(source_view.clone()),
+                    background_view.clone(),
+                    annotation_view,
+                ]),
             );
             context.PSSetSamplers(0, Some(&[Some(self.sampler.clone())]));
             context.PSSetConstantBuffers(0, Some(&[Some(parameter_buffer)]));
@@ -758,7 +891,7 @@ impl D3d11Compositor {
                 None::<&ID3D11DepthStencilView>,
             );
             context.Draw(3, 0);
-            context.PSSetShaderResources(0, Some(&[None, None]));
+            context.PSSetShaderResources(0, Some(&[None, None, None]));
         }
         Ok(())
     }
@@ -1167,6 +1300,8 @@ fn stage<T>(
 
 #[derive(Debug, Error)]
 pub enum CompositorError {
+    #[error("video annotation: {0}")]
+    Annotation(String),
     #[error("D3D11 compositor stage '{stage}' failed: {source}")]
     WindowsStage {
         stage: &'static str,
@@ -1252,6 +1387,105 @@ pub enum RenderHashProbeError {
 mod tests {
     use super::*;
     use panzo_core::{CameraState, CameraTransform, SourceFrameSelection};
+
+    #[test]
+    fn multi_layer_passes_reuse_unchanged_subtitle_raster() {
+        let compositor=D3d11Compositor::create().unwrap();
+        let source=DecodedBgraFrame{native_size:None,pts:TimeTick::ZERO,duration:None,width:320,height:180,pixels:std::sync::Arc::new([20,30,40,255].repeat(320*180))};
+        let evaluation=FrameEvaluation{project_tick:TimeTick::ZERO,source_tick:TimeTick::ZERO,source_frame:SourceFrameSelection{frame_index:0,presentation_tick:TimeTick::ZERO},camera_state:CameraState::BASE,camera_transform:CameraState::BASE.into(),cursor:None,output:OutputDescriptor::bgra8(320,180).unwrap()};
+        let mut settings=WorkbenchSettings::default();
+        settings.visual_assets.push(panzo_core::timeline::VisualAsset{id:"visual".into(),name:"visual".into(),path:"media/visual.png".into(),kind:panzo_core::timeline::VisualKind::Image,duration:TimeTick(10_000_000),width:320,height:180,audio_path:None,audio_frames:0,source_audio:vec![]});
+        settings.insert_visual_asset("visual","video",TimeTick::ZERO).unwrap();
+        settings.subtitles.push(panzo_core::media_edit::SubtitleCue{id:"caption".into(),start:TimeTick::ZERO,end:TimeTick(10_000_000),text:"cached subtitle".into(),anchor:panzo_core::media_edit::TimeAnchor::Project});
+        for _ in 0..3 {compositor.compose_with_settings(&source,&evaluation,&settings).unwrap();}
+        assert_eq!(compositor.annotation_rasterizations.get(),1);
+        settings.subtitles[0].text="changed".into();compositor.compose_with_settings(&source,&evaluation,&settings).unwrap();assert_eq!(compositor.annotation_rasterizations.get(),2);
+    }
+
+    #[test]
+    fn annotations_follow_camera_and_expire_without_stale_cache() {
+        use panzo_core::{AnnotationAnchor, AnnotationKind, VideoAnnotation};
+        let compositor = D3d11Compositor::create().unwrap();
+        let source = DecodedBgraFrame {
+            native_size: None,
+            pts: TimeTick::ZERO,
+            duration: None,
+            width: 320,
+            height: 180,
+            pixels: [20, 30, 40, 255].repeat(320 * 180).into(),
+        };
+        let mut evaluation = FrameEvaluation {
+            project_tick: TimeTick::ZERO,
+            source_tick: TimeTick::ZERO,
+            source_frame: SourceFrameSelection {
+                frame_index: 0,
+                presentation_tick: TimeTick::ZERO,
+            },
+            camera_state: CameraState::BASE,
+            camera_transform: CameraState::BASE.into(),
+            cursor: None,
+            output: OutputDescriptor::bgra8(320, 180).unwrap(),
+        };
+        let mut settings = WorkbenchSettings::default();
+        settings.annotations.push(VideoAnnotation {
+            id: "a".into(),
+            start: TimeTick::ZERO,
+            end: TimeTick::from_millis(1000),
+            kind: AnnotationKind::Cover,
+            anchor: AnnotationAnchor::Source,
+            bounds: [0.4, 0.4, 0.6, 0.6],
+            text: String::new(),
+            color: "#00FF00".into(),
+            stroke: 0.003,
+            font_size: 0.03,
+        });
+        let pixel = |frame: &CompositedFrame, x: usize, y: usize| {
+            let i = (y * 320 + x) * 4;
+            frame.pixels[i..i + 4].to_vec()
+        };
+        let first = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&first, 160, 90), vec![0, 255, 0, 255]);
+        let cached = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(first, cached);
+        settings.annotations[0].color = "#FF0000".into();
+        let changed = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&changed, 160, 90), vec![0, 0, 255, 255]);
+        evaluation.source_tick = TimeTick::from_millis(1000);
+        let expired = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&expired, 160, 90), vec![20, 30, 40, 255]);
+        evaluation.source_tick = TimeTick::ZERO;
+        settings.canvas.inset = 0.2;
+        let inset = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&inset, 160, 90), vec![0, 0, 255, 255]);
+        assert_ne!(first.sha256_hex(), inset.sha256_hex());
+        settings.canvas.inset = 0.0;
+        evaluation.camera_state = CameraState {
+            center_x: 0.5,
+            center_y: 0.5,
+            scale: 2.0,
+        };
+        evaluation.camera_transform = evaluation.camera_state.into();
+        let zoomed = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&zoomed, 110, 90), vec![0, 0, 255, 255]);
+        assert_eq!(pixel(&changed, 110, 90), vec![20, 30, 40, 255]);
+        settings.annotations[0].anchor = panzo_core::AnnotationAnchor::Canvas;
+        let fixed = compositor
+            .compose_with_settings(&source, &evaluation, &settings)
+            .unwrap();
+        assert_eq!(pixel(&fixed, 110, 90), vec![20, 30, 40, 255]);
+    }
 
     #[test]
     fn rounded_video_corners_blend_edges_without_softening_the_center() {
@@ -1758,4 +1992,9 @@ mod tests {
             "editor cross must not appear in export"
         );
     }
+}
+
+#[cfg(test)]
+impl D3d11Compositor {
+    pub(crate) fn review_visual_size(&self,slot:&str)->Option<(u32,u32)>{self.visuals.borrow().as_ref().and_then(|v|v.review_size(slot))}
 }

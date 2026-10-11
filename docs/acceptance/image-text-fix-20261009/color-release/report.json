@@ -1,0 +1,66 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-text-fix\\release\\panzo.exe",
+  "sha256": "a09c3b97a406fbb79c051e2acd9d5493de691c170f3b1177efd28e2289114658",
+  "monitors": [
+    {
+      "work": [
+        0,
+        0,
+        2560,
+        1440
+      ],
+      "primary": true
+    },
+    {
+      "work": [
+        2560,
+        0,
+        5120,
+        1440
+      ],
+      "primary": false
+    }
+  ],
+  "cases": [
+    {
+      "monitor": {
+        "work": [
+          2560,
+          0,
+          5120,
+          1440
+        ],
+        "primary": false
+      },
+      "root": [
+        2572,
+        12,
+        3672,
+        812
+      ],
+      "anchor": [
+        3524,
+        265,
+        3558,
+        291
+      ],
+      "popup": [
+        3266,
+        295,
+        3558,
+        705
+      ],
+      "ownerMatches": true,
+      "rootDisabled": true,
+      "insideRoot": true,
+      "visibleAfterWait": false,
+      "rootDisabledAfterWait": false,
+      "hitPopup": false,
+      "hung": false,
+      "paintPending": false
+    }
+  ],
+  "passed": false,
+  "isolatedPid": 62692,
+  "error": "Message 0x201 timed out for test HWND 3939472"
+}

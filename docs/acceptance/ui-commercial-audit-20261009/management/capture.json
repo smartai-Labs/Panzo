@@ -1,0 +1,1017 @@
+{
+  "windowsAfterOpen": [
+    {
+      "hwnd": 859672,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401608,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 662724,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 662734,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401654,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 5447402,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 154605444,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 411636972,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336098,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 859710,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336120,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336142,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 990594,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 925368,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401624,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401650,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 728590,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1056342,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1056334,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 597962,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 2170438,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12065618,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 532780,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336022,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336070,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336084,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12590034,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12590872,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270522,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270530,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270594,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270624,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270616,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270608,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336158,
+      "class": "PanzoManagementWindow",
+      "title": "Panzo · 插件",
+      "visible": true,
+      "bounds": [
+        140,
+        90,
+        1100,
+        830
+      ]
+    },
+    {
+      "hwnd": 532544,
+      "class": "PanzoWorkspace",
+      "title": "Panzo · 图片工具",
+      "visible": true,
+      "bounds": [
+        30,
+        30,
+        1210,
+        890
+      ]
+    },
+    {
+      "hwnd": 532514,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        246
+      ]
+    },
+    {
+      "hwnd": 9903506,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        246
+      ]
+    },
+    {
+      "hwnd": 401618,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        36
+      ]
+    },
+    {
+      "hwnd": 793958,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        118,
+        246
+      ]
+    },
+    {
+      "hwnd": 794144,
+      "class": "MSCTFIME UI",
+      "title": "MSCTFIME UI",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1776808,
+      "class": "IME",
+      "title": "Default IME",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "windowsAfterPosition": [
+    {
+      "hwnd": 270522,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270530,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270594,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270624,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270616,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 270608,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336158,
+      "class": "PanzoManagementWindow",
+      "title": "Panzo · 插件",
+      "visible": true,
+      "bounds": [
+        100,
+        80,
+        1060,
+        820
+      ]
+    },
+    {
+      "hwnd": 859672,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401608,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 662724,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 662734,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401654,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 5447402,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 154605444,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 411636972,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336098,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 859710,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336120,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336142,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 990594,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 925368,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401624,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 401650,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 728590,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1056342,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1056334,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 597962,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 2170438,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12065618,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 532780,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336022,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336070,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 336084,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12590034,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 12590872,
+      "class": "tooltips_class32",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 532544,
+      "class": "PanzoWorkspace",
+      "title": "Panzo · 图片工具",
+      "visible": true,
+      "bounds": [
+        30,
+        30,
+        1210,
+        890
+      ]
+    },
+    {
+      "hwnd": 532514,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        246
+      ]
+    },
+    {
+      "hwnd": 9903506,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        246
+      ]
+    },
+    {
+      "hwnd": 401618,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        1,
+        36
+      ]
+    },
+    {
+      "hwnd": 793958,
+      "class": "ComboLBox",
+      "title": "",
+      "visible": false,
+      "bounds": [
+        0,
+        36,
+        118,
+        246
+      ]
+    },
+    {
+      "hwnd": 794144,
+      "class": "MSCTFIME UI",
+      "title": "MSCTFIME UI",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "hwnd": 1776808,
+      "class": "IME",
+      "title": "Default IME",
+      "visible": false,
+      "bounds": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "hitRoot": 336158,
+  "requestedRoot": 336158,
+  "validCapture": true
+}

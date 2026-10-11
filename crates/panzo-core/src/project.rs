@@ -70,7 +70,9 @@ pub struct CaptureDescriptor {
 #[serde(rename_all = "lowercase")]
 pub enum CaptureKind {
     Monitor,
+    Region,
     Window,
+    Imported,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -150,20 +152,25 @@ impl ProjectManifest {
             return Err(ProjectValidationError::EmptyCaptureSize);
         }
         match self.capture.kind {
-            CaptureKind::Monitor if self.capture.monitor_id.trim().is_empty() => {
+            CaptureKind::Monitor | CaptureKind::Region
+                if self.capture.monitor_id.trim().is_empty() =>
+            {
                 return Err(ProjectValidationError::MissingMonitorId);
             }
             CaptureKind::Window if self.capture.window_id.as_deref().is_none_or(str::is_empty) => {
                 return Err(ProjectValidationError::MissingWindowId);
             }
-            CaptureKind::Monitor | CaptureKind::Window => {}
+            CaptureKind::Monitor
+            | CaptureKind::Region
+            | CaptureKind::Window
+            | CaptureKind::Imported => {}
         }
-        if self.capture.target_fps != 60 {
+        if !matches!(self.capture.target_fps, 30 | 60) {
             return Err(ProjectValidationError::UnsupportedTargetFps(
                 self.capture.target_fps,
             ));
         }
-        if self.capture.cursor_captured_in_video {
+        if self.capture.cursor_captured_in_video && self.capture.kind != CaptureKind::Imported {
             return Err(ProjectValidationError::CursorPresentInSourceVideo);
         }
 

@@ -7,7 +7,7 @@ use windows::Win32::UI::Shell::{DefSubclassProc, RemoveWindowSubclass, SetWindow
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DestroyWindow, ES_AUTOHSCROLL, GetWindowTextW, PostMessageW, SendMessageW,
     WINDOW_EX_STYLE, WINDOW_STYLE, WM_APP, WM_CHAR, WM_KEYDOWN, WM_KILLFOCUS, WM_NCDESTROY,
-    WM_SETFONT, WS_BORDER, WS_CHILD, WS_VISIBLE,
+    WM_SETFONT, WS_CHILD, WS_VISIBLE,
 };
 use windows::core::{PCWSTR, w};
 
@@ -29,7 +29,7 @@ impl InlineInput {
                 WINDOW_EX_STYLE::default(),
                 w!("EDIT"),
                 PCWSTR(text.as_ptr()),
-                WS_CHILD | WS_VISIBLE | WS_BORDER | WINDOW_STYLE(ES_AUTOHSCROLL as u32),
+                WS_CHILD | WS_VISIBLE | WINDOW_STYLE(ES_AUTOHSCROLL as u32),
                 rect.left,
                 rect.top,
                 rect.right - rect.left,
@@ -40,6 +40,8 @@ impl InlineInput {
                 None,
             )?
         };
+        super::desktop_ui::install(owner);
+        super::desktop_ui::edit(hwnd);
         let state = Box::new(FieldState {
             owner,
             composing: std::cell::Cell::new(false),
@@ -67,6 +69,9 @@ impl InlineInput {
             let _ = SetFocus(Some(hwnd));
         }
         Ok(input)
+    }
+    pub fn numeric(&self, min: f64, max: f64, step: f64) {
+        super::desktop_ui::decimal_field(self.hwnd, min, max, step);
     }
     pub fn value(&self) -> String {
         let mut text = [0u16; 65];

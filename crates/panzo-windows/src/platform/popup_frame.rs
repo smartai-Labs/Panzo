@@ -3,18 +3,19 @@ use super::{ACTIVE, EditorTheme};
 use std::cell::RefCell;
 use windows::Win32::Foundation::{COLORREF, HWND, LPARAM, LRESULT, POINT, RECT, WPARAM};
 use windows::Win32::Graphics::Gdi::{
-    ClientToScreen, CreateSolidBrush, DeleteObject, ExcludeClipRect, GetWindowDC, HBRUSH, HDC,
-    HGDIOBJ, ReleaseDC, RestoreDC, SaveDC,
+    ClientToScreen, CreateRoundRectRgn, CreateSolidBrush, DeleteObject, ExcludeClipRect,
+    GetWindowDC, HBRUSH, HDC, HGDIOBJ, ReleaseDC, RestoreDC, SaveDC, SetWindowRgn,
 };
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::UI::Shell::{DefSubclassProc, RemoveWindowSubclass, SetWindowSubclass};
 use windows::Win32::UI::WindowsAndMessaging::{
     CallNextHookEx, GetClassNameW, GetClientRect, GetWindowRect, HCBT_CREATEWND, HHOOK, HMENU,
     MENUINFO, MIM_BACKGROUND, PRF_NONCLIENT, SetMenuInfo, SetWindowsHookExW, UnhookWindowsHookEx,
-    WH_CBT, WM_NCDESTROY, WM_NCPAINT, WM_PRINT,
+    WH_CBT, WM_NCDESTROY, WM_NCPAINT, WM_PRINT, WM_WINDOWPOSCHANGED,
 };
 
 thread_local! { static WINDOWS: RefCell<Vec<HWND>> = const { RefCell::new(Vec::new()) }; }
+thread_local! { static SIZES: RefCell<std::collections::HashMap<isize, (i32, i32)>> = RefCell::new(std::collections::HashMap::new()); }
 const SUBCLASS_ID: usize = 0x504d;
 
 pub(super) struct StyleGuard {
@@ -25,7 +26,7 @@ pub(super) struct StyleGuard {
 impl StyleGuard {
     pub(super) fn install(menu: HMENU, theme: EditorTheme) -> windows::core::Result<Self> {
         let hook = unsafe { SetWindowsHookExW(WH_CBT, Some(created), None, GetCurrentThreadId())? };
-        let brush = unsafe { CreateSolidBrush(theme.palette.panel) };
+        let brush = unsafe { CreateSolidBrush(theme.palette.raised) };
         let guard = Self { hook, brush };
         let info = MENUINFO {
             cbSize: std::mem::size_of::<MENUINFO>() as u32,
@@ -45,6 +46,7 @@ impl Drop for StyleGuard {
         unsafe {
             let _ = UnhookWindowsHookEx(self.hook);
         }
+        SIZES.with(|v| v.borrow_mut().clear());
         let windows = WINDOWS.with(|windows| std::mem::take(&mut *windows.borrow_mut()));
         for hwnd in windows {
             unsafe {
@@ -65,7 +67,7 @@ unsafe extern "system" fn created(code: i32, wp: WPARAM, lp: LPARAM) -> LRESULT 
         if length == 6
             && name[..6] == [35, 51, 50, 55, 54, 56]
             && let Some(color) =
-                ACTIVE.with(|view| view.borrow().as_ref().map(|view| view.theme.palette.panel))
+                ACTIVE.with(|view| view.borrow().as_ref().map(|view| view.theme.palette.raised))
             && unsafe { SetWindowSubclass(hwnd, Some(frame_proc), SUBCLASS_ID, color.0 as usize) }
                 .as_bool()
         {
@@ -84,6 +86,31 @@ unsafe extern "system" fn frame_proc(
     data: usize,
 ) -> LRESULT {
     let color = COLORREF(data as u32);
+    if message == WM_WINDOWPOSCHANGED {
+        let mut r = RECT::default();
+        if unsafe { GetWindowRect(hwnd, &mut r) }.is_ok() {
+            let size = (r.right - r.left, r.bottom - r.top);
+            let changed =
+                SIZES.with(|v| v.borrow_mut().insert(hwnd.0 as isize, size) != Some(size));
+            if changed && size.0 > 0 && size.1 > 0 {
+                let dpi = unsafe { windows::Win32::UI::HiDpi::GetDpiForWindow(hwnd) }.max(96);
+                let radius = (12 * dpi / 96) as i32;
+                unsafe {
+                    let region = CreateRoundRectRgn(0, 0, size.0 + 1, size.1 + 1, radius, radius);
+                    if !region.is_invalid() && SetWindowRgn(hwnd, Some(region), false) == 0 {
+                        let _ = DeleteObject(region.into());
+                    }
+                    let corner = windows::Win32::Graphics::Dwm::DWMWCP_ROUND;
+                    let _ = windows::Win32::Graphics::Dwm::DwmSetWindowAttribute(
+                        hwnd,
+                        windows::Win32::Graphics::Dwm::DWMWA_WINDOW_CORNER_PREFERENCE,
+                        (&raw const corner).cast(),
+                        std::mem::size_of_val(&corner) as u32,
+                    );
+                }
+            }
+        }
+    }
     if message == WM_NCPAINT {
         let dc = unsafe { GetWindowDC(Some(hwnd)) };
         paint_frame(hwnd, dc, color);
@@ -97,6 +124,7 @@ unsafe extern "system" fn frame_proc(
             let _ = RemoveWindowSubclass(hwnd, Some(frame_proc), id);
         }
         WINDOWS.with(|windows| windows.borrow_mut().retain(|window| *window != hwnd));
+        SIZES.with(|v| v.borrow_mut().remove(&(hwnd.0 as isize)));
     }
     let result = unsafe { DefSubclassProc(hwnd, message, wp, lp) };
     if message == WM_PRINT && lp.0 & PRF_NONCLIENT as isize != 0 {

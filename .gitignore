@@ -1,9 +1,38 @@
 /target/
 /target-*/
 /dist/
-/.tmp/
+.tmp/
 *.panzo/
 *.mp4
 *.part.mp4
 *.pdb
 Acceptance-Report.local.md
+
+# Generated Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Disposable native-test profiles and downloaded toolchains
+/docs/acceptance/**/*profile*/
+/docs/acceptance/**/user/
+/docs/acceptance/**/appdata/
+/docs/acceptance/**/AppData/
+/docs/acceptance/**/.rustup/
+/docs/acceptance/**/.cargo/
+
+# Local credentials and generated binaries
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.pfx
+*.p12
+*.key
+id_rsa
+id_ed25519
+*.exe
+*.dll
+*.rlib
+*.rmeta

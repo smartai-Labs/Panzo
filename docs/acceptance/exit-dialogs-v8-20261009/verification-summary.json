@@ -1,0 +1,90 @@
+﻿{
+    "verifiedAtUtc":  "2026-10-08T22:34:11.6523756Z",
+    "candidate":  {
+                      "directory":  "D:\\ChatGPT\\Panzo\\target\\desktop-v8\\release",
+                      "sourceSha256":  "0E785E42DEA326070474195BCFD1D7F09F32AE621B9B3427FCB215A6F40762DB",
+                      "binaries":  [
+                                       {
+                                           "name":  "panzo.exe",
+                                           "sha256":  "8B0E11264E5E7D161BC2DA984674AA8E07D8C3DA1DFA5771C3E4008AAABF8CEB",
+                                           "bytes":  8185856
+                                       },
+                                       {
+                                           "name":  "panzo-cli.exe",
+                                           "sha256":  "E3B20A13B5F68C263CC1743860A4642FEA0C57D2E4EC18FD6376ACBFAF6A1392",
+                                           "bytes":  9444864
+                                       }
+                                   ],
+                      "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\desktop-v8\\release\\candidate-build.json"
+                  },
+    "unitTests":  {
+                      "ignored":  37,
+                      "report":  "tests.txt",
+                      "failed":  0,
+                      "passed":  216
+                  },
+    "baseline":  {
+                     "binary":  "target/desktop-v7/release/panzo.exe",
+                     "baseline":  true,
+                     "passed":  true,
+                     "checks":  [
+                                    "v7 single tray exit creates multiple simultaneous Close Image dialogs with no further input"
+                                ],
+                     "reproducedDialogs":  [
+                                               "关闭图片",
+                                               "关闭图片",
+                                               "关闭图片",
+                                               "关闭图片"
+                                           ]
+                 },
+    "exitRegression":  {
+                           "binary":  "target/desktop-v8/release/panzo.exe",
+                           "baseline":  false,
+                           "passed":  true,
+                           "checks":  [
+                                          "single combined two-image confirmation survives 80 repeated exit/close requests; Cancel preserves both pictures and stops automatic retries",
+                                          "individual picture confirmation cannot reenter or start nested application exits",
+                                          "Discard exits once, writes no screenshots and leaves source files untouched",
+                                          "Save All writes both edited images with rotated dimensions and exits successfully",
+                                          "Save failure cancels exit, reports inline without extra dialogs, retains all documents and permits a later successful retry",
+                                          "clean workspace exits without a confirmation",
+                                          "all test processes exit without new crash dumps, including normal painting teardown"
+                                      ],
+                           "processIds":  [
+                                              51284,
+                                              64132,
+                                              38096,
+                                              69356
+                                          ],
+                           "newCrashDumps":  [
+
+                                             ],
+                           "lastProcessId":  69356,
+                           "exitCode":  0
+                       },
+    "uiRegression":  {
+                         "passed":  true,
+                         "binary":  "target/desktop-v8/release/panzo.exe",
+                         "checks":  [
+                                        "three workspaces; ordered top commands; no settings/plugin tabs",
+                                        "directory field is transient; posted Escape/Enter; native picker cancel preserves path",
+                                        "settings drafts survive navigation and closing; popup is unique; main workspace retained; no EDIT frames",
+                                        "settings/plugins each use a unique owned window",
+                                        "asset preview and image editing load; crop session; light/dark controls; result scrollbar has no native white frame",
+                                        "video-page undo leaves rotated image unchanged; image-page undo restores original dimensions"
+                                    ],
+                         "processId":  28300,
+                         "exitCode":  0
+                     },
+    "uiRegressionCrashDumps":  [
+
+                               ],
+    "screenshots":  [
+                        "native/one-exit-confirmation.png",
+                        "native/save-failure-retains-documents.png"
+                    ],
+    "limitations":  [
+                        "The tray command path is invoked by its native command handler in an isolated process; existing user instances are never closed.",
+                        "An earlier test process was interrupted by DoubaoIME tsf-oime-core.dll; input settings were unchanged. Final isolated exit and UI runs passed without new dumps."
+                    ]
+}

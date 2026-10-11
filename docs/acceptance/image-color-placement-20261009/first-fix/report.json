@@ -1,0 +1,102 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-color-fix\\release\\panzo.exe",
+  "sha256": "6eb948836f818bd4cdbc166a32cfe3406af4f8432d04316e00b545b1cc4ac439",
+  "monitors": [
+    {
+      "work": [
+        0,
+        0,
+        2560,
+        1440
+      ],
+      "primary": true
+    },
+    {
+      "work": [
+        2560,
+        0,
+        5120,
+        1440
+      ],
+      "primary": false
+    }
+  ],
+  "cases": [
+    {
+      "monitor": {
+        "work": [
+          2560,
+          0,
+          5120,
+          1440
+        ],
+        "primary": false
+      },
+      "root": [
+        2572,
+        12,
+        3672,
+        812
+      ],
+      "anchor": [
+        3524,
+        265,
+        3558,
+        291
+      ],
+      "popup": [
+        2268,
+        295,
+        2560,
+        705
+      ],
+      "ownerMatches": true,
+      "rootDisabled": true,
+      "insideRoot": false,
+      "hung": false,
+      "paintPending": false,
+      "closed": true,
+      "rootEnabledAfter": true,
+      "passed": false
+    },
+    {
+      "monitor": {
+        "work": [
+          0,
+          0,
+          2560,
+          1440
+        ],
+        "primary": true
+      },
+      "root": [
+        12,
+        12,
+        1112,
+        812
+      ],
+      "anchor": [
+        964,
+        265,
+        998,
+        291
+      ],
+      "popup": [
+        964,
+        295,
+        1256,
+        705
+      ],
+      "ownerMatches": true,
+      "rootDisabled": true,
+      "insideRoot": false,
+      "hung": false,
+      "paintPending": false,
+      "closed": true,
+      "rootEnabledAfter": true,
+      "passed": false
+    }
+  ],
+  "passed": false,
+  "isolatedPid": 15900
+}

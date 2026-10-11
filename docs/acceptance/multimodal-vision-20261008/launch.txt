@@ -1,0 +1,12 @@
+Idle prior instance exited normally
+Preserved prior project instance 44840
+
+   Id Path                                                     MainWindowTitle Responding
+   -- ----                                                     --------------- ----------
+55468 D:\ChatGPT\Panzo\target\multimodal-ocr\release\panzo.exe Panzo · 功能菜单          True
+{
+    "sourceIdentityMatches":  true,
+    "sourceSha256":  "C134938D3CCE10068A243B1095FC115D3721C6A96E50F26FA56AB1D96DEB7426"
+}
+
+

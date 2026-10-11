@@ -1,0 +1,59 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-text-fix\\release\\panzo.exe",
+  "sha256": "ddf8980953cfd4ddf22fe13916c279ce696af64b5cf5312539d4bf8d5d93449c",
+  "passed": true,
+  "isolatedPid": 70872,
+  "emptyDraft": true,
+  "keyboardSynchronized": true,
+  "canvasToInspector": true,
+  "inspectorToCanvas": true,
+  "draftMoved": true,
+  "committedOnToolChange": true,
+  "reopenedText": "右侧同步修改",
+  "escapeClosed": true,
+  "cancelRestored": true,
+  "editPersisted": true,
+  "selectedInspectorVisible": true,
+  "selectedInspectorPersisted": true,
+  "savedTextPixels": 1087,
+  "gdiBefore": 146,
+  "repaintChecks": 270,
+  "whiteBlocks": [],
+  "wrongBackgrounds": [],
+  "gdiAfter": 146,
+  "hung": false,
+  "numberFields": [
+    {
+      "value": "4",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true
+    },
+    {
+      "value": "24",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "blankKeepsExistingKey": true,
+  "defaultOnlinePersisted": true,
+  "deleteClearsKey": true,
+  "externalNetworkRequests": 0,
+  "freshProcessDecrypts": true,
+  "passwordControlMasked": true,
+  "plaintextAbsentFromDisk": true,
+  "savedKeyNotPrefilled": true,
+  "userSettingsUntouched": true
+}

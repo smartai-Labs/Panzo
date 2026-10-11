@@ -78,6 +78,7 @@ pub enum PersistedInputEvent {
 
 #[derive(Debug, Clone)]
 pub struct InputEventNormalizer {
+    restrict_to_capture: bool,
     clock: SessionClock,
     capture_rect: PhysicalRect,
     geometry_revision: u32,
@@ -99,6 +100,7 @@ impl InputEventNormalizer {
             return Err(InputNormalizationError::EmptyCaptureGeometry);
         }
         Ok(Self {
+            restrict_to_capture: false,
             clock,
             capture_rect,
             geometry_revision,
@@ -135,13 +137,17 @@ impl InputEventNormalizer {
         Ok(true)
     }
 
+    pub fn set_restrict_to_capture(&mut self, restricted: bool) {
+        self.restrict_to_capture = restricted;
+    }
+
     pub fn normalize_batch(
         &mut self,
         mut raw_events: Vec<StampedInputEvent>,
     ) -> Result<Vec<PersistedInputEvent>, InputNormalizationError> {
         raw_events.sort_by_key(|event| (event.qpc, event.sequence));
         let mut output = Vec::with_capacity(raw_events.len());
-        for raw in raw_events {
+        for mut raw in raw_events {
             if raw.qpc < self.clock.session_start_qpc {
                 self.dropped_before_epoch += 1;
                 continue;
@@ -156,6 +162,16 @@ impl InputEventNormalizer {
             }
             self.last_qpc = Some(raw.qpc);
             let time_tick = self.clock.event_tick(raw.qpc)?;
+            if self.restrict_to_capture && !self.capture_rect.contains(raw.desktop_point) {
+                if matches!(raw.kind, RawInputKind::Button { .. }) {
+                    continue;
+                }
+                raw.desktop_point = PhysicalPoint {
+                    x: self.capture_rect.x,
+                    y: self.capture_rect.y,
+                };
+                raw.kind = RawInputKind::Cursor { visible: false };
+            }
             match raw.kind {
                 RawInputKind::Cursor { visible } => {
                     let current_state = (raw.desktop_point, visible);
@@ -316,6 +332,71 @@ impl ClickEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn region_events_hide_outside_coordinates_and_restore_inside_visibility() {
+        let clock = SessionClock::establish(10_000_000, 0).unwrap();
+        let mut normalizer = InputEventNormalizer::new(
+            clock,
+            PhysicalRect {
+                x: -100,
+                y: 20,
+                width: 80,
+                height: 60,
+            },
+            0,
+        )
+        .unwrap();
+        normalizer.set_restrict_to_capture(true);
+        let raw = |sequence, point, kind| StampedInputEvent {
+            sequence,
+            qpc: i64::try_from(sequence).unwrap() * 10,
+            desktop_point: point,
+            kind,
+        };
+        let events = normalizer
+            .normalize_batch(vec![
+                raw(
+                    1,
+                    PhysicalPoint { x: -80, y: 40 },
+                    RawInputKind::Cursor { visible: true },
+                ),
+                raw(
+                    2,
+                    PhysicalPoint { x: 500, y: 500 },
+                    RawInputKind::Cursor { visible: true },
+                ),
+                raw(
+                    3,
+                    PhysicalPoint { x: 501, y: 500 },
+                    RawInputKind::Button {
+                        button: MouseButton::Left,
+                        action: MouseAction::Down,
+                    },
+                ),
+                raw(
+                    4,
+                    PhysicalPoint { x: -70, y: 40 },
+                    RawInputKind::Cursor { visible: true },
+                ),
+            ])
+            .unwrap();
+        assert_eq!(events.len(), 3);
+        for event in &events {
+            let PersistedInputEvent::Cursor(cursor) = event else {
+                panic!("outside click leaked")
+            };
+            assert!((-100..-20).contains(&cursor.desktop_x));
+        }
+        let PersistedInputEvent::Cursor(hidden) = &events[1] else {
+            unreachable!()
+        };
+        assert!(!hidden.visible);
+        let PersistedInputEvent::Cursor(inside) = &events[2] else {
+            unreachable!()
+        };
+        assert!(inside.visible);
+    }
 
     #[test]
     fn only_inside_left_or_right_down_triggers_camera() {

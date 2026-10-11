@@ -44,7 +44,10 @@ impl PreviewProxy {
     }
 
     pub fn restore_source_time(&self, frame: &mut DecodedBgraFrame) -> Result<(), String> {
-        if (frame.width, frame.height) != self.native_size {
+        self.restore_source_time_with_limit(frame,None)
+    }
+    pub fn restore_source_time_with_limit(&self,frame:&mut DecodedBgraFrame,limit:Option<u32>)->Result<(),String> {
+        if (frame.width, frame.height) != super::media_decoder::preview_geometry(self.native_size.0,self.native_size.1,limit) {
             return Err("预览缓存尺寸不匹配，需要重新生成".into());
         }
         let index = self
@@ -380,6 +383,21 @@ mod tests {
         job.pause_preparation(true);
         job.cancel();
         assert!(check_cancel(&state).is_err());
+    }
+    #[test]
+    fn selected_preview_quality_keeps_native_geometry_and_source_timestamps() {
+        let proxy=PreviewProxy{path:PathBuf::new(),native_size:(2560,1440),
+            mapping:vec![(TimeTick(333_333),TimeTick(333_401))],source_size:1,source_modified_ns:1};
+        for (limit,width,height) in [(640,640,360),(1280,1280,720)] {
+            let mut frame=DecodedBgraFrame{pts:TimeTick(333_333),duration:None,width,height,
+                pixels:Arc::new(vec![42;width as usize*height as usize*4]),native_size:None};
+            let pixels=frame.pixels.clone();
+            proxy.restore_source_time_with_limit(&mut frame,Some(limit)).unwrap();
+            assert_eq!(frame.pts,TimeTick(333_401));
+            assert_eq!(frame.native_size,Some((2560,1440)));
+            assert!(Arc::ptr_eq(&pixels,&frame.pixels));
+            assert!(proxy.restore_source_time(&mut frame).is_err());
+        }
     }
     #[test]
     fn container_quantization_maps_back_to_source_without_changing_native_geometry() {

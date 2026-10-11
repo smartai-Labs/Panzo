@@ -1,0 +1,46 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-text-activation\\release\\panzo.exe",
+  "sha256": "c3c0e05569a5c75b3fa42f9731f3a4c55a7ba273b91e22e741b27c8af2aa5428",
+  "passed": true,
+  "isolatedPid": 39736,
+  "editingInk": [
+    4,
+    12,
+    71,
+    40
+  ],
+  "textAtEditCapture": "Abc",
+  "editingClosed": true,
+  "committedInk": [
+    4,
+    12,
+    71,
+    40
+  ],
+  "textAtCommitCapture": "Abc",
+  "inkDelta": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "initialFamily": "Arial",
+  "familyAfterInspectorChange": "Courier New",
+  "reenteredEditor": true,
+  "familyAfterReenter": "Courier New",
+  "outsideClickLeavesEditorVisible": false,
+  "outsideClickCreatesEmptyDraft": false,
+  "oldEditorRect": [
+    244,
+    410,
+    448,
+    477
+  ],
+  "newEditorRect": [
+    244,
+    410,
+    448,
+    477
+  ],
+  "unselectedFontControlDisabled": true
+}

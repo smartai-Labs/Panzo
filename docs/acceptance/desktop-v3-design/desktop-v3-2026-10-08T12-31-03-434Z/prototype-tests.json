@@ -1,0 +1,48 @@
+{
+  "runId": "desktop-v3-2026-10-08T12-31-03-434Z",
+  "status": "Pass",
+  "scope": "design-prototype-not-native-app",
+  "checks": [
+    {
+      "name": "empty-image-workspace",
+      "status": "Pass"
+    },
+    {
+      "name": "capture-annotation-and-undo",
+      "status": "Pass"
+    },
+    {
+      "name": "background-recognition-stays-with-source",
+      "status": "Pass"
+    },
+    {
+      "name": "disable-plugin-blocks-recognition",
+      "status": "Pass"
+    },
+    {
+      "name": "processing-is-inline-and-cancellable",
+      "status": "Pass"
+    },
+    {
+      "name": "record-follow-editor-and-export",
+      "status": "Pass"
+    },
+    {
+      "name": "asset-filter-and-service-page",
+      "status": "Pass"
+    },
+    {
+      "name": "keyboard-command-and-theme",
+      "status": "Pass"
+    },
+    {
+      "name": "compact-viewports",
+      "status": "Pass"
+    },
+    {
+      "name": "desktop-layout-and-panel-collapse",
+      "status": "Pass"
+    }
+  ],
+  "javascriptErrors": []
+}

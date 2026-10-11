@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panzo · 工作台布局交互原型（模拟操作）</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<div id="app" data-page="video">
+<header class="titlebar"><button class="brand icon-button" data-action="about" aria-label="关于此布局原型"><img src="panzo.svg" alt=""></button><nav class="menus" aria-label="应用菜单"><button data-menu="file">文件</button><button data-menu="edit">编辑</button><button data-menu="view">视图</button><button data-action="about">帮助</button><button data-action="plugins">插件</button><button data-action="settings">设置</button></nav><div class="spacer"></div><button id="theme" class="icon-button" data-action="theme" aria-label="切换浅色主题"></button><div class="window-buttons"><button data-action="window-demo" aria-label="最小化" data-icon="minus"></button><button data-action="window-demo" aria-label="最大化" data-icon="window"></button><button data-action="window-demo" aria-label="关闭" data-icon="close"></button></div></header>
+<div class="workspacebar"><div id="background-task" hidden></div><nav class="workspaces" aria-label="工作区"><button data-page="image">图片工具</button><button data-page="video" aria-current="page">录制与视频</button><button data-page="assets">素材</button></nav><button class="primary export-button" data-action="export">导出</button></div>
+<div id="contextbar" class="contextbar"></div><main id="main"></main>
+</div>
+<div id="tooltip" role="tooltip" hidden></div><div id="toast" role="status" aria-live="polite" hidden></div><div id="flyout" class="flyout" hidden></div><dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+<script src="app.js"></script></body></html>

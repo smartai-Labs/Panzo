@@ -1,0 +1,77 @@
+﻿{
+    "verifiedAtUtc":  "2026-10-08T22:50:19.9627098Z",
+    "candidate":  {
+                      "directory":  "D:\\ChatGPT\\Panzo\\target\\desktop-v9\\release",
+                      "sourceSha256":  "2BFAF2B351BD495ACEF09BC6572AB66FDE5847F659A8B24C220595BF9D2C1A99",
+                      "binaries":  [
+                                       {
+                                           "name":  "panzo.exe",
+                                           "sha256":  "BB089B846C7C11647C070B27D2DD19F7D2E460808D7282DA41492896B2F10DB9",
+                                           "bytes":  8185856
+                                       },
+                                       {
+                                           "name":  "panzo-cli.exe",
+                                           "sha256":  "75DDBAE37D18BE9658FFC24E6B8DF098D561B598AA4DB45639099233526F6B6E",
+                                           "bytes":  9444352
+                                       }
+                                   ],
+                      "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\desktop-v9\\release\\candidate-build.json"
+                  },
+    "unitTests":  {
+                      "ignored":  37,
+                      "report":  "tests.txt",
+                      "failed":  0,
+                      "passed":  218
+                  },
+    "nativeReport":  "release/collage-smoke.json",
+    "nativePassed":  true,
+    "previewGridCases":  18,
+    "export":  {
+                   "size":  [
+                                1376,
+                                1376
+                            ],
+                   "verticalGutter":  [
+                                          682,
+                                          683,
+                                          684,
+                                          685,
+                                          686,
+                                          687,
+                                          688,
+                                          689,
+                                          690,
+                                          691,
+                                          692,
+                                          693,
+                                          694
+                                      ],
+                   "horizontalGutter":  [
+                                            682,
+                                            683,
+                                            684,
+                                            685,
+                                            686,
+                                            687,
+                                            688,
+                                            689,
+                                            690,
+                                            691,
+                                            692,
+                                            693,
+                                            694
+                                        ]
+               },
+    "testProcessId":  48900,
+    "crashDumps":  [
+
+                   ],
+    "screenshots":  [
+                        "release/grid-2x2-aligned.png",
+                        "release/grid-3x3-aligned.png",
+                        "release/collage-cards-dark.png",
+                        "release/collage-cards-light.png",
+                        "release/generated-grid.png"
+                    ],
+    "formatCheck":  "rustfmt --edition 2024 --check (three changed Rust modules): passed"
+}

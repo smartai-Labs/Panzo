@@ -1,0 +1,61 @@
+{
+  "test": "native synthetic image drawing stability",
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v13\\release\\panzo.exe",
+  "binarySha256": "bae157f90f7f636e7bc642abb40aa8c16f440bf76a7de68060813e3f15bff909",
+  "imageSize": [
+    4000,
+    2500
+  ],
+  "sampled": true,
+  "passed": true,
+  "uniqueProfile": "D:\\ChatGPT\\Panzo\\.tmp\\drawing-stability-97ffd1be-2ccc-41f5-8d33-97c22b152b6c",
+  "fixture": "D:\\ChatGPT\\Panzo\\.tmp\\drawing-stability-97ffd1be-2ccc-41f5-8d33-97c22b152b6c\\Videos\\Panzo\\Screenshots\\synthetic-drawing.png",
+  "requestedMinimumSeconds": 14.0,
+  "requestedMoves": 750,
+  "samplingIntervalRequestedMilliseconds": 2,
+  "limit": "Pixel sampling only; counts are not display frame counts or FPS. Zero changed samples cannot exclude shorter flashes between samples. Desktop occlusion or movement invalidates the observation.",
+  "isolatedProcessId": 79456,
+  "readiness": {
+    "origin": [
+      50,
+      206
+    ],
+    "clientSize": [
+      800,
+      548
+    ],
+    "imageBoundsInClient": [
+      71,
+      60,
+      772,
+      498
+    ],
+    "sample": [
+      471,
+      412
+    ],
+    "strokeStart": [
+      246,
+      366
+    ],
+    "strokeWidth": 178,
+    "strokeHeight": 12,
+    "waitMilliseconds": 565.542
+  },
+  "unchangedPixel": [
+    471,
+    412
+  ],
+  "expectedColorRef": 15657704,
+  "actualMoves": 750,
+  "drawingMilliseconds": 12553.071,
+  "samples": 1400,
+  "changedSamples": 0,
+  "observedColors": [
+    15657704
+  ],
+  "firstChanges": [],
+  "samplingMilliseconds": 13994.475,
+  "cleanup": "terminated only the isolated child after close grace period",
+  "processExitCode": 1
+}

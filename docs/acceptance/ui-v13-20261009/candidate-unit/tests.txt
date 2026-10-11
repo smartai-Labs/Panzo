@@ -1,0 +1,299 @@
+cargo :    Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
+所在位置 行:20 字符: 1
++ cargo test --locked --offline -p panzo-windows --lib -- --test-thread ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pa...\panzo-windows):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.30s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-9b54cdddb84279c6.exe)
+
+running 285 tests
+test platform::accessibility::tests::abi_matches_windows_interfaces_and_null_outputs_are_initialized ... ok
+test platform::accessibility::tests::chinese_properties_patterns_navigation_and_screen_coordinates ... ok
+test platform::accessibility::tests::close_and_removed_nodes_invalidate_all_retained_client_references ... ok
+test platform::accessibility::tests::concurrent_client_reads_do_not_borrow_owner_state ... ok
+test platform::accessibility::tests::detaching_a_page_never_revives_retained_providers_after_ids_are_reused ... ok
+test platform::accessibility::tests::discrete_command_queue_is_bounded_and_does_not_silently_drop ... ok
+test platform::accessibility::tests::property_notifications_track_names_enabled_values_and_selection ... ok
+test platform::accessibility::tests::range_requests_coalesce_without_reordering_discrete_edit_commands ... ok
+test platform::accessibility::tests::runtime_ids_are_stable_and_differ_across_window_generations ... ok
+test platform::accessibility::tests::selection_returns_owned_interfaces_and_stable_object_ids ... ok
+test platform::app_menu::tests::shortcut_column_reserves_space_for_long_labels_at_all_dpi ... ok
+test platform::app_shell::close_tests::nested_close_attempts_keep_outer_confirmation_locked_and_cancel_allows_retry ... ok
+test platform::asset_index::tests::discovery_has_no_legacy_500_item_limit ... ok
+test platform::asset_index::tests::external_registration_is_deduplicated_and_missing_files_remain_visible ... ok
+test platform::asset_index::tests::registration_requires_completed_files_and_discovery_skips_encoder_temporaries ... ok
+test platform::asset_index::tests::scans_nested_outputs_and_skips_project_internals ... ok
+test platform::asset_preview::tests::pointer_zoom_keeps_same_image_coordinate ... ok
+test platform::asset_preview::worker_tests::asynchronous_image_and_gif_preview_preserves_dimensions_and_animation ... ok
+test platform::asset_preview::worker_tests::missing_and_corrupt_files_report_an_error_without_panicking ... ok
+test platform::asset_preview::worker_tests::video_poster_duration_and_random_seeks_use_existing_decoder ... ignored, requires PANZO_ASSET_TEST_MP4 pointing to a synthetic local MP4
+test platform::audio::clip_tests::independent_audio_clips_mix_trim_fade_and_mute ... ok
+test platform::audio::tests::pcm_gaps_and_mix_follow_trim_and_speed ... ok
+test platform::audio_decode::tests::stage_c_audio_video_roundtrip ... ignored, requires hardware encoder and a new PANZO_STAGE_C_DIR; uses a generated tone only
+test platform::background_image::tests::decodes_png_to_bgra ... ok
+test platform::background_image::tests::oversized_bmp_header_is_rejected_before_pixel_allocation ... ok
+test platform::background_image::tests::rejects_unknown_extension ... ok
+test platform::camera_regeneration::tests::regeneration_keeps_protected_segment_and_repairs_following_auto_transition ... ok
+test platform::capture_tools::capture_history::tests::selecting_preview_retains_list_state_and_loads_thumbnails_beyond_120 ... ok
+test platform::capture_tools::capture_selection::tests::buffered_frames_restore_moved_and_resized_selections_without_ghosts ... ok
+test platform::capture_tools::capture_selection::tests::partial_exposure_presents_only_the_invalid_rectangle ... ok
+test platform::capture_tools::capture_selection::tests::snap_intersection_uses_physical_negative_desktop_coordinates ... ok
+test platform::capture_tools::capture_selection::tests::stationary_mouse_messages_do_not_schedule_more_paints ... ok
+test platform::capture_tools::image_document::tests::annotation_opacity_composites_over_image_instead_of_punching_holes ... ok
+test platform::capture_tools::image_document::tests::corrupted_mark_coordinates_and_excessive_points_are_rejected ... ok
+test platform::capture_tools::image_document::tests::cropped_rotated_flipped_pixels_match_inverse_coordinate_mapping ... ok
+test platform::capture_tools::image_document::tests::edge_transform_roundtrips_outer_boundary_for_overlay_bitmaps ... ok
+test platform::capture_tools::image_document::tests::every_annotation_tool_changes_pixels_and_preserves_dimensions ... ok
+test platform::capture_tools::image_document::tests::exclusive_crop_preserves_every_edge_after_all_transforms ... ok
+test platform::capture_tools::image_document::tests::object_edits_and_framing_roundtrip_with_undo_and_redo ... ok
+test platform::capture_tools::image_document::tests::object_gesture_commits_one_undo_transaction ... ok
+test platform::capture_tools::image_document::tests::selection_and_cancelled_preview_preserve_redo_and_revision ... ok
+test platform::capture_tools::picture_window::image_interaction::tests::crop_moves_and_all_handles_stay_inside_image ... ok
+test platform::capture_tools::picture_window::image_interaction::tests::crop_ratio_survives_bounds ... ok
+test platform::capture_tools::picture_window::image_interaction::tests::zoom_keeps_cursor_over_same_image_point ... ok
+test platform::capture_tools::picture_window::picture_review::native_picture_gestures_crop_text_and_buffered_preview ... ignored, Opens an isolated native image editor; run explicitly on a Windows desktop
+test platform::capture_tools::pin_manager::tests::external_resource_paths_are_rejected ... ok
+test platform::capture_tools::pin_manager::tests::unplugged_monitor_moves_pin_inside_negative_origin_work_area ... ok
+test platform::capture_tools::subtitle_raster::tests::centered_caption_is_burned_into_shared_transparent_overlay ... ok
+test platform::capture_tools::tests::cropped_images_and_redactions_do_not_export_unselected_pixels ... ok
+test platform::capture_tools::tests::rejects_incomplete_or_oversized_clipboard_images ... ok
+test platform::collage_model::tests::direct_zoom_preserves_cursor_anchor_and_pan_tracks_pointer ... ok
+test platform::collage_model::tests::grid_gap_and_edge_are_output_pixels ... ok
+test platform::collage_model::tests::mixed_photo_grids_keep_shared_boundaries_in_every_display_mode ... ok
+test platform::collage_model::tests::natural_placement_preserves_photo_proportions_in_a_grid ... ok
+test platform::collage_model::tests::photo_transforms_apply_to_every_display_mode_and_export_has_no_selection_marks ... ok
+test platform::collage_model::tests::reject_invalid_and_oversize_geometry ... ok
+test platform::collage_model::tests::rendered_grids_have_continuous_gutters_and_keep_transforms_inside_cells ... ok
+test platform::collage_model::tests::rendered_modes_crop_position_and_cancellation_preserve_sources ... ok
+test platform::collage_model::tests::vertical_two_retains_whole_images ... ok
+test platform::compositor::tests::annotations_follow_camera_and_expire_without_stale_cache ... ok
+test platform::compositor::tests::compositor_reuses_textures_for_repeated_interactive_render ... ok
+test platform::compositor::tests::crop_removes_source_borders_without_stretching_canvas_or_zoom ... ok
+test platform::compositor::tests::cursor_has_a_stem_border_and_antialiased_edges_at_multiple_sizes ... ok
+test platform::compositor::tests::focus_cross_remains_visible_over_rounded_corners_and_background ... ok
+test platform::compositor::tests::focus_overlay_is_scaled_into_output_pixels_and_clamped ... ok
+test platform::compositor::tests::four_corner_camera_states_never_expose_black_border ... ok
+test platform::compositor::tests::non_widescreen_and_small_sources_are_contained_without_upscaling ... ok
+test platform::compositor::tests::rounded_video_corners_blend_edges_without_softening_the_center ... ok
+test platform::compositor::tests::workbench_image_background_is_sampled_behind_inset_canvas ... ok
+test platform::compositor::tests::workbench_inset_reveals_solid_background_and_keeps_source_center ... ok
+test platform::decode_worker::tests::cache_is_byte_bounded_lru_and_oversized_frames_are_not_retained ... ok
+test platform::decode_worker::tests::closing_does_not_join_an_in_flight_decoder ... ok
+test platform::decode_worker::tests::newer_exact_request_cancels_work_but_scrub_can_make_progress ... ok
+test platform::decode_worker::tests::ten_thousand_requests_use_one_pending_slot ... ok
+test platform::desktop_ui::color_popup::tests::color_popover_native_theme_and_cancel_preserves_input ... ignored, native colour popover review; isolated LOCALAPPDATA and PANZO_UI_REVIEW_DIR
+test platform::desktop_ui::color_popup::tests::hue_roundtrip_preserves_bgra_channels_and_alpha ... ok
+test platform::desktop_ui::field_controls::tests::native_fields_and_expanded_lists_keep_theme_and_scroll ... ignored, native desktop review; requires isolated LOCALAPPDATA and PANZO_UI_REVIEW_DIR
+test platform::desktop_ui::paint_lifetime_tests::nested_paint_sessions_release_before_thread_teardown_and_can_restart ... ok
+test platform::desktop_ui::tooltip_tests::registers_native_tooltip_and_releases_it_with_button ... ok
+test platform::edit_gestures::tests::move_clamps_without_shortening_and_trim_never_collapses ... ok
+test platform::edit_gestures::tests::snapping_stays_inside_neighbor_bounds ... ok
+test platform::editor::draft::tests::background_draft_recovers_and_discard_cannot_be_undone_by_pending_writer ... ok
+test platform::editor::draft::tests::cancelling_leave_while_writer_is_busy_resumes_future_drafts ... ok
+test platform::editor::draft::tests::cleared_draft_is_rewritten_after_resume_without_further_edits ... ok
+test platform::editor::draft::tests::skipped_pending_writer_does_not_claim_a_draft_exists_after_resume ... ok
+test platform::editor::tests::acknowledging_save_does_not_discard_edits_made_during_save ... ok
+test platform::editor::tests::background_import_is_project_owned_and_round_trips_through_history ... ok
+test platform::editor::tests::cancelled_draft_preserves_redo_and_saved_content_identity ... ok
+test platform::editor::tests::clip_crop_migrates_schema_three_and_round_trips_save_and_undo ... ok
+test platform::editor::tests::clip_speed_round_trips_save_undo_and_legacy_schema_two ... ok
+test platform::editor::tests::edit_group_coalesces_many_updates_into_one_undo_state ... ok
+test platform::editor::tests::every_transaction_crash_stage_recovers_one_complete_revision ... ok
+test platform::editor::tests::first_save_preserves_auto_draft_and_reopens_edits ... ok
+test platform::editor::tests::invalid_canvas_is_atomic_and_legacy_canvas_remains_original ... ok
+test platform::editor::tests::later_saves_never_replace_auto_draft ... ok
+test platform::editor::tests::legacy_micro_pan_is_shared_by_preview_and_editor_and_persists_only_on_save ... ok
+test platform::editor::tests::legacy_schema_upgrades_only_on_save_and_unknown_schema_is_rejected ... ok
+test platform::editor::tests::recovery_draft_restores_canvas_crop_speed_as_one_undo_without_saving ... ok
+test platform::editor::tests::selected_edge_focus_survives_save_reopen_undo_and_equal_crop_moves ... ok
+test platform::editor::tests::stale_editor_cannot_overwrite_another_saved_revision ... ok
+test platform::editor::tests::stale_or_corrupt_draft_never_replaces_newer_saved_edits ... ok
+test platform::editor::tests::twenty_mixed_commands_round_trip_and_gesture_is_one_command ... ok
+test platform::editor::tests::ui_change_revision_advances_for_edit_undo_redo_and_live_groups ... ok
+test platform::editor::tests::undo_and_redo_cover_camera_and_style_edits_in_order ... ok
+test platform::editor_load::tests::cancelled_load_does_not_open_the_project ... ok
+test platform::editor_load::tests::editor_load_result_can_cross_threads ... ok
+test platform::editor_tasks::feedback_tests::user_cancel_keeps_its_type_across_the_worker_boundary ... ok
+test platform::editor_timeline::tests::anchored_zoom_keeps_tick_under_pointer ... ok
+test platform::editor_timeline::tests::fit_mapping_round_trips_pixels ... ok
+test platform::editor_timeline::tests::pan_and_follow_stay_inside_project ... ok
+test platform::editor_timeline::tests::repeated_zoom_reaches_sub_millisecond_per_pixel ... ok
+test platform::editor_ui::alpha_cache_lifetime_tests::cached_gdi_handles_end_with_last_paint_session ... ok
+test platform::editor_ui::tests::curved_controls_have_transparent_and_partial_coverage_at_all_dpi_sizes ... ok
+test platform::editor_ui::tests::diagnostics_are_bounded_and_unicode_safe ... ok
+test platform::editor_ui::tests::disabled_button_uses_muted_text ... ok
+test platform::editor_ui::tests::every_svg_icon_rasterizes_to_a_non_empty_alpha_mask ... ok
+test platform::editor_ui::tests::keyboard_focus_skips_disabled_controls_and_wraps_both_directions ... ok
+test platform::editor_ui::tests::light_palette_has_distinct_interaction_states ... ok
+test platform::editor_ui::tests::page_header_ignores_native_frame_offsets_and_has_no_settings_button ... ok
+test platform::editor_ui::tests::pointer_activation_requires_release_over_the_original_button ... ok
+test platform::editor_ui::tests::pointer_press_is_transient_and_only_visible_over_its_button ... ok
+test platform::editor_ui::tests::theme_metrics_scale_with_per_monitor_dpi ... ok
+test platform::editor_ui::tests::theme_switch_preserves_layout_and_dark_text_contrast ... ok
+test platform::editor_ui::tests::tooltips_stay_within_small_physical_clients_and_flip_above_bottom_controls ... ok
+test platform::editor_ui::tests::unresolved_save_survives_other_failures_and_recovery ... ok
+test platform::export::tests::canvas_output_export_ui_review ... ignored, requires explicit synthetic project, GPU and output directory
+test platform::export::tests::cfr_frame_ticks_are_exact_at_one_second ... ok
+test platform::export::tests::cropped_clips_export_ui_review ... ignored, requires explicit synthetic project, GPU and output directory
+test platform::export::tests::mixed_speed_export_ui_review ... ignored, requires explicit synthetic project, GPU and output directory
+test platform::export::tests::selectable_rates_preserve_total_duration_and_size ... ok
+test platform::export_window::tests::embedded_export_fits_short_physical_clients_and_stays_below_the_shared_header ... ok
+test platform::export_window::tests::hiding_a_running_export_keeps_it_running_and_only_explicit_cancel_queues_cancellation ... ok
+test platform::export_window::tests::pending_start_accepts_committed_metadata_then_freezes_it_until_export_finishes ... ok
+test platform::fmp4_writer::export_timing::tests::explicit_times_preserve_variable_duration_offsets_and_existing_timestamps ... ok
+test platform::fmp4_writer::tests::frame_time_accumulation_is_exact_at_one_second ... ok
+test platform::fmp4_writer::tests::media_foundation_pairs_use_high_low_layout ... ok
+test platform::fmp4_writer::tests::native_screen_config_scales_bitrate_and_frame_size ... ok
+test platform::fmp4_writer::tests::rejects_non_mp4_box_data ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_five_seconds_of_rate_limited_100_hz_vfr_samples ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_native_1440p_samples ... ok
+test platform::fmp4_writer::tests::reusable_writer_accepts_timestamped_nv12_samples ... ok
+test platform::fmp4_writer::tests::streaming_inspection_excludes_unfinished_fragment_timing ... ok
+test platform::fmp4_writer::tests::streaming_inspection_handles_compact_long_runs_without_per_sample_work ... ok
+test platform::fmp4_writer::tests::streaming_inspection_limits_metadata_and_validates_sample_fields ... ok
+test platform::fmp4_writer::tests::streaming_inspection_preserves_signed_offsets_and_empty_runs ... ok
+test platform::fmp4_writer::tests::streaming_inspection_skips_multi_gigabyte_payloads ... ok
+test platform::gif_player::tests::timeline_uses_frame_delays_and_loops ... ok
+test platform::image_ops::tests::batch_and_collage_preserve_sources_and_refuse_collisions ... ok
+test platform::image_ops::tests::jpeg_flattens_transparency_and_png_keeps_it ... ok
+test platform::image_ops::tests::manual_overlap_repairs_repeated_content ... ok
+test platform::image_ops::tests::stitch_recovers_overlap_and_rejects_ambiguous_frames ... ok
+test platform::input_capture::tests::samples_cursor_and_stops_cleanly ... ok
+test platform::manifest_store::tests::atomic_create_never_replaces_an_existing_file_or_leaves_a_temporary ... ok
+test platform::manifest_store::tests::atomically_replaces_existing_manifest ... ok
+test platform::manifest_store::tests::atomically_updates_and_removes_recording_lock ... ok
+test platform::manifest_store::tests::finalized_media_publication_never_replaces_an_existing_file ... ok
+test platform::media_acceptance::media_audio_subtitle_export_roundtrip ... ignored, requires PANZO_MEDIA_PROJECT synthetic native smoke project and PANZO_MEDIA_OUTPUT
+test platform::media_decoder::preview_geometry_tests::only_explicit_scrub_proxy_reduces_dimensions ... ok
+test platform::media_import::stage_d_video_review::stage_d_annotations_export ... ignored, requires synthetic PANZO_STAGE_D_SOURCE video and new PANZO_STAGE_D_VIDEO_DIR
+test platform::media_import::tests::stage_c_import_edit_range_export ... ignored, requires generated tone.mp4 and new PANZO_STAGE_C_IMPORT_DIR; no user capture
+test platform::ocr::tests::cjk_spacing_keeps_english_and_newlines ... ok
+test platform::ocr::tests::stage_d_native_ocr ... ignored, requires installed Windows OCR capability and PANZO_STAGE_D_DIR; generated text only
+test platform::path_field::tests::directory_validation_distinguishes_relative_and_invalid_paths ... ok
+test platform::plugin_runtime::tests::independent_worker_round_trip ... ignored, requires independently built PANZO_PLUGIN_REVIEW_PACKAGE
+test platform::plugins::lifecycle_review::independent_process_lifecycle_isolation ... ignored, requires PANZO_LIFECYCLE_FIXTURE_EXE and PANZO_LIFECYCLE_REVIEW_DIR; isolated processes only
+test platform::plugins::lifecycle_review::lease_holder_process ... ignored, only spawned by independent_process_lifecycle_isolation with an isolated lease root
+test platform::plugins::tests::corrupt_registry_is_reported_without_reset ... ok
+test platform::plugins::tests::damaged_rollback_keeps_current_version_and_registry ... ok
+test platform::plugins::tests::detects_payload_tampering_and_keeps_builtin_preferences ... ok
+test platform::plugins::tests::in_flight_jobs_block_removal_and_update_but_allow_disable ... ok
+test platform::plugins::tests::independent_package_install_disable_reload_update_rollback_uninstall ... ok
+test platform::plugins::tests::independent_stores_share_job_leases_and_pin_accepted_version ... ok
+test platform::plugins::tests::invalid_refresh_preserves_last_valid_registry_and_job_leases ... ok
+test platform::plugins::tests::invalid_update_leaves_previous_plugin_intact ... ok
+test platform::plugins::tests::manager_refresh_observes_media_install_from_another_host ... ok
+test platform::plugins::tests::multiple_jobs_hold_shared_leases_until_the_last_job_finishes ... ok
+test platform::plugins::tests::stale_host_observes_reinstallation_without_restart ... ok
+test platform::presentation_metrics::tests::duplicate_presents_do_not_hide_a_video_stall ... ok
+test platform::presentation_metrics::tests::pause_is_excluded_and_budget_is_bounded ... ok
+test platform::presentation_metrics::tests::scrub_counts_changed_frames_and_includes_release_stalls ... ok
+test platform::preview::speed_stability_tests::mixed_speed_seek_stability_ui_review ... ignored, requires disposable PANZO_STABILITY_PROJECT, GPU and PANZO_UI_REVIEW_DIR; saves edits
+test platform::preview::tests::background_load_prepares_trimmed_first_frame_without_gpu ... ignored, requires PANZO_LOAD_PROJECT with a short readable Windows media fixture; no GPU
+test platform::preview::tests::camera_diagnostics_follow_source_mapping_and_effect_bypass ... ok
+test platform::preview::tests::expanded_preroll_can_reach_stream_start ... ok
+test platform::preview::tests::playback_deadline_uses_vfr_pts_and_wakes_at_deleted_cut ... ok
+test platform::preview::tests::playback_deadlines_scale_with_clip_speed ... ok
+test platform::preview::tests::random_seek_starts_from_bounded_preroll ... ok
+test platform::preview::tests::retained_preview_survives_seek_ui_review ... ignored, requires PANZO_UI_REVIEW_PROJECT and a Windows GPU
+test platform::preview_proxy::tests::container_quantization_maps_back_to_source_without_changing_native_geometry ... ok
+test platform::preview_proxy::tests::paused_preparation_resumes_and_cancel_wakes_without_gpu_work ... ok
+test platform::preview_scheduler::tests::moving_target_still_accepts_recent_completed_frame ... ok
+test platform::preview_scheduler::tests::old_gesture_and_expired_result_are_rejected ... ok
+test platform::preview_scheduler::tests::reversal_invalidates_previous_direction ... ok
+test platform::preview_window::crop_review::video_crop_ui_review ... ignored, explicit synthetic project and UI review output directory required
+test platform::preview_window::editor_layout::selection_parameters_stay_above_tracks_with_inspector_hidden ... ok
+test platform::preview_window::editor_layout::tests::all_inspector_pages_use_the_same_boundary_above_full_width_tracks ... ok
+test platform::preview_window::editor_layout::tests::background_tabs_never_leave_invisible_swatch_hit_targets ... ok
+test platform::preview_window::editor_layout::tests::editor_has_separate_transport_and_timeline_context ... ok
+test platform::preview_window::editor_layout::tests::inspector_width_changes_layout_without_overlapping_properties_or_transport ... ok
+test platform::preview_window::editor_layout::tests::long_timecodes_fit_the_real_font_without_covering_transport_buttons ... ok
+test platform::preview_window::editor_layout::tests::occupied_lanes_stay_readable_and_use_the_reclaimed_space ... ok
+test platform::preview_window::editor_layout::tests::partially_visible_property_rows_keep_their_visible_hit_area ... ok
+test platform::preview_window::editor_layout::tests::preview_tools_share_one_row_with_saved_state ... ok
+test platform::preview_window::editor_layout::tests::short_physical_windows_keep_all_properties_reachable_at_high_dpi ... ok
+test platform::preview_window::editor_layout::tests::taller_timeline_caps_video_and_keeps_empty_room_below_tracks ... ok
+test platform::preview_window::editor_layout::tests::timeline_expands_for_media_tracks_and_reclamps_after_window_resize ... ok
+test platform::preview_window::editor_layout::tests::video_tabs_keep_header_fixed_and_hide_canvas_hit_targets ... ok
+test platform::preview_window::editor_layout::tests::visible_controls_fit_and_never_overlap_across_dpi_and_collapsed_layouts ... ok
+test platform::preview_window::editor_titlebar::tests::custom_caption_paint_and_hit_bounds_match_at_each_dpi ... ok
+test platform::preview_window::editor_titlebar::tests::native_titlebar_ui_review ... ignored, explicit disposable project/profile and native window required
+test platform::preview_window::editor_widgets::tests::background_presets_match_approved_prototype ... ok
+test platform::preview_window::editor_widgets::tests::inline_time_rejects_nonfinite_and_negative ... ok
+test platform::preview_window::inspector_review::unified_inspector_native_review ... ignored, requires isolated synthetic project/profile and native review directory
+test platform::preview_window::media_panel_review::media_panel_native_review ... ignored, requires isolated synthetic fixture, profile, native desktop and output directory
+test platform::preview_window::preview_view::tests::zoom_preserves_pointer_anchor_pan_scales_with_window_and_reset_fits ... ok
+test platform::preview_window::tests::background_and_low_resolution_filmstrip_ui_review ... ignored, uses an explicit disposable project copy and UI review output directory
+test platform::preview_window::tests::capped_and_compact_timeline_ui_review ... ignored, uses a disposable media project and an offscreen render output directory
+test platform::preview_window::tests::deferred_playback_can_be_requested_cancelled_and_consumed ... ok
+test platform::preview_window::tests::editor_feedback_ui_review ... ignored, explicit disposable fixture and UI review directory required
+test platform::preview_window::tests::editor_layout_stays_separated_across_supported_dpi_and_window_sizes ... ok
+test platform::preview_window::tests::every_editor_control_has_a_unique_accessible_name_and_tooltip ... ok
+test platform::preview_window::tests::every_visual_button_maps_back_to_its_control_id ... ok
+test platform::preview_window::tests::exercise_layout_ui_review ... ignored, explicit local fixture and native window required
+test platform::preview_window::tests::focus_drag_reaches_frame_edges_ui_review ... ignored, explicit disposable project and native window required
+test platform::preview_window::tests::long_scrub_probe_repeats_full_gestures_instead_of_slowing_the_pointer ... ok
+test platform::preview_window::tests::macos_workbench_regions_do_not_overlap_at_default_size ... ok
+test platform::preview_window::tests::narrow_clips_choose_the_nearest_trim_edge_at_every_dpi ... ok
+test platform::preview_window::tests::paused_timer_does_not_request_a_frame_render ... ok
+test platform::preview_window::tests::render_ui_review ... ignored, explicit local fixture and UI review output directory required
+test platform::preview_window::tests::scrub_requests_coalesce_to_the_latest_pointer_position ... ok
+test platform::preview_window::tests::video_speed_ui_review ... ignored, explicit local fixture and UI review output directory required
+test platform::preview_window::workbench_v12_review::workbench_v12_native_review ... ignored, requires an isolated synthetic project, LOCALAPPDATA and native review directory
+test platform::preview_window::workflow_review::workflow_ui_review ... ignored, explicit synthetic project and native UI output required
+test platform::qpc::tests::qpc_is_monotonic_and_has_positive_frequency ... ok
+test platform::recorder::tests::keyed_shared_texture_is_stable_across_isolated_capture_and_processing_devices ... ok
+test platform::recorder::tests::recording_control_shares_a_monotonic_stop_request ... ok
+test platform::recorder_window::stage_a_review::stage_a_native_capture_and_export ... ignored, requires desktop/GPU and PANZO_STAGE_A_DIR; records only its own synthetic image window
+test platform::recorder_window::stage_b_review::stage_b_native_image_and_pin_restart ... ignored, requires interactive desktop and a new PANZO_STAGE_B_DIR; uses only synthetic image content
+test platform::recorder_window::stage_c_review::stage_c_pause_hud_and_camera ... ignored, requires desktop/GPU and new PANZO_STAGE_C_NATIVE_DIR; no audio is recorded
+test platform::recorder_window::stage_d_review::stage_d_native_image_tools ... ignored, requires desktop and new PANZO_STAGE_D_DIR; synthetic images only
+test platform::recorder_window::tests::eight_home_cards_fit_small_windows_and_scale ... ok
+test platform::recorder_window::tests::every_recorder_control_has_a_unique_accessible_name_and_tooltip ... ok
+test platform::recorder_window::tests::formats_recorder_duration_without_fractional_drift ... ok
+test platform::recorder_window::tests::recorder_controls_have_distinct_hit_targets ... ok
+test platform::recorder_window::tests::recorder_controls_scale_without_overlap_across_supported_dpi ... ok
+test platform::recorder_window::tests::render_ui_review ... ignored, explicit local UI review output directory required
+test platform::recorder_window::tray_menu_review::tray_menu_native_review ... ignored, opens native menus in an isolated PANZO_TRAY_REVIEW_DIR profile
+test platform::recorder_window::unified_window_review::real_host_survives_twenty_content_round_trips ... ignored, requires a desktop and PANZO_UI_REVIEW_PROJECT/PANZO_UI_REVIEW_DIR; no recording
+test platform::recorder_window::workspace_review::persistent_workspaces_keep_documents_and_job_ownership ... ignored, requires desktop and PANZO_UI_REVIEW_PROJECT/PANZO_UI_REVIEW_DIR; isolated fixtures only
+test platform::recording_hud::review::recording_strip_native_theme_and_capture_exclusion ... ignored, native HUD review; isolated LOCALAPPDATA and PANZO_UI_REVIEW_DIR
+test platform::recovery::tests::every_recovery_boundary_is_retryable_and_preserves_completed_files ... ok
+test platform::recovery::tests::leaves_project_owned_by_live_process_untouched ... ok
+test platform::recovery::tests::recovers_dead_recording_and_trims_events_after_video ... ok
+test platform::recovery::tests::recovery_completes_recording_rename_and_markerless_processing ... ok
+test platform::recovery::tests::recovery_only_truncates_incomplete_partial_media ... ok
+test platform::recovery::tests::recovery_preserves_conflicts_and_corrupt_edit_data_for_retry ... ok
+test platform::recovery::tests::recovery_waits_for_project_owner_and_preserves_existing_edits ... ok
+test platform::shortcuts::tests::defaults_are_unique_and_only_two_rare_global_combinations ... ok
+test platform::shortcuts::tests::duplicate_scopes_invalid_and_reserved_keys_are_rejected ... ok
+test platform::shortcuts::tests::edits_disabled_bindings_and_scope_survive_serialization ... ok
+test platform::shortcuts::tests::exact_modifiers_and_native_text_editing_are_distinct ... ok
+test platform::speech_settings::tests::encrypted_speech_settings ... ok
+test platform::ui_preferences::preset_tests::presets_remember_each_profile_and_main_camera_toggle ... ok
+test platform::ui_preferences::tests::settings_menu_persists_and_updates_runtime_theme ... ignored, requires isolated LOCALAPPDATA matching PANZO_SETTINGS_REVIEW_DIR
+test platform::ui_preferences::tests::theme_roundtrips_and_invalid_settings_fall_back_to_light ... ok
+test platform::video_processor::color_tests::color_roundtrip_ui_review ... ignored, requires GPU, hardware encoder and explicit output directory
+test platform::video_processor::color_tests::nv12_conversion_matches_bt709_at_native_and_scaled_sizes ... ok
+test platform::video_processor::tests::processor_preserves_native_1440p_when_requested ... ok
+test platform::video_processor::tests::reusable_processor_converts_five_seconds_of_1440p_source_frames ... ok
+test platform::video_processor::tests::reusable_processor_returns_packed_1080p_nv12 ... ok
+test platform::vision::tests::cancellation_interrupts_response_wait_and_pre_cancel_sends_nothing ... ok
+test platform::vision::tests::endpoints_accept_base_or_full_url_and_reject_credentials_or_remote_cleartext ... ok
+test platform::vision::tests::errors_do_not_echo_provider_secrets_and_redirects_are_not_followed ... ok
+test platform::vision::tests::multimodal_request_sends_exact_image_prompt_and_auth_to_configured_endpoint ... ok
+test platform::vision::tests::response_limits_timeout_empty_and_truncation_are_reported ... ok
+test platform::vision_settings::tests::encrypted_settings_reload_replace_clear_and_endpoint_binding ... ok
+test platform::vision_settings::tests::invalid_key_and_corrupt_protected_data_are_rejected_without_echoing_them ... ok
+test platform::vision_ui::review_tests::multimodal_native_settings_dialog_and_restart ... ignored, requires interactive desktop and PANZO_VISION_REVIEW_DIR; synthetic credentials only
+test platform::vision_ui::review_tests::multimodal_settings_fresh_process_read ... ignored, child helper; reads only the isolated synthetic configuration
+test platform::workspace_form::review::cached_combo_refreshes_choices_retains_valid_selection_and_falls_back_when_removed ... ok
+test platform::workspace_form::review::cached_form_reopen_keeps_executing_callback_alive_and_installs_replacement ... ok
+test platform::workspace_form::review::form_contexts_keep_independent_handles_callbacks_and_drafts ... ok
+test platform::workspace_form::review::settings_draft_and_form_job_survive_close_reopen_and_complete_while_hidden ... ignored, opens isolated settings window; requires PANZO_FORM_REVIEW_DIR with LOCALAPPDATA inside that directory
+test platform::workspace_form::schema::tests::explicit_contracts_reject_non_finite_fractional_and_out_of_range_values ... ok
+test platform::workspace_form::schema::tests::semantic_fields_and_scopes_are_independent_of_visible_titles ... ok
+
+test result: ok. 240 passed; 0 failed; 45 ignored; 0 measured; 0 filtered out; finished in 28.38s
+

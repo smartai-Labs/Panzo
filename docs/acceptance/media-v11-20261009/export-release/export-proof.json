@@ -1,0 +1,16 @@
+{
+  "audioEndTick": 60159999,
+  "audioRmsBeforeInsideAfter": [
+    0.022360679774997897,
+    3804.7428445664173,
+    0.02212629959783253
+  ],
+  "captionPixelsChangedActiveInactive": [
+    18428,
+    0
+  ],
+  "passed": true,
+  "pluginRequiredForExport": false,
+  "videoFrames": 180,
+  "videoSeconds": 6
+}

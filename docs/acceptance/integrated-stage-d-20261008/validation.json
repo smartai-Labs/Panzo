@@ -1,0 +1,55 @@
+{
+  "stage": "D",
+  "date": "2026-10-08",
+  "sourceSha256": "FC1A3324392790E37D7B11271A30D07A5C998E6AD14C2A7342DE27AD19A4FD87",
+  "binaries": [
+    {
+      "name": "panzo.exe",
+      "sha256": "9A43C93F6984712AD28FCF3D7C04225D63A409AB4B392DC1F6FB332C54866579",
+      "bytes": 5289984
+    },
+    {
+      "name": "panzo-cli.exe",
+      "sha256": "77F0D7AAA95B3D72681454206ADE8BF197B36EA7FBFF8D46C69CF4D99F5BB425",
+      "bytes": 6560768
+    }
+  ],
+  "standardTests": {
+    "passed": 256,
+    "ignored": 28,
+    "log": ".tmp/stage-d-verify1.log"
+  },
+  "strictClippy": ".tmp/stage-d-final-clippy.log",
+  "nativeEvidence": [
+    "ocr-proof.json",
+    "image-tools-proof.json",
+    "scroll-proof.json",
+    "annotation-proof.json"
+  ],
+  "releaseRenderHashProbe": ".tmp/stage-d-release-hash.log",
+  "releasePreviewExportHashesMatch": true,
+  "nativeRegressions": [
+    ".tmp/stage-d-regression-a.log",
+    ".tmp/stage-d-regression-b.log",
+    ".tmp/stage-d-navigation.log"
+  ],
+  "msix": {
+    "schemaVersion": 1,
+    "package": "D:\\ChatGPT\\Panzo\\dist\\stage-d\\Panzo-0.4.0.0-x64.msix",
+    "sha256": "680954CBAC744DF4634651FDFFD7B548830FFB09925556B40DDA5A030FAA7F29",
+    "sourceSha256": "FC1A3324392790E37D7B11271A30D07A5C998E6AD14C2A7342DE27AD19A4FD87",
+    "signed": false,
+    "installed": false,
+    "makeappxValidated": true,
+    "ocrCapability": "Windows Language.OCR; managed inside Panzo or via included manage-ocr-capability.ps1",
+    "releaseAcceptance": false
+  },
+  "launchedPid": 49780,
+  "wholeReleaseAcceptance": false,
+  "pending": [
+    "MSIX signing and clean-system installation/upgrade",
+    "OCR character accuracy and other languages",
+    "Scrolling application and dynamic-content matrix",
+    "Physical mixed-DPI and cross-GPU/long-running tests"
+  ]
+}

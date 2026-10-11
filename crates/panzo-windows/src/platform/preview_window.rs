@@ -1,6 +1,9 @@
+#[cfg(test)]
+use panzo_core::CameraSegmentKind;
 #[path = "editor_layout.rs"]
 mod editor_layout;
-use editor_layout::ControlLayout;
+use editor_layout::{ControlLayout, SplitterId};
+use crate::platform::pane_splitter::Drag as PaneDrag;
 #[path = "editor_chrome.rs"]
 mod editor_chrome;
 use editor_chrome::draw_controls;
@@ -38,7 +41,7 @@ use crate::platform::preview::{
 use crate::platform::preview_scheduler::ScrubPresentationGate;
 use crate::platform::scrub_preview::{ScrubPreviewWorker, ScrubPreviewWorkerError};
 use panzo_core::{
-    CameraEditKind, CameraSegment, CameraSegmentKind, CameraState, NormalizedPoint,
+    CameraEditKind, CameraSegment, CameraState, NormalizedPoint,
     OutputDescriptor, PlaybackState, TICKS_PER_SECOND, TimeMapping, TimeTick,
 };
 use std::ffi::c_void;
@@ -54,11 +57,10 @@ use windows::Win32::Foundation::{
     RECT, WPARAM,
 };
 use windows::Win32::Graphics::Gdi::{
-    BI_RGB, BITMAPINFO, BITMAPINFOHEADER, BitBlt, CreateCompatibleBitmap, CreateCompatibleDC,
-    DIB_RGB_COLORS, DT_CENTER, DT_END_ELLIPSIS, DT_LEFT, DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER,
-    DeleteDC, DeleteObject, DrawTextW, EndPaint, FillRect, HALFTONE, HGDIOBJ, InvalidateRect,
-    PAINTSTRUCT, SRCCOPY, ScreenToClient, SelectObject, SetBkMode, SetStretchBltMode, SetTextColor,
-    SetViewportOrgEx, StretchDIBits, TRANSPARENT, UpdateWindow,
+    BI_RGB, BITMAPINFO, BITMAPINFOHEADER, BitBlt, DIB_RGB_COLORS, DT_CENTER, DT_END_ELLIPSIS,
+    DT_LEFT, DT_NOPREFIX, DT_SINGLELINE, DT_VCENTER, DeleteObject, DrawTextW, EndPaint, FillRect,
+    HALFTONE, HGDIOBJ, InvalidateRect, PAINTSTRUCT, SRCCOPY, ScreenToClient, SelectObject,
+    SetBkMode, SetStretchBltMode, SetTextColor, StretchDIBits, TRANSPARENT, UpdateWindow,
 };
 use windows::Win32::Graphics::Gdi::{BeginPaint, CreateSolidBrush};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
@@ -69,8 +71,7 @@ use windows::Win32::UI::Controls::Dialogs::{
 use windows::Win32::UI::Controls::WM_MOUSELEAVE;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
     GetKeyState, ReleaseCapture, SetCapture, SetFocus, TME_LEAVE, TRACKMOUSEEVENT, TrackMouseEvent,
-    VK_CONTROL, VK_DELETE, VK_ESCAPE, VK_HOME, VK_LEFT, VK_RETURN, VK_RIGHT, VK_SHIFT, VK_SPACE,
-    VK_TAB,
+    VK_CONTROL, VK_ESCAPE, VK_LEFT, VK_RETURN, VK_RIGHT, VK_SHIFT, VK_SPACE, VK_TAB,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     CREATESTRUCTW, CreateWindowExW, DefWindowProcW, DestroyWindow, GetClientRect, GetCursorPos,
@@ -97,7 +98,7 @@ const SCRUB_TIME_REFRESH_INTERVAL: Duration = Duration::from_millis(16);
 const SEEK_STEP: TimeTick = TimeTick(5 * TICKS_PER_SECOND);
 const EDIT_STEP: TimeTick = TimeTick(TICKS_PER_SECOND / 10);
 const WHEEL_EDIT_SETTLE: Duration = Duration::from_millis(160);
-const TOOLTIP_DELAY: Duration = Duration::from_millis(550);
+const TOOLTIP_DELAY: Duration = Duration::from_millis(450);
 const TIMELINE_RULER_STEPS: [i64; 18] = [
     10_000,
     50_000,
@@ -227,15 +228,17 @@ impl PreviewWindow {
         )?);
         let output = state.session.output();
         state.theme = initial_theme;
-        let library = std::env::var_os("USERPROFILE").map_or_else(
-            || {
-                project_root
-                    .parent()
-                    .unwrap_or(Path::new("."))
-                    .to_path_buf()
-            },
-            |profile| std::path::PathBuf::from(profile).join("Videos/Panzo"),
-        );
+        let library = crate::platform::ui_preferences::library_directory().unwrap_or_else(|| {
+            std::env::var_os("USERPROFILE").map_or_else(
+                || {
+                    project_root
+                        .parent()
+                        .unwrap_or(Path::new("."))
+                        .to_path_buf()
+                },
+                |profile| std::path::PathBuf::from(profile).join("Videos/Panzo"),
+            )
+        });
         crate::platform::recorder_window::RecorderWindow::run_editor(&library, state, ready)
             .map_err(|error| PreviewWindowError::Host(error.to_string()))?;
         Ok(PreviewWindowSmokeReport {
@@ -588,6 +591,7 @@ pub(crate) struct WindowState {
     scrub_preview: ScrubPreviewWorker,
     thumbnails: crate::platform::timeline_thumbnails::TimelineThumbnails,
     background_preview: std::cell::RefCell<Option<editor_chrome::BackgroundPreview>>,
+    chrome_frame: std::cell::RefCell<Option<(i32, i32, super::capture_tools::Surface)>>,
     timer_resolution: Option<crate::platform::timer_resolution::TimerResolution>,
     frame_clock: Option<crate::platform::editor_clock::EditorClock>,
     session: ProjectPreviewSession,
@@ -602,6 +606,9 @@ pub(crate) struct WindowState {
     selected_segment: Option<String>,
     selected_video: Option<String>,
     video_drag: Option<VideoDrag>,
+    media_drag: Option<media_timeline::MediaDrag>,
+    media_selected: Option<(bool, String)>,
+    recording_preview: Option<media_timeline::RecordingPreview>,
     snap_guide: Option<TimeTick>,
     export_task: Option<crate::platform::editor_tasks::ExportTask>,
     export_output: Option<std::path::PathBuf>,
@@ -621,8 +628,15 @@ pub(crate) struct WindowState {
     canvas_drag: Option<CanvasDrag>,
     timeline: TimelineViewport,
     timeline_pan: Option<(i32, TimelineViewport)>,
-    timeline_resize: Option<(i32, i32)>,
-    inspector_resize: Option<(i32, i32)>,
+    timeline_resize: Option<PaneDrag>,
+    preview_view: preview_view::PreviewView,
+    preview_pan: Option<(i32, i32, preview_view::PreviewView)>,
+    splitter_hover: Option<SplitterId>,
+    inspector_panel: Option<HWND>,
+    inspector_resize: Option<PaneDrag>,
+    project_bin_resize: Option<PaneDrag>,
+    project_bin_width_dip: i32,
+    pending_panel_layout: Option<ControlLayout>,
     inspector_width_dip: i32,
     inspector_scroll: i32,
     inspector_scroll_drag: Option<(i32, i32)>,
@@ -630,9 +644,15 @@ pub(crate) struct WindowState {
     inline_input: Option<crate::platform::inline_input::InlineInput>,
     inline_control: Option<ControlId>,
     inline_validation: Option<String>,
-    inspector_image_tab: bool,
     inspector_video_tab: bool,
+    track_scroll: i32,
+    track_scroll_drag: Option<(i32, i32)>,
+    project_bin_visible: bool,
+    project_bin: Option<project_bin::ProjectBin>,
+    preview_seek_drag: Option<bool>,
+    project_bin_overlay: bool,
     video_collapsed: [bool; 2],
+    canvas_advanced: bool,
     crop_editing: bool,
     crop_drag: Option<editor_crop::CropDrag>,
     crop_locked: bool,
@@ -681,6 +701,8 @@ struct VideoDrag {
 struct PreviewSurface {
     hwnd: HWND,
     presenter: GpuPreviewPresenter,
+    bounds: RECT,
+    well: RECT,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -793,6 +815,12 @@ impl WindowState {
         self.status_severity = severity;
         self.status = text;
         self.status_until = Some(Instant::now() + Duration::from_secs(8));
+        if let Some(hwnd) = self.host_hwnd {
+            let row = self.control_layout(client_rect(hwnd)).status;
+            unsafe {
+                let _ = InvalidateRect(Some(hwnd), Some(&row), false);
+            }
+        }
     }
 
     fn status_message(&self) -> (&str, StatusSeverity) {
@@ -883,29 +911,86 @@ impl WindowState {
     }
 
     fn control_layout(&self, client: RECT) -> ControlLayout {
-        ControlLayout::new(client, self.theme)
-            .with_caption_bounds(
-                self.host_hwnd
-                    .filter(|hwnd| {
-                        client_rect(*hwnd).right == client.right
-                            && window_dpi(*hwnd) == self.theme.dpi
-                    })
-                    .and(self.caption_bounds),
-                self.theme,
+        let mut layout_theme = self.theme;
+        if client.bottom <= self.theme.scale(684)
+            && layout_theme.metrics.timeline_height
+                == self
+                    .theme
+                    .scale(crate::platform::workbench_layout::TIMELINE)
+        {
+            layout_theme.metrics.timeline_height = self
+                .theme
+                .scale(crate::platform::workbench_layout::TIMELINE_COMPACT);
+        }
+        if client.right <= self.theme.scale(1150)
+            && layout_theme.metrics.inspector_width == self.theme.scale(304)
+        {
+            layout_theme.metrics.inspector_width = self.theme.scale(284);
+        }
+        let build = |scroll| {
+            self.media_layout(
+                ControlLayout::new(client, layout_theme)
+                    .with_timeline_context(
+                        self.selected_segment.is_some()
+                            || self.selected_video.is_some()
+                            || self.media_selected.is_some(),
+                    )
+                    .with_caption_bounds(
+                        self.host_hwnd
+                            .filter(|hwnd| {
+                                client_rect(*hwnd).right == client.right
+                                    && window_dpi(*hwnd) == self.theme.dpi
+                            })
+                            .and(self.caption_bounds),
+                        self.theme,
+                    )
+                    .with_inspector(
+                        self.inspector_video_tab && self.selected_segment.is_some(),
+                        self.inspector_video_tab && self.selected_video.is_some(),
+                        scroll,
+                        self.theme,
+                    )
+                    .with_canvas_details(
+                        self.canvas_advanced,
+                        self.inspector_video_tab,
+                        self.editor.settings().background.kind==panzo_core::BackgroundKind::Image,
+                        scroll,
+                        self.theme,
+                    )
+                    .with_video_groups(
+                        self.inspector_video_tab,
+                        scroll,
+                        self.theme,
+                        self.video_collapsed,
+                    )
+                    .with_crop_details(self.crop_editing, self.theme)
+                    .with_follow_details(self.inspector_video_tab,self.video_collapsed[0],self.theme),
             )
-            .with_background_tab(self.inspector_image_tab)
-            .with_inspector(
-                self.selected_segment.is_some(),
-                self.selected_video.is_some(),
-                self.inspector_scroll,
-                self.theme,
-            )
-            .with_video_groups(
-                self.inspector_video_tab,
-                self.inspector_scroll,
-                self.theme,
-                self.video_collapsed,
-            )
+        };
+        let initial = build(self.inspector_scroll);
+        let layout = build(self.inspector_scroll.clamp(0, initial.inspector_scroll_max));
+        let compact = client.right <= self.theme.scale(1000);
+        let bin = if compact {
+            if self.project_bin_overlay {
+                self.theme.scale(212)
+            } else {
+                0
+            }
+        } else if self.project_bin_visible {
+            self.theme
+                .scale(crate::platform::workbench_layout::project_bin(
+                    client.right * 96 / self.theme.dpi as i32,
+                ))
+        } else {
+            0
+        };
+        let bin = if bin > 0 && self.project_bin_width_dip > 0 {
+            self.theme.scale(self.project_bin_width_dip).clamp(self.theme.scale(160),
+                (layout.preview_well.right - self.theme.scale(240)).max(self.theme.scale(160)).min(self.theme.scale(420)))
+        } else { bin };
+        layout
+            .with_external_inspector(self.inspector_panel.is_some())
+            .with_project_bin(bin, compact, self.theme)
     }
     #[allow(clippy::too_many_lines)]
     fn open(
@@ -992,9 +1077,15 @@ impl WindowState {
             timer_resolution: None,
             frame_clock: None,
             session,
-            inspector_image_tab: editor.settings().background.image.is_some(),
             inspector_video_tab: false,
+            track_scroll: 0,
+            track_scroll_drag: None,
+            project_bin_visible: true,
+            project_bin: None,
+            preview_seek_drag: None,
+            project_bin_overlay: false,
             video_collapsed: [false; 2],
+            canvas_advanced: false,
             crop_editing: false,
             crop_drag: None,
             crop_locked: false,
@@ -1009,6 +1100,9 @@ impl WindowState {
             selected_segment,
             selected_video: None,
             video_drag: None,
+            media_drag: None,
+            media_selected: None,
+            recording_preview: None,
             snap_guide: None,
             export_task: None,
             export_output: None,
@@ -1024,6 +1118,7 @@ impl WindowState {
             #[cfg(test)]
             review_navigation_answer: None,
             generation: NEXT_EDITOR.fetch_add(1, Ordering::Relaxed),
+            chrome_frame: std::cell::RefCell::new(None),
             background_task: None,
             timeline_drag: None,
             timeline_scrub: None,
@@ -1031,8 +1126,15 @@ impl WindowState {
             timeline,
             timeline_pan: None,
             timeline_resize: None,
+            preview_view: preview_view::PreviewView::default(),
+            preview_pan: None,
+            splitter_hover: None,
+            inspector_panel: None,
             inspector_resize: None,
-            inspector_width_dip: 288,
+            project_bin_resize: None,
+            project_bin_width_dip: 0,
+            pending_panel_layout: None,
+            inspector_width_dip: 304,
             inspector_scroll: 0,
             inspector_scroll_drag: None,
             property_drag: None,
@@ -1109,6 +1211,7 @@ impl WindowState {
                 )
             };
         });
+        self.session.set_asset_ready_callback(move||{unsafe{let _=PostMessageW(Some(HWND(window_handle as *mut c_void)),WM_APP+5,WPARAM(generation),LPARAM(0));}});
         self.scrub_preview.set_frame_ready_callback(move || {
             let _ = unsafe {
                 PostMessageW(
@@ -1119,6 +1222,8 @@ impl WindowState {
                 )
             };
         });
+        self.session.set_preview_quality(crate::platform::ui_preferences::preview_quality());
+        self.scrub_preview.set_preview_limit(self.session.preview_source_limit());
         let started = Instant::now();
         match self.try_initialize_preview_surface(hwnd, instance) {
             Ok(surface) => {
@@ -1148,6 +1253,7 @@ impl WindowState {
             }
         }
         self.record_displayed_frame(started.elapsed().as_micros() as u64);
+        self.render()?;
         Ok(())
     }
 
@@ -1158,13 +1264,13 @@ impl WindowState {
     ) -> Result<PreviewSurface, PreviewWindowError> {
         let class_name = w!("PanzoGpuPreviewSurface");
         register_preview_surface_class(instance, class_name)?;
-        let rect = preview_video_rect(client_rect(parent), &self.frame, self.theme);
+        let rect = self.preview_rect(client_rect(parent));
         let hwnd = win("CreateWindowExW(preview surface)", unsafe {
             CreateWindowExW(
                 WINDOW_EX_STYLE::default(),
                 class_name,
                 w!("Panzo GPU Preview"),
-                WS_CHILD | WS_DISABLED,
+                WS_CHILD | WS_DISABLED | windows::Win32::UI::WindowsAndMessaging::WS_CLIPSIBLINGS,
                 rect.left,
                 rect.top,
                 (rect.right - rect.left).max(1),
@@ -1176,7 +1282,16 @@ impl WindowState {
             )
         })?;
         match self.session.create_presenter(hwnd) {
-            Ok(presenter) => Ok(PreviewSurface { hwnd, presenter }),
+            Ok(presenter) => {
+                let well = self.preview_clip_rect(client_rect(parent));
+                preview_view::clip_surface(hwnd, rect, well);
+                Ok(PreviewSurface {
+                    hwnd,
+                    presenter,
+                    bounds: rect,
+                    well,
+                })
+            }
             Err(error) => {
                 unsafe {
                     let _ = DestroyWindow(hwnd);
@@ -1192,7 +1307,7 @@ impl WindowState {
         }
         if let Some(drag) = &self.canvas_drag {
             let host = self.host_hwnd?;
-            let video = preview_video_rect(client_rect(host), &self.frame, self.theme);
+            let video = self.preview_rect(client_rect(host));
             let width = f64::from((video.right - video.left).max(1));
             let height = f64::from((video.bottom - video.top).max(1));
             return Some([
@@ -1232,13 +1347,67 @@ impl WindowState {
         Ok(())
     }
 
+    fn preview_clip_rect(&self, client: RECT) -> RECT {
+        let layout = self.control_layout(client);
+        let mut well = layout.preview_well;
+        if self.project_bin_overlay && client.right <= self.theme.scale(1000) {
+            well.left = well.left.max(layout.project_bin.right);
+        }
+        well
+    }
+
+    fn panel_resizing(&self) -> bool {
+        self.project_bin_resize.is_some() || self.inspector_resize.is_some() || self.timeline_resize.is_some()
+    }
+
+    // One layout commit per frame, no project update, title/accessibility rebuild or full repaint.
+    fn flush_panel_layout(&mut self, hwnd: HWND) {
+        let Some(before) = self.pending_panel_layout.take() else { return; };
+        let after = self.control_layout(client_rect(hwnd));
+        let _retained = crate::platform::workspace_ui::panel_resize();
+        {
+            let _batch = crate::platform::workspace_ui::layout_batch(hwnd);
+            if let Some(bin) = &self.project_bin {
+                let r = after.project_bin;
+                crate::platform::workspace_ui::place(bin.hwnd, r.left, r.top, r.right-r.left, r.bottom-r.top);
+            }
+            self.layout_inspector_panel(hwnd);
+        }
+        self.resize_preview_surface(hwnd);
+        if before.panel.left != after.panel.left {
+            let header = RECT { left:before.preview_fit.left.min(after.preview_fit.left)-self.theme.scale(72),
+                top:0, right:after.panel.right, bottom:after.preview_well.top };
+            unsafe { let _=InvalidateRect(Some(hwnd),Some(&header),false); }
+        }
+        for (a,b) in [(before.preview_card,after.preview_card), (before.panel,after.panel),
+            (before.project_bin,after.project_bin), (before.timeline_panel,after.timeline_panel),
+            (before.splitter.0,after.splitter.0), (before.inspector_splitter.0,after.inspector_splitter.0),
+            (before.project_bin_splitter.0,after.project_bin_splitter.0),
+            (before.preview_fit.0,after.preview_fit.0)] {
+            if a != b {
+                unsafe {
+                    let _ = InvalidateRect(Some(hwnd),Some(&a),false);
+                    let _ = InvalidateRect(Some(hwnd),Some(&b),false);
+                }
+            }
+        }
+    }
+
     fn resize_preview_surface(&mut self, host: HWND) {
+        if let Some(bin)=&self.project_bin {let c=self.control_layout(client_rect(host));project_bin::layout_preview(bin,c.transport,c.preview_quality.0,self.session.preview_quality());}
+
+        self.layout_inspector_panel(host);
         if let Some(panel) = &mut self.export_panel {
             panel.relayout(host);
         }
         self.caption_bounds = editor_titlebar::caption_bounds(host);
-        let rect = preview_video_rect(client_rect(host), &self.frame, self.theme);
-        if let Some(surface) = self.preview_surface.as_ref() {
+        let rect = self.preview_rect(client_rect(host));
+        let well = self.preview_clip_rect(client_rect(host));
+        if let Some(surface) = self.preview_surface.as_mut() {
+            if surface.bounds == rect && surface.well == well {
+                return;
+            }
+            preview_view::clip_surface(surface.hwnd, rect, well);
             if unsafe {
                 MoveWindow(
                     surface.hwnd,
@@ -1246,7 +1415,7 @@ impl WindowState {
                     rect.top,
                     (rect.right - rect.left).max(1),
                     (rect.bottom - rect.top).max(1),
-                    true,
+                    false,
                 )
             }
             .is_err()
@@ -1256,14 +1425,26 @@ impl WindowState {
                     "预览尺寸未更新，请再次调整窗口大小；当前工程仍可保存",
                     "错误：GPU 预览区域调整失败",
                 );
-            } else if let Err(error) = self.present_focus_overlay() {
-                self.record_session_result(Err(error));
+            } else {
+                surface.bounds = rect;
+                surface.well = well;
+                // Swap-chain output dimensions stay fixed. DWM stretches the already
+                // presented frame to the new child rectangle; dock resizing changes no pixels.
+                if !self.panel_resizing() {
+                    if let Err(error) = self.present_focus_overlay() {
+                        self.record_session_result(Err(error));
+                    }
+                }
             }
         }
     }
 
     #[allow(clippy::too_many_lines)] // One ordered, nonblocking scheduling pass.
     fn on_timer(&mut self, hwnd: HWND) {
+        self.flush_panel_layout(hwnd);
+        if let Some(warning) = self.session.take_audio_warning() {
+            self.note_problem("声音播放已停止", warning);
+        }
         if self
             .status_until
             .is_some_and(|until| Instant::now() >= until)
@@ -1289,8 +1470,9 @@ impl WindowState {
                 .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .pause();
         }
-        let active = self.timeline_scrub.is_some()
+        let active = self.project_bin_resize.is_some() || self.timeline_scrub.is_some()
             || self.timeline_resize.is_some()
+            || self.preview_pan.is_some()
             || self.inspector_resize.is_some()
             || self.canvas_drag.is_some()
             || self.wheel_edit_pending
@@ -1338,7 +1520,7 @@ impl WindowState {
                 Ok(false) => {}
                 Err(error) => self.report_problem(
                     crate::platform::editor_ui::StatusScope::RecoveryDraft,
-                    "恢复副本暂未写入，请按 Ctrl+S 保存当前修改",
+                    "恢复副本暂未写入，请按 保存当前修改",
                     format!("错误：编辑恢复副本暂未保存 · {error}"),
                 ),
             }
@@ -1356,6 +1538,11 @@ impl WindowState {
                 let _ = InvalidateRect(Some(hwnd), None, false);
             }
         }
+        if self.tooltip_visible && self.inline_validation.is_none() {
+            if let Some(id) = self.hot_control {
+                crate::platform::hover_tip::show(hwnd,self.control_layout(client_rect(hwnd)).control_rect(id).0,id.tooltip());
+            }
+        } else { crate::platform::hover_tip::hide(hwnd); }
         if self.trim_smoke == TrimSmokeState::Pending {
             self.trim_smoke = TrimSmokeState::Disabled;
             self.run_trim_smoke();
@@ -1396,7 +1583,7 @@ impl WindowState {
                 .and_then(|tick| self.session.advance(tick).map_err(Into::into))
                 .and_then(|_| self.render().map_err(Into::into));
             self.record_result(result);
-            if self.follow_playhead {
+            if self.follow_playhead && !self.session.is_asset_preview() {
                 self.timeline
                     .ensure_visible(self.session.snapshot().project_tick);
             }
@@ -1528,7 +1715,7 @@ impl WindowState {
                 }
                 if self.timeline_scrub.is_some() {
                     if self.preview_surface.is_none() {
-                        let video = preview_video_rect(client_rect(hwnd), &self.frame, self.theme);
+                        let video = self.preview_rect(client_rect(hwnd));
                         unsafe {
                             let _ = InvalidateRect(Some(hwnd), Some(&raw const video), false);
                         }
@@ -1574,7 +1761,7 @@ impl WindowState {
             .cloned()
         else {
             self.note_problem(
-                "此工程不满足修剪检查条件，请查看诊断详情",
+                "此工程暂时无法执行修剪检查",
                 "错误：工程没有可修剪的镜头片段",
             );
             return;
@@ -1582,7 +1769,7 @@ impl WindowState {
         let duration = segment.end_tick.as_i64() - segment.start_tick.as_i64();
         if duration < 4 {
             self.note_problem(
-                "此工程不满足修剪检查条件，请查看诊断详情",
+                "此工程暂时无法执行修剪检查",
                 "错误：镜头片段过短，无法运行修剪探针",
             );
             return;
@@ -1660,7 +1847,8 @@ impl WindowState {
             return;
         }
         // A command must not mutate the model underneath an active pointer draft.
-        if self.crop_drag.is_some()
+        if self.media_drag.is_some()
+            || self.crop_drag.is_some()
             || self.property_drag.is_some()
             || self.video_drag.is_some()
             || self.timeline_drag.is_some()
@@ -1699,7 +1887,7 @@ impl WindowState {
             let step = if control == ControlId::ZoomSlider {
                 5.0
             } else if control == ControlId::VideoSpeed {
-                0.05
+                0.1
             } else {
                 1.0
             };
@@ -1709,6 +1897,8 @@ impl WindowState {
                 (value + if key == VK_RIGHT.0 { step } else { -step }).clamp(
                     if control == ControlId::VideoSpeed {
                         0.25
+                    } else if control == ControlId::VideoScale {
+                        5.0
                     } else {
                         0.0
                     },
@@ -1717,48 +1907,16 @@ impl WindowState {
             );
             return;
         }
-        if control_down && key == u16::from(b'Z') {
-            self.undo();
-            self.refresh(hwnd, true);
-            return;
-        }
-        if control_down && key == u16::from(b'Y') {
-            self.redo();
-            self.refresh(hwnd, true);
-            return;
-        }
-        match key {
-            value if value == VK_SPACE.0 => {
-                self.toggle_playback_intent();
-            }
-            value if value == VK_HOME.0 => self.seek_absolute(TimeTick::ZERO),
-            value if value == VK_LEFT.0 || value == VK_RIGHT.0 => {
-                let forward = value == VK_RIGHT.0;
-                if control_down {
-                    self.seek_clip_boundary(forward);
-                } else if unsafe { GetKeyState(i32::from(VK_SHIFT.0)) } < 0 {
-                    self.seek_relative(if forward { SEEK_STEP.0 } else { -SEEK_STEP.0 });
-                } else {
-                    self.step_frame(forward);
-                }
-            }
-            value if value == VK_DELETE.0 => self.delete_selected(),
-            value if value == u16::from(b'B') => self.split_video(),
-            value if value == u16::from(b'D') => {
-                self.session.toggle_camera_diagnostics();
-                self.set_status(
-                    crate::platform::editor_ui::StatusSeverity::Information,
-                    "已切换镜头诊断".into(),
-                );
-            }
-            value if value == u16::from(b'S') => self.save_editor(CameraEditKind::Update),
-            value if value == u16::from(b'R') => self.reset_to_auto(),
-            _ => {}
-        }
         self.refresh(hwnd, true);
     }
 
     fn cancel_gesture(&mut self, hwnd: HWND) {
+        self.track_scroll_drag = None;
+        if let Some((_, _, original)) = self.preview_pan.take() {
+            self.preview_view = original;
+            self.refresh_preview_view(hwnd);
+        }
+        self.media_drag = None;
         self.snap_guide = None;
         if self.crop_drag.is_some() {
             self.finish_crop_drag(hwnd, true);
@@ -1778,14 +1936,14 @@ impl WindowState {
         if let Some((_, original)) = self.timeline_scroll.take() {
             self.timeline = original;
         }
-        if let Some((_, original)) = self.timeline_resize.take() {
-            self.theme.metrics.timeline_height = original;
-            self.resize_preview_surface(hwnd);
+        if self.panel_resizing() {
+            self.pending_panel_layout.get_or_insert(self.control_layout(client_rect(hwnd)));
+            if let Some(drag) = self.project_bin_resize.take() { self.project_bin_width_dip = drag.restore; }
+            if let Some(drag) = self.timeline_resize.take() { self.theme.metrics.timeline_height = drag.restore; }
+            if let Some(drag) = self.inspector_resize.take() { self.theme.metrics.inspector_width = drag.restore; }
+            self.flush_panel_layout(hwnd);
         }
-        if let Some((_, original)) = self.inspector_resize.take() {
-            self.theme.metrics.inspector_width = original;
-            self.resize_preview_surface(hwnd);
-        }
+        self.pending_panel_layout = None;
         self.wheel_edit_deadline = None;
         self.wheel_edit_pending = false;
         self.editor.cancel_edit_group();
@@ -1800,11 +1958,8 @@ impl WindowState {
             let result = self.apply_editor_state();
             self.record_result(result);
         }
-        // State is cleared before releasing capture: Windows sends a synchronous
-        // WM_CAPTURECHANGED when capture is released.
-        unsafe {
-            let _ = ReleaseCapture();
-        }
+        // Capture may already belong to a child after focus changes.
+        crate::platform::desktop_ui::release_capture_owned_by(hwnd);
         self.refresh(hwnd, true);
     }
 
@@ -1871,13 +2026,47 @@ impl WindowState {
         self.cancel_pressed_control(hwnd, true);
         let client = client_rect(hwnd);
         let controls = self.control_layout(client);
-        if controls.inspector_splitter.contains(x, y) {
-            self.inspector_resize = Some((x, controls.panel.right - controls.panel.left));
-            self.tooltip_visible = false;
-            self.tooltip_deadline = None;
+        if self.preview_seek_rect(client).contains(x,y) {
+            self.preview_seek_drag=Some(self.session.snapshot().playback==PlaybackState::Playing);
+            self.session.pause();self.deferred_playback.cancel();
+            unsafe{SetCapture(hwnd);}
+            self.seek_preview_at(hwnd,x);return;
+        }
+        if y>=controls.ruler.top {let result=self.select_preview_source(false);self.record_result(result);}
+
+        if controls.track_scroll_max > 0
+            && x >= controls.timeline_panel.right - self.theme.scale(10)
+            && y >= controls.track_area.top
+            && y < controls.track_area.bottom
+        {
+            self.track_scroll_drag = Some((y, self.track_scroll));
             unsafe {
                 SetCapture(hwnd);
             }
+            return;
+        }
+        if self.step_widget_at(hwnd,x,y) || self.track_switch_at(hwnd,x,y) {return;}
+        if self.media_down(hwnd, x, y) {
+            return;
+        }
+        if let Some((id, splitter)) = controls.splitter_at(x, y) {
+            let (size, restore) = match id {
+                SplitterId::ProjectBin => (controls.project_bin.right-controls.project_bin.left, self.project_bin_width_dip),
+                SplitterId::Inspector => (controls.panel.right-controls.panel.left, self.theme.metrics.inspector_width),
+                SplitterId::Timeline => (controls.timeline_panel.bottom-controls.timeline_panel.top, self.theme.metrics.timeline_height),
+            };
+            let drag = splitter.begin(hwnd, x, y, size, restore);
+            match id {
+                SplitterId::ProjectBin => self.project_bin_resize = Some(drag),
+                SplitterId::Inspector => self.inspector_resize = Some(drag),
+                SplitterId::Timeline => self.timeline_resize = Some(drag),
+            }
+            if let Some(clock) = &self.frame_clock { clock.set_active(true); }
+            self.tooltip_visible = false;
+            self.tooltip_deadline = None;
+            crate::platform::hover_tip::hide(hwnd);
+            self.update_splitter_hover(hwnd, x, y);
+            unsafe { let _ = InvalidateRect(Some(hwnd), Some(&splitter.bounds), false); }
             self.update_cursor(hwnd, x, y);
             return;
         }
@@ -1896,17 +2085,7 @@ impl WindowState {
             self.refresh(hwnd, true);
             return;
         }
-        if controls.splitter.contains(x, y) {
-            self.timeline_resize = Some((
-                y,
-                controls.timeline_panel.bottom - controls.timeline_panel.top,
-            ));
-            unsafe {
-                SetCapture(hwnd);
-            }
-            return;
-        }
-        if controls.scrollbar.contains(x, y) && !self.timeline.is_fit() {
+        if controls.scrollbar.contains(x, y) && self.timeline.can_pan() {
             let thumb = self.scrollbar_thumb(controls.scrollbar);
             if !thumb.contains(x, y) {
                 let fit = TimelineViewport::fit(self.editor.project_duration());
@@ -1949,11 +2128,14 @@ impl WindowState {
             self.begin_timeline_scrub(hwnd, controls.camera_track, x);
             return;
         }
+        if self.can_pan_preview(client, x, y) && self.begin_preview_pan(hwnd, x, y) {
+            return;
+        }
         if self.begin_crop_drag(hwnd, x, y) {
             return;
         }
-        let video = preview_video_rect(client, &self.frame, self.theme);
-        if HitRect(video).contains(x, y) {
+        let video = self.preview_rect(client);
+        if HitRect(controls.preview_well).contains(x, y) && HitRect(video).contains(x, y) {
             if let Some(original) = self.selected_segment() {
                 self.session.pause();
                 self.deferred_playback.cancel();
@@ -1978,7 +2160,7 @@ impl WindowState {
                     "请先选择一个镜头片段".into(),
                 );
             }
-        } else if controls.video_track.contains(x, y) {
+        } else if self.editor.settings().source_video_enabled && controls.track_area.contains(x, y) && controls.video_track.contains(x, y) {
             if self.crop_editing {
                 self.toggle_crop_editing();
             }
@@ -1986,12 +2168,15 @@ impl WindowState {
             if let Some(span) = video.clip_at(timeline_tick(controls.video_track, x, self.timeline))
             {
                 self.inspector_scroll = 0;
+                self.media_selected = None;
                 self.selected_video = Some(span.clip.id.clone());
+                self.clear_inspector_panel();
                 self.inspector_video_tab = true;
                 self.selected_segment = None;
                 let left = timeline_x(controls.video_track, span.project_in, self.timeline);
                 let right = timeline_x(controls.video_track, span.project_out, self.timeline);
                 let edge_mode = timeline_edge_mode(x, left, right, self.theme.scale(8));
+                if edge_mode==TimelineDragMode::Move{self.begin_source_move(hwnd,x,y,span.clip.id.clone(),span.project_in,span.project_out);}
                 if edge_mode != TimelineDragMode::Move {
                     self.session.pause();
                     self.deferred_playback.cancel();
@@ -2020,7 +2205,7 @@ impl WindowState {
             self.refresh(hwnd, true);
         } else if controls.ruler.contains(x, y) || controls.click_track.contains(x, y) {
             self.begin_timeline_scrub(hwnd, controls.camera_track, x);
-        } else if controls.camera_track.contains(x, y) {
+        } else if controls.track_area.contains(x, y) && controls.camera_track.contains(x, y) {
             if self.crop_editing {
                 self.toggle_crop_editing();
             }
@@ -2042,7 +2227,9 @@ impl WindowState {
                     .unwrap_or(self.last_clock);
                 self.selected_video = None;
                 self.inspector_scroll = 0;
+                self.media_selected = None;
                 self.selected_segment = Some(segment.id.clone());
+                self.clear_inspector_panel();
                 self.inspector_video_tab = false;
                 let mode = timeline_edge_mode(x, rect.left, rect.right, self.theme.scale(8));
                 self.timeline_drag = Some(TimelineDrag {
@@ -2075,13 +2262,20 @@ impl WindowState {
             self.accessibility.invoked(control as u32 + 1);
         }
         match control {
+            ControlId::CanvasAdvanced => {
+                self.canvas_advanced = !self.canvas_advanced;
+                self.inspector_scroll = 0;
+                self.refresh(hwnd, true);
+            }
             ControlId::SpeedSection | ControlId::CropSection => {
                 let index = usize::from(control == ControlId::CropSection);
                 self.video_collapsed[index] = !self.video_collapsed[index];
                 self.inspector_scroll = 0;
                 self.persist_layout();
             }
-            ControlId::CanvasOriginal
+            ControlId::CanvasResolution => self.choose_canvas_resolution(hwnd),
+            ControlId::FollowZoom => self.begin_inline_input(hwnd, control),
+            ControlId::CanvasStandard | ControlId::CanvasOriginal
             | ControlId::CanvasWide
             | ControlId::CanvasPortrait
             | ControlId::CanvasSquare => self.set_canvas_preset(control),
@@ -2093,7 +2287,8 @@ impl WindowState {
             }
             ControlId::CropEdit => self.toggle_crop_editing(),
             ControlId::CropLock => {
-                self.crop_locked = !self.crop_locked;
+                self.crop_locked = false;
+                self.set_crop_editing(true);
             }
             ControlId::WindowMinimize | ControlId::WindowMaximize => unsafe {
                 use windows::Win32::UI::WindowsAndMessaging::{
@@ -2108,14 +2303,46 @@ impl WindowState {
                 };
                 let _ = ShowWindow(hwnd, mode);
             },
-            ControlId::Menu => self.application_menu(hwnd),
+            ControlId::AudioPanel
+            | ControlId::SubtitlePanel
+            | ControlId::AudioTab
+            | ControlId::SubtitleTab => {
+                self.session.pause();
+                self.deferred_playback.cancel();
+                if control==ControlId::AudioTab {
+                    if let Some((false,id))=self.media_selected.clone(){
+                        if self.editor.settings().visual_clips.iter().any(|c|c.id==id){if let Err(e)=crate::platform::visual_panel::open(hwnd,&id,true){self.note_problem("声音属性未打开",e);}return;}
+                        if self.editor.settings().audio_clips.iter().any(|c|c.id==id){crate::platform::media_panel::select_item(hwnd,false,&id);return;}
+                    }
+                }
+                if let Err(e) = crate::platform::media_panel::open(
+                    hwnd,
+                    usize::from(matches!(
+                        control,
+                        ControlId::SubtitlePanel | ControlId::SubtitleTab
+                    )),
+                ) {
+                    self.note_problem("媒体面板未打开", e);
+                }
+            }
+            ControlId::PreviewFit => {
+                self.preview_view = preview_view::PreviewView::default();
+                self.refresh_preview_view(hwnd);
+            }
+            ControlId::Menu => {
+                if client_rect(hwnd).right <= self.theme.scale(1000) {
+                    self.project_bin_overlay = !self.project_bin_overlay;
+                } else {
+                    self.project_bin_visible = !self.project_bin_visible;
+                }
+                self.refresh(hwnd, true);
+            }
+            ControlId::NewRecording if crate::platform::workspace::active() => crate::platform::recorder_window::workspace_record_setup(hwnd),
             ControlId::Back | ControlId::NewRecording => {
                 self.request_navigation(hwnd, NavigationIntent::NewRecording);
             }
             ControlId::OpenProject => {
-                if let Some(project) = crate::platform::recorder_window::choose_project_path(hwnd) {
-                    self.request_navigation(hwnd, NavigationIntent::OpenProject(project));
-                }
+                crate::platform::recorder_window::workspace_open(hwnd, false);
             }
             ControlId::WindowClose => unsafe {
                 let _ = PostMessageW(Some(hwnd), WM_CLOSE, WPARAM(0), LPARAM(0));
@@ -2129,6 +2356,7 @@ impl WindowState {
                 if self.crop_editing {
                     self.toggle_crop_editing();
                 }
+                self.clear_inspector_panel();
                 self.inspector_video_tab = false;
                 self.inspector_scroll = 0;
             }
@@ -2160,7 +2388,8 @@ impl WindowState {
             | ControlId::ScaleValue
             | ControlId::Inset
             | ControlId::Radius
-            | ControlId::VideoSpeed
+            | ControlId::VideoScale
+                | ControlId::VideoSpeed
             | ControlId::CropLeft
             | ControlId::CropTop
             | ControlId::CropRight
@@ -2196,14 +2425,22 @@ impl WindowState {
             }
             ControlId::ZoomSlider => self
                 .timeline
-                .zoom_at(self.session.snapshot().project_tick, 2.0),
-            ControlId::Split => self.split_video(),
-            ControlId::Background => {
-                self.inspector_image_tab = false;
+                .zoom_at(self.session.project_playhead(), 2.0),
+            ControlId::Split => {
+                if self.media_selected.is_some() {
+                    self.split_media();
+                } else {
+                    self.split_video();
+                }
             }
+            ControlId::Background => {
+                let color=self.editor.settings().background.color.clone();
+                let result=self.editor.set_solid_background(color).map_err(PreviewWindowError::from).and_then(|()|self.apply_editor_state());
+                self.record_editor_result(result,"背景已切换 · 可撤销");
+            }
+            ControlId::BackgroundColor => {unsafe{let _=PostMessageW(Some(hwnd),WM_APP+0x561,WPARAM(0),LPARAM(0));}},
             ControlId::VideoTrim
             | ControlId::CameraProperties
-            | ControlId::BackgroundColor
             | ControlId::CursorProperties => {
                 self.edit_properties(hwnd, control);
             }
@@ -2216,19 +2453,19 @@ impl WindowState {
             ControlId::Export => self.begin_export(hwnd),
             ControlId::Location => self.show_export_location(),
             ControlId::Home => self.seek_absolute(TimeTick::ZERO),
+            ControlId::Last => self.seek_absolute(self.session.snapshot().duration_tick),
+            ControlId::PreviewMute => self.session.toggle_preview_mute(),
             ControlId::Play => self.toggle_playback_intent(),
             ControlId::Save => self.save_editor(CameraEditKind::Update),
             ControlId::Undo => self.undo(),
             ControlId::Redo => self.redo(),
-            ControlId::Add => self.add_manual_segment(),
+            ControlId::Add => {let c=self.control_layout(client_rect(hwnd));self.track_menu(hwnd,c.add.left,c.add.bottom);},
             ControlId::Delete => self.delete_selected(),
             ControlId::Reset => self.reset_to_auto(),
-            ControlId::Diagnostics => {
-                self.appearance_menu(hwnd);
-            }
+            ControlId::Diagnostics => {}
             ControlId::TimelineZoomOut => {
                 self.timeline
-                    .zoom_at(self.session.snapshot().project_tick, 0.5);
+                    .zoom_at(self.session.project_playhead(), 0.5);
                 self.set_status(
                     crate::platform::editor_ui::StatusSeverity::Information,
                     "时间线已缩小".into(),
@@ -2244,7 +2481,7 @@ impl WindowState {
             }
             ControlId::TimelineZoomIn => {
                 self.timeline
-                    .zoom_at(self.session.snapshot().project_tick, 2.0);
+                    .zoom_at(self.session.project_playhead(), 2.0);
                 self.set_status(
                     crate::platform::editor_ui::StatusSeverity::Information,
                     "时间线已放大".into(),
@@ -2264,12 +2501,19 @@ impl WindowState {
                 self.adjust_timing(TimeTick::ZERO, TimeTick(-EDIT_STEP.as_i64()));
             }
             ControlId::EndPlus => self.adjust_timing(TimeTick::ZERO, EDIT_STEP),
-            ControlId::BackgroundImage => self.inspector_image_tab = true,
+            ControlId::BackgroundImage => {
+                if self.editor.settings().background.image.is_some() {
+                    let mut style=self.editor.settings().background.clone();style.kind=panzo_core::BackgroundKind::Image;
+                    let result=self.editor.set_background_style(style).map_err(PreviewWindowError::from).and_then(|()|self.apply_editor_state());
+                    self.record_editor_result(result,"背景已切换 · 可撤销");
+                } else { self.import_background(hwnd); }
+            },
             ControlId::BackgroundFile => self.import_background(hwnd),
         }
     }
 
     fn begin_timeline_scrub(&mut self, hwnd: HWND, track: HitRect, x: i32) {
+        let result=self.select_preview_source(false);self.record_result(result);
         if self.crop_editing {
             self.toggle_crop_editing();
         }
@@ -2480,7 +2724,7 @@ impl WindowState {
                     "正在拖动播放头".into(),
                 );
                 if self.preview_surface.is_none() {
-                    let video = preview_video_rect(client_rect(hwnd), &self.frame, self.theme);
+                    let video = self.preview_rect(client_rect(hwnd));
                     unsafe {
                         let _ = InvalidateRect(Some(hwnd), Some(&raw const video), false);
                     }
@@ -2494,15 +2738,16 @@ impl WindowState {
     }
 
     fn auto_pan_gesture(&mut self, hwnd: HWND) {
+        if let Some(d)=&self.media_drag{let(x,y)=(d.current_x,d.current_y);let c=self.control_layout(client_rect(hwnd));let zone=self.theme.scale(18);let step=if y<c.track_area.top+zone{-self.theme.scale(5)}else if y>c.track_area.bottom-zone{self.theme.scale(5)}else{0};let next=(self.track_scroll+step).clamp(0,c.track_scroll_max);if next!=self.track_scroll{self.track_scroll=next;self.media_move(hwnd,x,y);}}
         let x = self
             .timeline_scrub
             .map(|s| s.current_x)
             .or_else(|| self.timeline_drag.as_ref().map(|d| d.current_x))
-            .or_else(|| self.video_drag.as_ref().map(|d| d.current_x));
+            .or_else(|| self.video_drag.as_ref().map(|d| d.current_x)).or_else(||self.media_drag.as_ref().map(|d|d.current_x));
         let Some(x) = x else {
             return;
         };
-        if self.timeline.is_fit() {
+        if !self.timeline.can_pan() && self.media_drag.is_none() {
             return;
         }
         let controls = self.control_layout(client_rect(hwnd));
@@ -2515,35 +2760,57 @@ impl WindowState {
         if direction != 0 {
             let before = self.timeline.visible_start();
             // Bounded at 2/3 of a viewport per second at the 60 Hz frame clock.
-            self.timeline.pan_by(TimeTick(
-                self.timeline.visible_duration().0 / 90 * direction,
-            ));
+            let delta=TimeTick(self.timeline.visible_duration().0/90*direction);
+            if self.media_drag.is_some(){self.timeline.pan_for_drop(delta);}else{self.timeline.pan_by(delta);}
             if before != self.timeline.visible_start() {
                 self.follow_playhead = false;
-                self.on_mouse_move(hwnd, x, controls.camera_track.top);
-                self.refresh(hwnd, true);
+                let y=self.media_drag.as_ref().map_or(controls.camera_track.top,|d|d.current_y);
+                self.on_mouse_move(hwnd, x, y);
+                unsafe{let _=InvalidateRect(Some(hwnd),Some(&controls.timeline_panel),false);}
             }
         }
     }
 
     #[allow(clippy::too_many_lines)] // Mutually exclusive gestures; each returns before the next handler.
     fn on_mouse_move(&mut self, hwnd: HWND, x: i32, y: i32) {
+        if self.preview_seek_drag.is_some() {self.seek_preview_at(hwnd,x);return;}
+        if let Some((start, offset)) = self.track_scroll_drag {
+            let c = self.control_layout(client_rect(hwnd));
+            let height = c.track_area.bottom - c.track_area.top;
+            let bar =
+                (height * height / (height + c.track_scroll_max).max(1)).max(self.theme.scale(24));
+            self.track_scroll = (offset + (y - start) * c.track_scroll_max / (height - bar).max(1))
+                .clamp(0, c.track_scroll_max);
+            self.refresh(hwnd, true);
+            return;
+        }
+        self.update_splitter_hover(hwnd, x, y);
+        if self.move_preview_pan(hwnd, x, y) {
+            return;
+        }
+        if self.media_move(hwnd, x, y) {
+            return;
+        }
         self.update_cursor(hwnd, x, y);
         if self.crop_drag.is_some() {
             self.update_crop_drag(hwnd, x, y);
             return;
         }
-        if let Some((start_x, original)) = self.inspector_resize {
+        if let Some(drag) = self.project_bin_resize {
+            let before = self.control_layout(client_rect(hwnd));
+            let max = (before.preview_well.right - self.theme.scale(240)).max(self.theme.scale(160)).min(self.theme.scale(420));
+            let width = drag.size_at(x, y).clamp(self.theme.scale(160), max);
+            self.pending_panel_layout.get_or_insert(before);
+            self.project_bin_width_dip = width * 96 / self.theme.dpi as i32;
+            return;
+        }
+        if let Some(drag) = self.inspector_resize {
+            self.pending_panel_layout.get_or_insert(self.control_layout(client_rect(hwnd)));
             self.theme.metrics.inspector_width = ControlLayout::clamp_inspector_width(
                 client_rect(hwnd).right,
-                (original + start_x - x).max(1),
+                drag.size_at(x, y).max(1),
                 self.theme,
             );
-            if self.last_drag_refresh.elapsed() >= DRAG_REFRESH_INTERVAL {
-                self.last_drag_refresh = Instant::now();
-                self.resize_preview_surface(hwnd);
-                self.refresh(hwnd, true);
-            }
             return;
         }
         if let Some((start_y, original)) = self.inspector_scroll_drag {
@@ -2562,17 +2829,13 @@ impl WindowState {
             self.update_property_drag(hwnd, control, x);
             return;
         }
-        if let Some((start_y, height)) = self.timeline_resize {
+        if let Some(drag) = self.timeline_resize {
+            self.pending_panel_layout.get_or_insert(self.control_layout(client_rect(hwnd)));
             self.theme.metrics.timeline_height = ControlLayout::clamp_timeline_height(
                 client_rect(hwnd).bottom,
-                height + start_y - y,
+                drag.size_at(x, y),
                 self.theme,
             );
-            if self.last_drag_refresh.elapsed() >= DRAG_REFRESH_INTERVAL {
-                self.last_drag_refresh = Instant::now();
-                self.resize_preview_surface(hwnd);
-                self.refresh(hwnd, true);
-            }
             return;
         }
         if let Some((start_x, original)) = self.timeline_scroll {
@@ -2582,7 +2845,7 @@ impl WindowState {
                 - (thumb.right - thumb.left))
                 .max(1);
             let delta =
-                (i128::from(self.editor.project_duration().0 - original.visible_duration().0)
+                (i128::from((self.editor.project_duration().0 - original.visible_duration().0).max(0))
                     * i128::from(x - start_x)
                     / i128::from(travel)) as i64;
             self.timeline = original;
@@ -2739,7 +3002,7 @@ impl WindowState {
                     bottom: controls.camera_track.bottom + 3,
                 }
             } else {
-                preview_video_rect(client_rect(hwnd), &self.frame, self.theme)
+                self.preview_rect(client_rect(hwnd))
             };
             unsafe {
                 let _ = InvalidateRect(Some(hwnd), Some(&raw const region), false);
@@ -2767,21 +3030,48 @@ impl WindowState {
 
     #[allow(clippy::too_many_lines)] // Release each exclusive gesture before releasing capture.
     fn on_mouse_up(&mut self, hwnd: HWND, x: i32, y: i32) {
+        if let Some(resume)=self.preview_seek_drag.take() {
+            self.seek_preview_at(hwnd,x);
+            unsafe{let _=ReleaseCapture();}
+            if resume {self.session.play();self.last_clock=Instant::now();}
+            self.refresh(hwnd,false);return;
+        }
+        if self.track_scroll_drag.take().is_some() {
+            unsafe {
+                let _ = ReleaseCapture();
+            }
+            return;
+        }
+        if self.end_preview_pan(hwnd, x, y) {
+            return;
+        }
+        if self.media_up(hwnd, x, y) {
+            return;
+        }
         self.snap_guide = None;
         if self.crop_drag.is_some() {
             self.update_crop_drag(hwnd, x, y);
             self.finish_crop_drag(hwnd, false);
             return;
         }
-        if self.inspector_resize.take().is_some() {
+        if self.panel_resizing() {
+            self.on_mouse_move(hwnd, x, y);
+            self.flush_panel_layout(hwnd);
+            let c=self.control_layout(client_rect(hwnd));
+            for r in [c.project_bin_splitter.0,c.inspector_splitter.0,c.splitter.0] {
+                unsafe { let _=InvalidateRect(Some(hwnd),Some(&r),false); }
+            }
+        }
+        if let Some(drag) = self.project_bin_resize.take() {
+            drag.finish(hwnd);
+            self.persist_layout();
+            return;
+        }
+        if let Some(drag) = self.inspector_resize.take() {
             self.inspector_width_dip =
                 self.theme.metrics.inspector_width * 96 / self.theme.dpi.cast_signed();
-            unsafe {
-                let _ = ReleaseCapture();
-            }
+            drag.finish(hwnd);
             self.persist_layout();
-            self.resize_preview_surface(hwnd);
-            self.refresh(hwnd, true);
             return;
         }
         if self.inspector_scroll_drag.take().is_some() {
@@ -2804,19 +3094,16 @@ impl WindowState {
             self.refresh(hwnd, true);
             return;
         }
-        let resized = self.timeline_resize.take().is_some();
+        let resize = self.timeline_resize.take();
+        let resized = resize.is_some();
         let scrolled = self.timeline_scroll.take().is_some();
         if resized {
             self.persist_layout();
         }
         if resized || scrolled {
-            unsafe {
-                let _ = ReleaseCapture();
-            }
-            if resized {
-                self.resize_preview_surface(hwnd);
-            }
-            self.refresh(hwnd, true);
+            if let Some(drag) = resize { drag.finish(hwnd); }
+            else { crate::platform::desktop_ui::release_capture_owned_by(hwnd); }
+            if !resized { self.refresh(hwnd, true); }
             return;
         }
         if self.video_drag.take().is_some() {
@@ -2909,7 +3196,7 @@ impl WindowState {
             self.editor.cancel_edit_group();
         }
         let result = result.and_then(|()| self.apply_editor_state());
-        self.record_editor_result(result, "画面焦点已更新 · Ctrl+Z 撤销");
+        self.record_editor_result(result, "画面焦点已更新 · 可撤销");
         self.refresh(hwnd, true);
     }
 
@@ -2918,7 +3205,7 @@ impl WindowState {
         hwnd: HWND,
         drag: &CanvasDrag,
     ) -> Result<NormalizedPoint, PreviewWindowError> {
-        let video = preview_video_rect(client_rect(hwnd), &self.frame, self.theme);
+        let video = self.preview_rect(client_rect(hwnd));
         let width = f64::from((video.right - video.left).max(1));
         let height = f64::from((video.bottom - video.top).max(1));
         let content = self.frame.content_rect(self.editor.settings());
@@ -2972,6 +3259,7 @@ impl WindowState {
         if next != self.hot_control {
             let tooltip_was_visible = self.tooltip_visible;
             self.tooltip_visible = false;
+            crate::platform::hover_tip::hide(hwnd);
             self.tooltip_deadline = next.map(|_| Instant::now() + TOOLTIP_DELAY);
             if let Some(previous) = self.hot_control {
                 let rect = controls.control_rect(previous).0;
@@ -3007,7 +3295,7 @@ impl WindowState {
     fn playhead_hit(&self, controls: &ControlLayout, x: i32, y: i32) -> bool {
         let tick = self
             .timeline_scrub
-            .map_or(self.session.snapshot().project_tick, |s| s.desired_tick);
+            .map_or(self.session.project_playhead(), |s| s.desired_tick);
         self.timeline.contains(tick)
             && controls.timeline_area().contains(x, y)
             && (x - timeline_x(controls.camera_track, tick, self.timeline)).abs()
@@ -3024,6 +3312,12 @@ impl WindowState {
 
     #[allow(clippy::too_many_lines)] // One priority order for all mutually exclusive pointer targets.
     fn cursor_at(&self, client: RECT, x: i32, y: i32) -> PCWSTR {
+        if let Some(cursor) = self.media_cursor(client, x, y) {
+            return cursor;
+        }
+        if self.preview_pan.is_some() {
+            return IDC_SIZEALL;
+        }
         if let Some((dx, dy)) = self.crop_hit(client, x, y) {
             use windows::Win32::UI::WindowsAndMessaging::{IDC_SIZENESW, IDC_SIZENWSE};
             return match (dx, dy) {
@@ -3035,10 +3329,8 @@ impl WindowState {
             };
         }
         let c = self.control_layout(client);
-        if self.inspector_resize.is_some() {
-            IDC_SIZEWE
-        } else if self.timeline_resize.is_some() {
-            IDC_SIZENS
+        if let Some(drag) = self.inspector_resize.or(self.project_bin_resize).or(self.timeline_resize) {
+            drag.cursor()
         } else if self.timeline_scrub.is_some()
             || self.property_drag.is_some()
             || self.timeline_scroll.is_some()
@@ -3053,10 +3345,12 @@ impl WindowState {
             } else {
                 IDC_SIZEWE
             }
-        } else if self.video_drag.is_some() || c.inspector_splitter.contains(x, y) {
+        } else if self.video_drag.is_some() {
             IDC_SIZEWE
-        } else if c.splitter.contains(x, y) {
-            IDC_SIZENS
+        } else if let Some((_, splitter)) = c.splitter_at(x, y) {
+            splitter.cursor()
+        } else if self.can_pan_preview(client, x, y) {
+            IDC_SIZEALL
         } else if self.playhead_hit(&c, x, y) {
             IDC_HAND
         } else if let Some(id) = c.hit_control(x, y).filter(|id| self.control_enabled(*id)) {
@@ -3069,6 +3363,7 @@ impl WindowState {
                 ControlId::Inset
                 | ControlId::Radius
                 | ControlId::Shadow
+                | ControlId::VideoScale
                 | ControlId::VideoSpeed
                 | ControlId::CropLeft
                 | ControlId::CropTop
@@ -3089,7 +3384,7 @@ impl WindowState {
                 ControlId::ZoomSlider => IDC_HAND,
                 _ => IDC_ARROW,
             }
-        } else if c.video_track.contains(x, y) {
+        } else if c.track_area.contains(x, y) && c.video_track.contains(x, y) {
             self.editor
                 .video_edit()
                 .clip_at(timeline_tick(c.video_track, x, self.timeline))
@@ -3104,10 +3399,10 @@ impl WindowState {
                         IDC_SIZEWE
                     }
                 })
-        } else if c.camera_track.contains(x, y) {
+        } else if c.track_area.contains(x, y) && c.camera_track.contains(x, y) {
             let playhead = timeline_x(
                 c.camera_track,
-                self.session.snapshot().project_tick,
+                self.session.project_playhead(),
                 self.timeline,
             );
             if (x - playhead).abs() <= self.theme.scale(7) {
@@ -3126,12 +3421,13 @@ impl WindowState {
             }
         } else if c.ruler.contains(x, y)
             || c.click_track.contains(x, y)
-            || (!self.timeline.is_fit() && c.scrollbar.contains(x, y))
+            || (self.timeline.can_pan() && c.scrollbar.contains(x, y))
             || (c.inspector_scroll_max > 0 && c.inspector_scrollbar.contains(x, y))
         {
             IDC_HAND
         } else if self.selected_segment.is_some()
-            && HitRect(preview_video_rect(client, &self.frame, self.theme)).contains(x, y)
+            && HitRect(c.preview_well).contains(x, y)
+            && HitRect(self.preview_rect(client)).contains(x, y)
         {
             IDC_SIZEALL
         } else {
@@ -3155,16 +3451,16 @@ impl WindowState {
     fn cancel_pressed_control(&mut self, hwnd: HWND, release_capture: bool) {
         self.clear_pressed_control(hwnd);
         if release_capture {
-            unsafe {
-                let _ = ReleaseCapture();
-            }
+            crate::platform::desktop_ui::release_capture_owned_by(hwnd);
         }
     }
 
     fn on_mouse_leave(&mut self, hwnd: HWND) {
+        self.update_splitter_hover(hwnd, -1, -1);
         self.tracking_mouse_leave = false;
         let tooltip_was_visible = self.tooltip_visible;
         self.tooltip_visible = false;
+        crate::platform::hover_tip::hide(hwnd);
         self.tooltip_deadline = None;
         if let Some(control) = self.hot_control.take() {
             let rect = self
@@ -3199,6 +3495,9 @@ impl WindowState {
 
     #[allow(clippy::too_many_lines)] // Keep the shared UI/keyboard/accessibility availability table together.
     fn control_enabled(&self, control: ControlId) -> bool {
+        if self.inspector_panel.is_some() && ControlLayout::is_inspector_control(control) {
+            return false;
+        }
         if self.navigation_authorized
             && !matches!(
                 control,
@@ -3208,6 +3507,11 @@ impl WindowState {
             return false;
         }
         match control {
+            ControlId::PreviewFit => true,
+            ControlId::AudioPanel
+            | ControlId::SubtitlePanel
+            | ControlId::AudioTab
+            | ControlId::SubtitleTab => self.pending_navigation.is_none(),
             ControlId::Menu => self.pending_navigation.is_none(),
             ControlId::CropEdit
             | ControlId::CropLock
@@ -3220,7 +3524,8 @@ impl WindowState {
             | ControlId::CropStandard
             | ControlId::CropSquare
             | ControlId::CropPortrait => self.selected_crop().is_some(),
-            ControlId::VideoSpeed
+            ControlId::VideoScale
+            | ControlId::VideoSpeed
             | ControlId::SpeedReset
             | ControlId::SpeedHalf
             | ControlId::SpeedNormal
@@ -3228,7 +3533,12 @@ impl WindowState {
             | ControlId::SpeedDouble
             | ControlId::SpeedQuadruple => self.widget_value(ControlId::VideoSpeed).is_some(),
             ControlId::Split => {
-                let tick = self.session.snapshot().project_tick;
+                let tick = self.session.project_playhead();
+                if self.media_selected.is_some() {
+                    return self
+                        .selected_media_range()
+                        .is_some_and(|(a, b)| tick > a && tick < b);
+                }
                 let video = self.editor.video_edit();
                 video.clip_at(tick).is_some_and(|span| {
                     tick > span.project_in
@@ -3237,8 +3547,10 @@ impl WindowState {
                         })
                 })
             }
-            ControlId::SpeedSection
+            ControlId::CanvasAdvanced
+            | ControlId::SpeedSection
             | ControlId::CropSection
+            | ControlId::CanvasStandard | ControlId::CanvasResolution | ControlId::FollowZoom
             | ControlId::CanvasOriginal
             | ControlId::CanvasWide
             | ControlId::CanvasPortrait
@@ -3270,6 +3582,8 @@ impl WindowState {
             | ControlId::Location
             | ControlId::Play
             | ControlId::Home
+            | ControlId::Last
+            | ControlId::PreviewMute
             | ControlId::Add
             | ControlId::Reset
             | ControlId::Diagnostics
@@ -3290,8 +3604,11 @@ impl WindowState {
             ControlId::Undo => self.editor.can_undo(),
             ControlId::Redo => self.editor.can_redo(),
             ControlId::Delete => {
+                if self.media_selected.is_some() {
+                    return self.selected_media_range().is_some();
+                }
                 if self.selected_video.is_some() {
-                    self.editor.video_edit().clips.len() > 1
+                    self.editor.settings().source_video_enabled
                 } else {
                     self.selected_segment.is_some()
                 }
@@ -3320,6 +3637,35 @@ impl WindowState {
             return;
         }
         let layout = self.control_layout(client_rect(hwnd));
+        if HitRect(layout.preview_well).contains(x, y)
+            && unsafe { GetKeyState(i32::from(VK_CONTROL.0)) } < 0
+        {
+            let base = preview_video_rect(
+                self.control_layout(client_rect(hwnd)),
+                &self.frame,
+                self.theme,
+            );
+            self.preview_view.zoom_at(
+                base,
+                layout.preview_well,
+                x,
+                y,
+                1.2_f64.powf(f64::from(delta) / 120.0),
+            );
+            self.refresh_preview_view(hwnd);
+            return;
+        }
+        if y >= layout.track_area.top
+            && y < layout.track_area.bottom
+            && layout.track_scroll_max > 0
+            && unsafe { GetKeyState(i32::from(VK_CONTROL.0)) } >= 0
+            && unsafe { GetKeyState(i32::from(VK_SHIFT.0)) } >= 0
+        {
+            self.track_scroll = (self.track_scroll - i32::from(delta) * self.theme.scale(38) / 120)
+                .clamp(0, layout.track_scroll_max);
+            self.refresh(hwnd, true);
+            return;
+        }
         if HitRect(layout.panel).contains(x, y) && layout.inspector_scroll_max > 0 {
             if !self.finish_inline_input(hwnd, true) {
                 return;
@@ -3329,6 +3675,7 @@ impl WindowState {
                 .clamp(0, layout.inspector_scroll_max);
             self.hot_control = None;
             self.tooltip_visible = false;
+            crate::platform::hover_tip::hide(hwnd);
             self.tooltip_deadline = None;
             self.refresh(hwnd, true);
             return;
@@ -3394,7 +3741,7 @@ impl WindowState {
             return;
         }
         if HitRect(preview_video_rect(
-            client_rect(hwnd),
+            self.control_layout(client_rect(hwnd)),
             &self.frame,
             self.theme,
         ))
@@ -3422,7 +3769,7 @@ impl WindowState {
             if self.wheel_edit_pending {
                 self.wheel_edit_pending = false;
                 let result = self.apply_editor_state();
-                self.record_editor_result(result, "调整已提交 · Ctrl+Z 撤销");
+                self.record_editor_result(result, "调整已提交 · 可撤销");
             }
         }
     }
@@ -3489,6 +3836,7 @@ impl WindowState {
     }
 
     fn toggle_playback_intent(&mut self) {
+
         if self.crop_editing {
             self.toggle_crop_editing();
         }
@@ -3560,11 +3908,11 @@ impl WindowState {
             .segments
             .iter()
             .find(|segment| segment.id == id)
-            .cloned()
+            .cloned().map(|mut c|{if let Some((a,b))=self.editor.settings().follow_positions.get(&c.id){c.start_tick=*a;c.end_tick=*b;}c})
     }
 
     fn segment_at_x(&self, track: HitRect, x: i32) -> Option<(CameraSegment, RECT)> {
-        self.display_segments().iter().find_map(|segment| {
+        self.display_segments().iter().filter(|segment|self.editor.settings().clip_tracks.get(&segment.id).map_or("follow",String::as_str)=="follow").find_map(|segment| {
             let rect = segment_rect(track, segment, self.timeline);
             (x >= rect.left && x < rect.right).then(|| {
                 (
@@ -3639,29 +3987,9 @@ impl WindowState {
         if self.crop_editing {
             self.toggle_crop_editing();
         }
-        let video = self.editor.video_edit();
-        let project_tick = self.session.snapshot().project_tick;
-        let Some(span) = video.clip_at(project_tick) else {
-            return;
-        };
-        let Ok(start_tick) = panzo_core::TimeMapping::source_time(&video, project_tick) else {
-            return;
-        };
-        let end_tick = TimeTick(
-            start_tick
-                .as_i64()
-                .saturating_add(
-                    span.clip
-                        .source_delta(TimeTick(5 * TICKS_PER_SECOND / 10))
-                        .0,
-                )
-                .min(span.clip.source_out_tick.as_i64()),
-        );
-        let current = if self.editor.settings().camera_enabled {
-            self.editor.camera().evaluate(start_tick)
-        } else {
-            CameraState::BASE
-        };
+        let project_tick = self.session.project_playhead();
+        let end_tick = TimeTick((project_tick.0+5*TICKS_PER_SECOND/10).min(panzo_core::media_edit::MAX_MEDIA_TICK));
+        let current = self.frame.evaluation.camera_state;
         let target = CameraState::focused(
             NormalizedPoint::new(current.center_x, current.center_y).expect("valid camera center"),
             current.scale.max(1.6),
@@ -3670,17 +3998,13 @@ impl WindowState {
         let id = format!("manual-{}", uuid::Uuid::new_v4());
         let result = self
             .editor
-            .add_segment(
-                id.clone(),
-                CameraSegmentKind::ZoomIn,
-                start_tick,
-                end_tick,
-                target,
-            )
+            .add_project_follow(id.clone(), project_tick, end_tick, target)
             .map_err(PreviewWindowError::from)
             .and_then(|_| {
+                self.media_selected = None;
                 self.selected_segment = Some(id);
                 self.selected_video = None;
+                self.clear_inspector_panel();
                 self.inspector_video_tab = false;
                 self.apply_editor_state()
             });
@@ -3688,6 +4012,10 @@ impl WindowState {
     }
 
     fn delete_selected(&mut self) {
+        if self.media_selected.is_some() {
+            self.delete_media();
+            return;
+        }
         if !self.control_enabled(ControlId::Delete) {
             self.set_status(
                 StatusSeverity::Information,
@@ -3712,7 +4040,7 @@ impl WindowState {
                     self.selected_video = None;
                     self.apply_editor_state()
                 });
-            self.record_editor_result(result, "视频已删除，空隙已闭合 · Ctrl+Z 撤销");
+            self.record_editor_result(result, "视频已删除，空隙已闭合 · 可撤销");
             return;
         }
         let Some(id) = self.selected_segment.clone() else {
@@ -3852,7 +4180,7 @@ impl WindowState {
                     )
                     .map_err(PreviewWindowError::from)
                     .and_then(|()| self.apply_editor_state());
-                self.record_editor_result(result, "背景已更新 · Ctrl+Z 撤销");
+                self.record_editor_result(result, "背景已更新 · 可撤销");
             }
             Err(error) => self.report_problem(
                 crate::platform::editor_ui::StatusScope::Background,
@@ -3864,6 +4192,23 @@ impl WindowState {
     }
 
     fn apply_editor_state(&mut self) -> Result<(), PreviewWindowError> {
+        self.session.leave_asset_preview()?;
+        if let Some(bin)=&self.project_bin {project_bin::select_preview(bin,false);}
+        if self.media_selected.as_ref().is_some_and(|(subtitle, id)| {
+            if *subtitle {
+                !self.editor.settings().subtitles.iter().any(|c| &c.id == id)
+            } else {
+                !self
+                    .editor
+                    .settings()
+                    .audio_clips
+                    .iter()
+                    .any(|c| &c.id == id)
+                    && !self.editor.settings().visual_clips.iter().any(|c| &c.id == id)
+            }
+        }) {
+            self.media_selected = None;
+        }
         self.timeline.set_duration(self.editor.project_duration());
         // Undoing a split can remove the selected ID. Keep video properties usable
         // by selecting the surviving clip under the playhead instead of a stale ID.
@@ -3871,7 +4216,7 @@ impl WindowState {
         if self
             .selected_video
             .as_ref()
-            .is_some_and(|id| !video.clips.iter().any(|clip| &clip.id == id))
+            .is_some_and(|id| !video.clips.iter().any(|clip| &clip.id == id) && !self.editor.settings().visual_clips.iter().any(|c| &c.id == id))
         {
             let tick = self
                 .session
@@ -3961,7 +4306,7 @@ impl WindowState {
             }
             Err(error) => self.report_problem(
                 crate::platform::editor_ui::StatusScope::Save,
-                "修改尚未保存，请勿关闭窗口；请再次保存，仍失败时查看诊断详情",
+                "修改尚未保存，请检查可用磁盘空间和工程目录权限后重试",
                 format!("错误：{error}"),
             ),
         }
@@ -4051,15 +4396,8 @@ impl WindowState {
         let display_started = Instant::now();
         self.session.set_crop_overlay(self.crop_overlay(&frame));
         let resized = frame.evaluation.output != self.frame.evaluation.output;
-        if resized && let Some(old) = self.preview_surface.take() {
-            let _ = unsafe { DestroyWindow(old.hwnd) };
-            drop(old);
-            if let Some(host) = self.host_hwnd
-                && let Ok(module) = unsafe { GetModuleHandleW(None) }
-                && let Ok(surface) = self.try_initialize_preview_surface(host, module.into())
-            {
-                self.preview_surface = Some(surface);
-            }
+        if resized && let Some(surface)=self.preview_surface.as_mut() {
+            self.session.resize_presenter(&mut surface.presenter,frame.evaluation.output)?;
         }
         if let Some(surface) = self.preview_surface.as_ref() {
             let overlay = self.focus_overlay();
@@ -4150,10 +4488,11 @@ impl WindowState {
         }
         self.displayed_title.clone_from(&title);
         let wide = wide(&title);
-        let caption = self.control_layout(client_rect(hwnd)).command_bar;
+        let controls = self.control_layout(client_rect(hwnd));
         unsafe {
             let _ = SetWindowTextW(hwnd, PCWSTR(wide.as_ptr()));
-            let _ = InvalidateRect(Some(hwnd), Some(&raw const caption), false);
+            let _ = InvalidateRect(Some(hwnd), Some(&raw const controls.command_bar), false);
+            let _ = InvalidateRect(Some(hwnd), Some(&raw const controls.status), false);
         }
     }
 
@@ -4181,9 +4520,15 @@ impl WindowState {
                 if id == ControlId::Cursor {
                     node.kind = Kind::Toggle(self.editor.settings().cursor.visible);
                 }
-                if id == ControlId::CanvasTab || id == ControlId::VideoTab {
-                    node.kind =
-                        Kind::Toggle(self.inspector_video_tab == (id == ControlId::VideoTab));
+                if [
+                    ControlId::CanvasTab,
+                    ControlId::VideoTab,
+                    ControlId::AudioTab,
+                    ControlId::SubtitleTab,
+                ]
+                .contains(&id)
+                {
+                    node.kind = Kind::Toggle(self.inspector_tab_selected(id));
                 }
                 if id == ControlId::Play {
                     node.name = if self.session.snapshot().playback == PlaybackState::Playing
@@ -4201,6 +4546,8 @@ impl WindowState {
                         maximum,
                         minimum: if id == ControlId::VideoSpeed {
                             0.25
+                        } else if id == ControlId::VideoScale {
+                            5.0
                         } else {
                             0.0
                         },
@@ -4214,7 +4561,7 @@ impl WindowState {
                     }
                 }
                 if let Some(value) = self.widget_value(id) {
-                    node.name = format!("{}，当前 {value:.3}", node.name);
+                    node.name = format!("{}，当前 {}", node.name,editor_widgets::format_widget_value(id,value));
                 }
                 node
             })
@@ -4259,7 +4606,7 @@ impl WindowState {
                     format_tick(span.project_in),
                     format_tick(span.project_out)
                 ),
-                help: "选择后可裁剪入出点；B 在播放位置分割；Delete 删除；Ctrl+Z 撤销".into(),
+                help: "选择后可裁剪入出点；可在播放位置分割或删除；可撤销".into(),
                 rect,
                 enabled: true,
                 kind: Kind::Item(self.selected_video.as_deref() == Some(span.clip.id.as_str())),
@@ -4287,7 +4634,7 @@ impl WindowState {
                     .accessibility
                     .stable_id(format!("camera:{}", segment.id)),
                 name: format!("镜头片段 {}，倍率 {:.2}", index + 1, segment.to.scale),
-                help: "选择后使用镜头属性调整时间、倍率和焦点；Delete 删除；Ctrl+Z 撤销".into(),
+                help: "选择后使用镜头属性调整时间、倍率和焦点；Delete 删除；可撤销".into(),
                 rect: RECT {
                     left,
                     right,
@@ -4333,8 +4680,10 @@ impl WindowState {
                 .any(|item| item.id == clip)
         {
             if selected {
+                self.media_selected = None;
                 self.selected_video = Some(clip.into());
                 self.selected_segment = None;
+                self.clear_inspector_panel();
                 self.inspector_video_tab = true;
                 self.inspector_scroll = 0;
                 if let Some(span) = self
@@ -4357,8 +4706,10 @@ impl WindowState {
                 .any(|item| item.id == segment)
         {
             if selected {
+                self.media_selected = None;
                 self.selected_segment = Some(segment.into());
                 self.selected_video = None;
+                self.clear_inspector_panel();
                 self.inspector_video_tab = false;
                 self.inspector_scroll = 0;
                 if let Some(camera) = self
@@ -4452,6 +4803,60 @@ impl WindowState {
     }
 
     fn refresh(&mut self, hwnd: HWND, force_title: bool) {
+        if self.panel_resizing() { return; }
+        if self.project_bin.is_none() {
+            self.project_bin = project_bin::create(hwnd).ok();
+        }
+        if let Some(bin) = &self.project_bin {
+            project_bin::update(
+                bin,
+                self.editor.project_root().to_path_buf(),
+                self.editor.change_revision(),
+                self.editor.settings(),
+            );
+            let r = self.control_layout(client_rect(hwnd)).project_bin;
+            crate::platform::workspace_ui::place(
+                bin.hwnd,
+                r.left,
+                r.top,
+                r.right - r.left,
+                (r.bottom - r.top).max(1),
+            );
+            crate::platform::workspace_ui::show(bin.hwnd, r.right > r.left);
+        }
+        if let Some(bin)=&self.project_bin {
+            let c=self.control_layout(client_rect(hwnd));project_bin::layout_preview(bin,c.transport,c.preview_quality.0,self.session.preview_quality());
+            if let Some(surface)=&self.preview_surface {crate::platform::workspace_ui::show(surface.hwnd,true);}
+        }
+        self.layout_inspector_panel(hwnd);
+        // Adding/removing the first media lane changes the dock's minimum height.
+        // Keep the GPU surface in the same geometry as drawing and pointer hit testing.
+        if force_title
+            && self.preview_surface.as_ref().is_some_and(|surface| {
+                let client = client_rect(hwnd);
+                surface.bounds != self.preview_rect(client)
+                    || surface.well != self.preview_clip_rect(client)
+            })
+        {
+            self.resize_preview_surface(hwnd);
+        }
+        if self.project_bin_overlay && client_rect(hwnd).right <= self.theme.scale(1000) {
+            if let Some(bin) = &self.project_bin {
+                unsafe {
+                    let _ = SetWindowPos(
+                        bin.hwnd,
+                        Some(windows::Win32::UI::WindowsAndMessaging::HWND_TOP),
+                        0,
+                        0,
+                        0,
+                        0,
+                        windows::Win32::UI::WindowsAndMessaging::SWP_NOSIZE
+                            | windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE
+                            | SWP_NOACTIVATE,
+                    );
+                }
+            }
+        }
         let now = Instant::now();
         let refresh_chrome = force_title
             || now.saturating_duration_since(self.last_title_refresh) >= Duration::from_millis(100);
@@ -4466,7 +4871,7 @@ impl WindowState {
             } else {
                 let client = client_rect(hwnd);
                 if self.preview_surface.is_none() {
-                    let video = preview_video_rect(client, &self.frame, self.theme);
+                    let video = self.preview_rect(client);
                     let _ = InvalidateRect(Some(hwnd), Some(&raw const video), false);
                 }
                 if refresh_chrome {
@@ -4483,101 +4888,79 @@ impl WindowState {
     fn paint(&self, hwnd: HWND) {
         let _scale = crate::platform::editor_ui::DrawingScale::enter(self.theme.dpi);
         self.telemetry.paint_calls.fetch_add(1, Ordering::Relaxed);
+        let damage = unsafe { windows::Win32::Graphics::Gdi::CreateRectRgn(0,0,0,0) };
+        unsafe { windows::Win32::Graphics::Gdi::GetUpdateRgn(hwnd, damage, false); }
         let mut paint = PAINTSTRUCT::default();
         let hdc = unsafe { BeginPaint(hwnd, &raw mut paint) };
         let client = client_rect(hwnd);
         let dirty = paint.rcPaint;
         let width = (dirty.right - dirty.left).max(1);
         let height = (dirty.bottom - dirty.top).max(1);
-        let buffer_dc = unsafe { CreateCompatibleDC(Some(hdc)) };
-        let mut caption_bits = std::ptr::null_mut();
-        let buffer_bitmap = if dirty.top < self.theme.metrics.toolbar_height {
-            let info = BITMAPINFO {
-                bmiHeader: BITMAPINFOHEADER {
-                    biSize: mem::size_of::<BITMAPINFOHEADER>() as u32,
-                    biWidth: width,
-                    biHeight: -height,
-                    biPlanes: 1,
-                    biBitCount: 32,
-                    biCompression: BI_RGB.0,
-                    ..Default::default()
-                },
-                ..Default::default()
-            };
+        let mut cache = self.chrome_frame.borrow_mut();
+        if cache
+            .as_ref()
+            .is_none_or(|(w, h, _)| *w != client.right || *h != client.bottom)
+        {
+            *cache = super::capture_tools::Surface::new(
+                client.right.max(1) as u32,
+                client.bottom.max(1) as u32,
+            )
+            .ok()
+            .map(|surface| (client.right, client.bottom, surface));
+        }
+        if let Some((_, _, surface)) = cache.as_ref() {
+            let buffer_dc = surface.dc;
+            let saved = unsafe { windows::Win32::Graphics::Gdi::SaveDC(buffer_dc) };
             unsafe {
-                windows::Win32::Graphics::Gdi::CreateDIBSection(
-                    Some(hdc),
-                    &raw const info,
-                    DIB_RGB_COLORS,
-                    &raw mut caption_bits,
-                    None,
-                    0,
-                )
+                windows::Win32::Graphics::Gdi::SelectClipRgn(buffer_dc, Some(damage));
+                windows::Win32::Graphics::Gdi::IntersectClipRect(
+                    buffer_dc,
+                    dirty.left,
+                    dirty.top,
+                    dirty.right,
+                    dirty.bottom,
+                );
             }
-            .unwrap_or_default()
-        } else {
-            unsafe { CreateCompatibleBitmap(hdc, width, height) }
-        };
-        if !buffer_dc.0.is_null() && !buffer_bitmap.0.is_null() {
-            let previous = unsafe { SelectObject(buffer_dc, HGDIOBJ(buffer_bitmap.0)) };
-            unsafe {
-                let _ = SetViewportOrgEx(buffer_dc, -dirty.left, -dirty.top, None);
+            let c = self.control_layout(client);
+            let preview = self.preview_surface.as_ref().map(|s| RECT {
+                left:s.bounds.left.max(s.well.left),top:s.bounds.top.max(s.well.top),
+                right:s.bounds.right.min(s.well.right),bottom:s.bounds.bottom.min(s.well.bottom),
+            });
+            for r in [Some(c.project_bin), self.inspector_panel.map(|_|c.inspector_content()), preview].into_iter().flatten() {
+                if r.right > r.left && r.bottom > r.top {
+                    unsafe { windows::Win32::Graphics::Gdi::ExcludeClipRect(buffer_dc,r.left,r.top,r.right,r.bottom); }
+                }
             }
             draw_scene_region(buffer_dc, client, dirty, self);
             editor_titlebar::paint_system_buttons(hwnd, buffer_dc, self.theme);
-            if !caption_bits.is_null() && self.caption_bounds.is_none() {
-                // Preserve the opaque header and antialiased icon alpha in live
-                // frames; also normalize alpha for the non-native fallback.
-                let rows = (self.theme.metrics.toolbar_height - dirty.top).clamp(0, height);
-                unsafe {
-                    let _ = windows::Win32::Graphics::Gdi::GdiFlush();
-                    let bytes = std::slice::from_raw_parts_mut(
-                        caption_bits.cast::<u8>(),
-                        usize::try_from(width * rows * 4).unwrap_or(0),
-                    );
-                    for pixel in bytes.chunks_exact_mut(4) {
-                        pixel[3] = 255;
-                    }
-                }
+            if dirty.top < self.theme.metrics.toolbar_height && self.caption_bounds.is_none() {
+                surface.opaque_rows(
+                    client.right.max(1) as u32,
+                    self.theme.metrics.toolbar_height.min(client.bottom).max(0) as u32,
+                );
             }
             unsafe {
-                let _ = SetViewportOrgEx(buffer_dc, 0, 0, None);
-            }
-            let _ = unsafe {
-                BitBlt(
+                let _ = windows::Win32::Graphics::Gdi::RestoreDC(buffer_dc, saved);
+                let _ = BitBlt(
                     hdc,
                     dirty.left,
                     dirty.top,
                     width,
                     height,
                     Some(buffer_dc),
-                    0,
-                    0,
+                    dirty.left,
+                    dirty.top,
                     SRCCOPY,
-                )
-            };
-            unsafe {
-                SelectObject(buffer_dc, previous);
-                let _ = DeleteObject(HGDIOBJ(buffer_bitmap.0));
-                let _ = DeleteDC(buffer_dc);
+                );
             }
         } else {
-            if !buffer_bitmap.0.is_null() {
-                unsafe {
-                    let _ = DeleteObject(HGDIOBJ(buffer_bitmap.0));
-                }
-            }
-            if !buffer_dc.0.is_null() {
-                unsafe {
-                    let _ = DeleteDC(buffer_dc);
-                }
-            }
             draw_scene_region(hdc, client, dirty, self);
             editor_titlebar::paint_system_buttons(hwnd, hdc, self.theme);
         }
 
         unsafe {
             let _ = EndPaint(hwnd, &raw const paint);
+            let _ = windows::Win32::Graphics::Gdi::DeleteObject(damage.into());
         }
     }
 }
@@ -4613,7 +4996,7 @@ fn draw_scene_region(
     let controls = state.control_layout(client);
     let palette = state.theme.palette;
     fill(hdc, &dirty, palette.window);
-    let video = preview_video_rect(client, &state.frame, state.theme);
+    let video = state.preview_rect(client);
     for card in [
         controls.preview_card,
         controls.panel,
@@ -4629,11 +5012,28 @@ fn draw_scene_region(
             );
         }
     }
+    if rects_intersect(dirty, controls.preview_well) {
+        fill(hdc, &controls.preview_well, crate::platform::desktop_ui::canvas(state.theme));
+    }
     if rects_intersect(dirty, video)
         && let Some(frame) = state.fallback_frame.as_ref()
     {
+        let saved = unsafe { windows::Win32::Graphics::Gdi::SaveDC(hdc) };
+        let well = controls.preview_well;
+        unsafe {
+            windows::Win32::Graphics::Gdi::IntersectClipRect(
+                hdc,
+                well.left,
+                well.top,
+                well.right,
+                well.bottom,
+            );
+        }
         draw_frame(hdc, video, frame);
         draw_focus_target(hdc, video, state);
+        unsafe {
+            let _ = windows::Win32::Graphics::Gdi::RestoreDC(hdc, saved);
+        }
     }
     let full_controls_dirty = rects_intersect(dirty, controls.command_bar)
         || rects_intersect(dirty, controls.panel)
@@ -4653,6 +5053,7 @@ fn draw_scene_region(
     } else if full_controls_dirty || rects_intersect(dirty, controls.timeline_panel) {
         draw_controls(hdc, &controls, state);
     }
+    editor_chrome::draw_splitter(hdc, &controls, state);
     if state.keyboard_focus
         && let Some(id) = state.accessibility_focus
         && let Some(rect) = state.accessibility.node_rect(id)
@@ -4714,10 +5115,12 @@ fn timeline_edge_mode(x: i32, left: i32, right: i32, tolerance: i32) -> Timeline
     }
 }
 
-fn preview_video_rect(client: RECT, frame: &PreparedPreviewFrame, theme: EditorTheme) -> RECT {
-    let controls = ControlLayout::new(client, theme);
-    let padding = ((controls.preview_well.bottom - controls.preview_well.top) / 16)
-        .clamp(theme.scale(8), theme.scale(24));
+fn preview_video_rect(
+    controls: ControlLayout,
+    frame: &PreparedPreviewFrame,
+    theme: EditorTheme,
+) -> RECT {
+    let padding = theme.scale(if controls.timeline_panel.right <= theme.scale(1000) { 16 } else if controls.timeline_panel.right <= theme.scale(1150) { 20 } else { 26 });
     video_rect(
         RECT {
             left: controls.preview_well.left + padding,
@@ -4787,6 +5190,8 @@ enum ControlId {
     Export,
     Location,
     Home,
+    Last,
+    PreviewMute,
     Play,
     Save,
     Undo,
@@ -4848,6 +5253,7 @@ enum ControlId {
     WindowMinimize,
     WindowMaximize,
     WindowClose,
+    CanvasAdvanced,
     SpeedSection,
     CropSection,
     CropEdit,
@@ -4865,12 +5271,25 @@ enum ControlId {
     Menu,
     BackgroundColor,
     CursorProperties,
+    AudioPanel,
+    SubtitlePanel,
+    PreviewFit,
+    AudioTab,
+    SubtitleTab,
+    CanvasStandard,
+    CanvasResolution,
+    FollowZoom,
+    VideoScale,
 }
 
 impl ControlId {
-    const ORDER: [Self; 86] = [
+    const ORDER: [Self; 97] = [
+        Self::VideoScale,
+        Self::CanvasStandard, Self::CanvasResolution, Self::FollowZoom,
+        Self::AudioPanel,
+        Self::SubtitlePanel,
+        Self::PreviewFit,
         Self::Menu,
-        Self::Diagnostics,
         Self::NewRecording,
         Self::OpenProject,
         Self::Save,
@@ -4882,6 +5301,8 @@ impl ControlId {
         Self::Cursor,
         Self::Location,
         Self::Home,
+        Self::Last,
+        Self::PreviewMute,
         Self::Play,
         Self::Undo,
         Self::Redo,
@@ -4924,6 +5345,8 @@ impl ControlId {
         Self::CursorProperties,
         Self::CanvasTab,
         Self::VideoTab,
+        Self::AudioTab,
+        Self::SubtitleTab,
         Self::VideoSpeed,
         Self::SpeedReset,
         Self::SpeedHalf,
@@ -4943,6 +5366,7 @@ impl ControlId {
         Self::WindowMinimize,
         Self::WindowMaximize,
         Self::WindowClose,
+        Self::CanvasAdvanced,
         Self::SpeedSection,
         Self::CropSection,
         Self::CropEdit,
@@ -4959,13 +5383,22 @@ impl ControlId {
 
     const fn accessibility_name(self) -> &'static str {
         match self {
-            Self::Menu => "主菜单",
+            Self::AudioPanel => "声音与旁白：录制旁白、编辑音频",
+            Self::AudioTab => "声音属性标签",
+            Self::SubtitlePanel => "字幕：添加字幕、导入 SRT、AI 自动字幕",
+            Self::SubtitleTab => "字幕属性标签",
+            Self::PreviewFit => "预览居中并适应窗口（Ctrl＋滚轮缩放，拖动平移）",
+            Self::Menu => "展开或收起项目素材",
             Self::NewRecording => "新录制",
-            Self::OpenProject => "打开工程",
-            Self::SpeedSection => "展开或收起播放速度",
+            Self::OpenProject => "导入视频 / 图片",
+            Self::CanvasAdvanced => "高级画面参数",
+            Self::SpeedSection => "展开或收起鼠标跟随与缩放",
             Self::CropSection => "展开或收起画面裁剪",
             Self::CropEdit => "在预览中调整裁剪（Enter 完成）",
             Self::CropLock => "锁定裁剪比例",
+            Self::CanvasStandard => "4:3 画布",
+            Self::CanvasResolution => "分辨率",
+            Self::FollowZoom => "放大倍数",
             Self::CanvasOriginal => "原始画布",
             Self::CanvasWide => "16:9 画布",
             Self::CanvasPortrait => "9:16 画布",
@@ -4989,6 +5422,7 @@ impl ControlId {
             Self::WindowClose => "关闭窗口",
             Self::CanvasTab => "画布属性标签",
             Self::VideoTab => "视频属性标签",
+            Self::VideoScale => "画面缩放（%）：单击数值输入，拖动滑杆调整",
             Self::VideoSpeed => "视频速度（倍）：单击数值输入，拖动滑杆调整",
             Self::SpeedReset => "恢复视频原速",
             Self::SpeedHalf => "视频速度 0.5 倍",
@@ -5010,7 +5444,7 @@ impl ControlId {
             Self::SwatchWhite => "纯白背景",
             Self::SwatchSage => "鼠尾草背景",
             Self::BackgroundFile => "选择或更换背景图片",
-            Self::Split => "在播放头分割视频（B）",
+            Self::Split => "在播放头分割视频",
             Self::VideoTrim => "视频入点与出点",
             Self::CameraProperties => "镜头时间、倍率与焦点",
             Self::CameraEnabled => "应用或旁路镜头效果",
@@ -5019,6 +5453,8 @@ impl ControlId {
             Self::BackgroundColor => "自定义背景颜色…",
             Self::Export => "导出当前编辑结果",
             Self::Location => "打开文件位置",
+            Self::Last => "跳到结尾",
+            Self::PreviewMute => "静音 / 恢复预览声音",
             Self::Home => "回到时间线起点",
             Self::Play => "播放或暂停视频",
             Self::Save => "保存编辑更改",
@@ -5051,13 +5487,15 @@ impl ControlId {
 
     const fn tooltip(self) -> &'static str {
         match self {
-            Self::Play => "播放/暂停（Space）",
+            Self::Play => "播放/暂停",
             Self::Save => "保存更改（S）",
-            Self::Undo => "撤销（Ctrl+Z）",
-            Self::Redo => "重做（Ctrl+Y）",
-            Self::Home => "回到项目起点（Home）",
-            Self::Delete => "删除选中对象（Delete）",
-            Self::Reset => "恢复自动镜头初稿（R）",
+            Self::Undo => "撤销",
+            Self::Redo => "重做",
+            Self::Last => "跳到结尾",
+            Self::PreviewMute => "静音 / 恢复预览声音",
+            Self::Home => "回到项目起点",
+            Self::Delete => "删除选中对象",
+            Self::Reset => "恢复自动镜头初稿",
             Self::Diagnostics => "设置：主题、属性与更多选项",
             other => other.accessibility_name(),
         }
@@ -5065,8 +5503,11 @@ impl ControlId {
 
     fn icon(self, state: &WindowState) -> IconKind {
         match self {
-            Self::Menu => IconKind::Menu,
-            Self::NewRecording => IconKind::Record,
+            Self::AudioPanel | Self::AudioTab => IconKind::Microphone,
+            Self::SubtitlePanel | Self::SubtitleTab => IconKind::Subtitles,
+            Self::PreviewFit => IconKind::Fit,
+            Self::Menu => IconKind::Panel,
+            Self::NewRecording => IconKind::RecordOutline,
             Self::OpenProject | Self::Location => IconKind::Folder,
             Self::VideoTab => IconKind::Monitor,
             Self::Back => IconKind::Back,
@@ -5074,6 +5515,8 @@ impl ControlId {
             Self::CameraEnabled => IconKind::Camera,
             Self::Cursor | Self::CursorProperties => IconKind::Cursor,
             Self::Export => IconKind::Export,
+            Self::Last => IconKind::NextFrame,
+            Self::PreviewMute => if state.session.preview_muted() { IconKind::Muted } else { IconKind::Sound },
             Self::Home => IconKind::Home,
             Self::Play
                 if state.session.snapshot().playback == PlaybackState::Playing
@@ -5082,6 +5525,7 @@ impl ControlId {
                 IconKind::Pause
             }
             Self::Play
+            | Self::VideoScale
             | Self::VideoSpeed
             | Self::SpeedHalf
             | Self::SpeedNormal
@@ -5105,12 +5549,13 @@ impl ControlId {
                 }
             }
             Self::WindowClose => IconKind::Close,
-            Self::SpeedSection | Self::CropSection => IconKind::ChevronDown,
+            Self::CanvasAdvanced | Self::SpeedSection | Self::CropSection => IconKind::ChevronDown,
 
             Self::CropLock => IconKind::Lock,
             Self::PreviousFrame => IconKind::PreviousFrame,
             Self::NextFrame => IconKind::NextFrame,
             Self::CropEdit
+            | Self::CanvasStandard | Self::CanvasResolution | Self::FollowZoom
             | Self::CanvasOriginal
             | Self::CanvasWide
             | Self::CanvasPortrait
@@ -5128,7 +5573,8 @@ impl ControlId {
             Self::SpeedReset | Self::CropReset => IconKind::Restore,
             Self::Reset => IconKind::Reset,
             Self::Diagnostics => IconKind::Settings,
-            Self::InspectorToggle | Self::CameraProperties => IconKind::Diagnostics,
+            Self::InspectorToggle => IconKind::Panel,
+            Self::CameraProperties => IconKind::Diagnostics,
             Self::TimelineZoomOut | Self::ScaleMinus => IconKind::ZoomOut,
             Self::CenterFocus | Self::TimelineFit => IconKind::Fit,
             Self::ZoomSlider | Self::TimelineZoomIn | Self::ScalePlus => IconKind::ZoomIn,
@@ -5186,7 +5632,45 @@ pub(crate) unsafe extern "system" fn window_proc(
     if message == WM_NCCREATE {
         let _ = lparam.0 as *const CREATESTRUCTW;
     }
+    if message==WM_APP+83 {
+        if let Some(s)=unsafe{state_mut(hwnd)} {
+            s.change_preview_quality(super::preview_quality::PreviewQuality::from_index(wparam.0));
+            s.refresh(hwnd,true);
+        }
+        return LRESULT(0);
+    }
+    if message==WM_APP+82 {
+        if let Some(s)=unsafe{state_mut(hwnd)} {let r=s.control_layout(client_rect(hwnd)).track_area.0;unsafe{let _=InvalidateRect(Some(hwnd),Some(&r),false);}}
+        return LRESULT(0);
+    }
+    if message==WM_APP+81 {
+        if let Some(s)=unsafe{state_mut(hwnd)} {
+            s.session.pause(); s.deferred_playback.cancel();
+            let result=s.select_preview_source(wparam.0!=0);s.record_result(result);
+            s.refresh(hwnd,true);
+        } return LRESULT(0);
+    }
+    if message==WM_APP+0x561 {
+        let data=(unsafe{state_mut(hwnd)}).map(|s|{
+            s.session.pause();s.deferred_playback.cancel();s.editor.begin_edit_group();
+            let r=s.control_layout(client_rect(hwnd)).control_rect(ControlId::BackgroundColor).0;
+            let color=u32::from_str_radix(s.editor.settings().background.color.trim_start_matches('#'),16).unwrap_or(0);
+            (r,[color as u8,(color>>8) as u8,(color>>16) as u8,255])
+        });
+        if let Some((mut r,color))=data {
+            let mut origin=windows::Win32::Foundation::POINT::default();unsafe{let _=windows::Win32::Graphics::Gdi::ClientToScreen(hwnd,&mut origin);}
+            r.left+=origin.x;r.right+=origin.x;r.top+=origin.y;r.bottom+=origin.y;
+            if let Err(e)=crate::platform::desktop_ui::open_color_at(hwnd,hwnd,r,color,true){if let Some(s)=unsafe{state_mut(hwnd)}{s.editor.finish_edit_group();s.note_problem("颜色面板未打开",e);}}
+        }return LRESULT(0);
+    }
     match message {
+        crate::platform::desktop_ui::COLOR_PREVIEW | crate::platform::desktop_ui::COLOR_CLOSED => {
+            if let Some(s)=unsafe{state_mut(hwnd)}{
+                let c=(wparam.0 as u32).to_le_bytes();let color=format!("#{:02X}{:02X}{:02X}",c[2],c[1],c[0]);
+                if !s.editor.settings().background.color.eq_ignore_ascii_case(&color){let result=s.editor.set_solid_background(&color).map_err(PreviewWindowError::from).and_then(|()|s.apply_editor_state());s.record_editor_result(result,"背景颜色已更新");s.refresh(hwnd,true);}
+                if message==crate::platform::desktop_ui::COLOR_CLOSED{s.editor.finish_edit_group();}
+            }LRESULT(0)
+        }
         crate::platform::inline_input::WM_INLINE_DONE => {
             let mut restore_focus = false;
             if let Some(state) = unsafe { state_mut(hwnd) }
@@ -5232,6 +5716,7 @@ pub(crate) unsafe extern "system" fn window_proc(
             }
             LRESULT(0)
         }
+        m if m==WM_APP+5 => {if let Some(s)=unsafe{state_mut(hwnd)} {if s.generation==wparam.0 {let r=s.present_focus_overlay();s.record_session_result(r);}}LRESULT(0)}
         WM_INTERACTIVE_RENDER => {
             if let Some(state) = unsafe { state_mut(hwnd) } {
                 state.poll_interactive_render(hwnd);
@@ -5304,20 +5789,40 @@ pub(crate) unsafe extern "system" fn window_proc(
                     return LRESULT(0);
                 }
                 state.clear_pressed_control(hwnd);
-                if state.video_drag.is_some()
+                state.preview_seek_drag=None;
+                if state.media_drag.is_some()
+                    || state.video_drag.is_some()
                     || state.crop_drag.is_some()
                     || state.canvas_drag.is_some()
                     || state.timeline_drag.is_some()
                     || state.timeline_scrub.is_some()
                     || state.timeline_pan.is_some()
                     || state.inspector_scroll_drag.is_some()
+                    || state.project_bin_resize.is_some()
                     || state.inspector_resize.is_some()
                     || state.timeline_resize.is_some()
+                    || state.preview_pan.is_some()
                     || state.timeline_scroll.is_some()
                     || state.property_drag.is_some()
                 {
                     state.cancel_gesture(hwnd);
                 }
+            }
+            LRESULT(0)
+        }
+        windows::Win32::UI::WindowsAndMessaging::WM_CONTEXTMENU => {
+            if let Some(state) = unsafe { state_mut(hwnd) } {
+                let mut point = windows::Win32::Foundation::POINT {
+                    x: signed_low(lparam.0),
+                    y: signed_high(lparam.0),
+                };
+                let keyboard = point.x == -1 && point.y == -1;
+                if !keyboard {
+                    unsafe {
+                        let _ = windows::Win32::Graphics::Gdi::ScreenToClient(hwnd, &mut point);
+                    }
+                }
+                state.media_context_menu(hwnd, point.x, point.y, keyboard);
             }
             LRESULT(0)
         }
@@ -5329,7 +5834,7 @@ pub(crate) unsafe extern "system" fn window_proc(
             }
             LRESULT(0)
         }
-        WM_SETCURSOR if signed_low(lparam.0) == 1 => {
+        WM_SETCURSOR if signed_low(lparam.0) == 1 && wparam.0 == hwnd.0 as usize => {
             if let Some(state) = unsafe { state_mut(hwnd) } {
                 let mut point = POINT::default();
                 if unsafe { GetCursorPos(&raw mut point) }.is_ok() {
@@ -5359,6 +5864,11 @@ pub(crate) unsafe extern "system" fn window_proc(
             LRESULT(0)
         }
         WM_MBUTTONDOWN => {
+            if let Some(state) = unsafe { state_mut(hwnd) } {
+                if state.begin_preview_pan(hwnd, signed_low(lparam.0), signed_high(lparam.0)) {
+                    return LRESULT(0);
+                }
+            }
             if let Some(state) = unsafe { state_mut(hwnd) }
                 && !state.navigation_authorized
             {
@@ -5378,6 +5888,11 @@ pub(crate) unsafe extern "system" fn window_proc(
             LRESULT(0)
         }
         WM_MBUTTONUP => {
+            if let Some(state) = unsafe { state_mut(hwnd) } {
+                if state.end_preview_pan(hwnd, signed_low(lparam.0), signed_high(lparam.0)) {
+                    return LRESULT(0);
+                }
+            }
             if let Some(state) = unsafe { state_mut(hwnd) } {
                 state.timeline_pan = None;
             }
@@ -5451,6 +5966,7 @@ pub(crate) unsafe extern "system" fn window_proc(
             LRESULT(0)
         }
         WM_DPICHANGED => {
+            super::app_icon::apply(hwnd);
             let dpi = u32::try_from((wparam.0 >> 16) & 0xffff)
                 .unwrap_or(96)
                 .max(96);
@@ -5590,25 +6106,6 @@ fn scrub_probe_progress(elapsed: f64, duration: f64) -> f64 {
     }
 }
 
-fn draw_control_tooltip(
-    hdc: windows::Win32::Graphics::Gdi::HDC,
-    controls: &ControlLayout,
-    control: ControlId,
-    theme: EditorTheme,
-) {
-    crate::platform::editor_ui::draw_tooltip(
-        hdc,
-        RECT {
-            left: controls.command_bar.left,
-            top: controls.command_bar.top,
-            right: controls.command_bar.right,
-            bottom: controls.timeline_panel.bottom + theme.metrics.outer_margin,
-        },
-        controls.control_rect(control).0,
-        control.tooltip(),
-        theme,
-    );
-}
 
 fn draw_timeline_ruler(
     hdc: windows::Win32::Graphics::Gdi::HDC,
@@ -5886,6 +6383,33 @@ pub enum ClockError {
     Overflow,
 }
 
+pub(crate) fn workspace_media_color_group(hwnd: HWND, begin: bool) {
+    if let Some(state)=unsafe{state_mut(hwnd)} {
+        if begin {state.editor.begin_edit_group();} else {state.editor.finish_edit_group();}
+    }
+}
+
+pub(crate) fn apply_workspace_media(
+    hwnd: HWND,
+    project: &Path,
+    expected: &panzo_core::WorkbenchSettings,
+    next: panzo_core::WorkbenchSettings,
+) -> Result<(), String> {
+    let state = unsafe { state_mut(hwnd) }.ok_or("视频工程已关闭")?;
+    if state.editor.project_root() != project || state.editor.settings() != expected {
+        return Err("视频工程或参数已经变化，请重新打开此设置后应用，避免覆盖其他修改".into());
+    }
+    let resume=state.session.snapshot().playback==PlaybackState::Playing && !state.session.is_asset_preview();
+    state
+        .editor
+        .replace_media_settings(next)
+        .map_err(|e| e.to_string())?;
+    state.apply_editor_state().map_err(|e| e.to_string())?;
+    if resume {state.session.play();state.last_clock=Instant::now();}
+    state.refresh(hwnd, true);
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -5997,7 +6521,7 @@ mod tests {
                     state.add_manual_segment();
                     state.frame = state.session.prepare_current().unwrap();
                     let id = state.selected_segment.clone().unwrap();
-                    let video = preview_video_rect(client_rect(hwnd), &state.frame, state.theme);
+                    let video = state.preview_rect(client_rect(hwnd));
                     let width = f64::from(video.right - video.left);
                     let height = f64::from(video.bottom - video.top);
                     let middle = (
@@ -6612,7 +7136,6 @@ mod tests {
             .spans()
             .next()
             .map(|span| span.clip.id.clone());
-        state.inspector_image_tab = true;
         crate::platform::editor_ui::render_review_png(
             &output.join("editor-dark-video-image.png"),
             1440,
@@ -6643,7 +7166,6 @@ mod tests {
         state.theme = EditorTheme::for_mode(96, crate::platform::ui_preferences::ThemeMode::Dark);
         state.theme.metrics.inspector_width = 416;
         state.theme.metrics.timeline_height = 2000;
-        state.inspector_image_tab = true;
         state.editor.set_canvas_inset(0.09).unwrap();
         let first = output.join("background-fixture.png");
         let second = output.join("background-replacement.png");
@@ -6798,6 +7320,148 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "uses a disposable media project and an offscreen render output directory"]
+    fn capped_and_compact_timeline_ui_review() {
+        use crate::platform::ui_preferences::ThemeMode;
+        let output = std::path::PathBuf::from(std::env::var_os("PANZO_UI_REVIEW_DIR").unwrap());
+        let project =
+            std::path::PathBuf::from(std::env::var_os("PANZO_UI_REVIEW_PROJECT").unwrap());
+        let descriptor = ProjectPreviewSession::native_output_descriptor(&project).unwrap();
+        let mut state = WindowState::open(
+            &project,
+            descriptor,
+            None,
+            SmokeAction::None,
+            Arc::new(WindowTelemetry::default()),
+        )
+        .unwrap();
+        state.theme = EditorTheme::for_mode(96, ThemeMode::Dark);
+        state.theme.metrics.inspector_width = 288;
+        let original = state.editor.settings().clone();
+        assert!(!original.audio_clips.is_empty() && !original.subtitles.is_empty());
+        state.frame = state.session.prepare_current().unwrap();
+        state.fallback_frame = Some(state.session.compose_prepared(&state.frame).unwrap());
+        let client = RECT {
+            right: 1440,
+            bottom: 1000,
+            ..RECT::default()
+        };
+        let mut report = String::new();
+        for media in [false, true] {
+            let mut settings = original.clone();
+            if !media {
+                settings.audio_clips.clear();
+                settings.subtitles.clear();
+            }
+            state.editor.replace_media_settings(settings).unwrap();
+            // Exercise expand, collapse, and re-expand with the same thumbnail cache.
+            for (height, selected) in [
+                (440, false),
+                (216, true),
+                (304, false),
+                (304, true),
+                (500, false),
+            ] {
+                state.selected_video = if selected {
+                    state
+                        .editor
+                        .video_edit()
+                        .spans()
+                        .next()
+                        .map(|span| span.clip.id.clone())
+                } else {
+                    None
+                };
+                state.theme.metrics.timeline_height = height;
+                let controls = state.control_layout(client);
+                let track = controls.video_track;
+                let video_height = track.bottom - track.top;
+                assert!(video_height <= 72);
+                let visible: Vec<_> = state
+                    .visible_thumbnails(track)
+                    .iter()
+                    .map(|(_, tick)| *tick)
+                    .collect();
+                if height == 216 && media {
+                    assert!(visible.is_empty());
+                }
+                if media {
+                    for track in controls.media_tracks {
+                        assert!(track.bottom - track.top >= state.theme.scale(24));
+                    }
+                }
+                assert!(controls.status.bottom <= controls.preview_well.top);
+                if height >= 440 {
+                    assert_eq!(video_height, 72);
+                    assert!(!visible.is_empty());
+                }
+                let started = Instant::now();
+                loop {
+                    state
+                        .thumbnails
+                        .poll(state.scrub_preview.ready_proxy(), &visible, true);
+                    if visible
+                        .iter()
+                        .all(|tick| state.thumbnails.get(*tick).is_some())
+                    {
+                        break;
+                    }
+                    assert!(
+                        started.elapsed() < Duration::from_mins(2),
+                        "filmstrip did not load"
+                    );
+                    std::thread::sleep(Duration::from_millis(5));
+                }
+                let video = state.editor.video_edit();
+                let span = video.spans().next().unwrap();
+                let left = timeline_x(track, span.project_in, state.timeline);
+                let right = timeline_x(track, span.project_out, state.timeline);
+                let middle_y = (track.top + track.bottom) / 2;
+                assert!(track.contains(left + 2, middle_y));
+                assert!(track.contains(right - 2, middle_y));
+                assert_eq!(
+                    timeline_edge_mode(left + 2, left, right, 8),
+                    TimelineDragMode::TrimStart
+                );
+                assert_eq!(
+                    timeline_edge_mode(right - 2, left, right, 8),
+                    TimelineDragMode::TrimEnd
+                );
+                for (mode, name) in [(ThemeMode::Dark, "dark"), (ThemeMode::Light, "light")] {
+                    state.theme.set_mode(mode);
+                    crate::platform::editor_ui::render_review_png(
+                        &output.join(format!(
+                            "timeline-media-{media}-{height}-selected-{selected}-{name}.png"
+                        )),
+                        client.right,
+                        client.bottom,
+                        |dc, rect| draw_scene_region(dc, rect, rect, &state),
+                    );
+                }
+                report.push_str(&format!(
+                    "media={media}, dock={height}, selected={selected}, video={video_height}, auxiliary={:?}, thumbnails={}\n",
+                    controls.media_tracks.map(|r| r.bottom - r.top), visible.len()
+                ));
+            }
+        }
+        state.theme.set_mode(ThemeMode::Dark);
+        state
+            .editor
+            .set_canvas_inset(original.canvas.inset + 0.01)
+            .unwrap();
+        assert!(state.editor.is_dirty());
+        state.theme.metrics.timeline_height = 304;
+        state.status = "当前修改尚未保存".into();
+        crate::platform::editor_ui::render_review_png(
+            &output.join("project-unsaved-dark.png"),
+            client.right,
+            client.bottom,
+            |dc, rect| draw_scene_region(dc, rect, rect, &state),
+        );
+        std::fs::write(output.join("timeline-review.txt"), report).unwrap();
+    }
+
+    #[test]
     fn narrow_clips_choose_the_nearest_trim_edge_at_every_dpi() {
         for dpi in [96, 120, 144, 192] {
             let theme = EditorTheme::for_dpi(dpi);
@@ -6881,17 +7545,20 @@ mod tests {
         assert!(layout.panel.bottom <= layout.timeline_panel.top);
         assert!(layout.timeline_panel.left <= layout.camera_track.left);
         assert!(layout.timeline_panel.right >= layout.camera_track.right);
-        assert!(layout.camera_track.bottom < layout.status.top);
+        assert!(layout.camera_track.bottom < layout.scrollbar.top);
+        assert!(layout.status.bottom <= layout.preview_well.top);
         assert_eq!(layout.start_value.right, layout.start_value.left);
         assert!(layout.start_value.bottom <= layout.status.top);
         assert!(layout.end_plus.right <= layout.timeline_panel.right);
-        assert!(layout.background.left >= layout.panel.left);
+        assert!(layout.background_color.left >= layout.panel.left);
         assert!(!rects_intersect(layout.ruler.0, layout.time));
         assert!(layout.status.right <= layout.timeline_panel.right);
-        assert!(layout.background.right <= layout.background_image.left);
-        assert!(layout.background_image.bottom <= layout.inset.top);
-        assert!(layout.inset.bottom <= layout.radius.top);
-        assert!(layout.radius.bottom <= layout.shadow.top);
+        assert!(layout.background.right>layout.background.left);
+        assert_eq!(layout.background.right,layout.background_image.left);
+        assert!(layout.background_color.bottom <= layout.inset.top);
+        assert!(layout.inset.bottom <= layout.control_rect(ControlId::CanvasAdvanced).top);
+        assert_eq!(layout.radius.0, RECT::default());
+        assert_eq!(layout.shadow.0, RECT::default());
     }
 
     #[test]
@@ -6932,7 +7599,7 @@ mod tests {
                 assert!(layout.end_plus.right <= layout.timeline_panel.right);
                 assert_eq!(layout.start_value.right, layout.start_value.left);
                 assert!(layout.start_value.bottom <= layout.status.top);
-                assert!(layout.status.bottom <= layout.timeline_panel.bottom);
+                assert!(layout.status.bottom <= layout.preview_well.top);
                 let scrolled = layout.with_inspector(false, false, i32::MAX, theme);
                 assert!(scrolled.control_rect(ControlId::Shadow).bottom <= layout.panel.bottom);
             }
@@ -6973,5 +7640,327 @@ mod tests {
             assert!(!id.tooltip().trim().is_empty());
             assert!(names.insert(id.accessibility_name()));
         }
+    }
+}
+
+/// Commands from the host menu are scoped to the active video editor.
+pub(crate) fn workspace_available(hwnd: HWND) -> [bool; 4] {
+    unsafe { state_mut(hwnd) }.map_or([false; 4], |s| {
+        [
+            ControlId::Save,
+            ControlId::Undo,
+            ControlId::Redo,
+            ControlId::Export,
+        ]
+        .map(|c| s.control_enabled(c))
+    })
+}
+pub(crate) fn workspace_command(hwnd: HWND, command: i32) {
+    let Some(s) = (unsafe { state_mut(hwnd) }) else {
+        return;
+    };
+    if s.media_drag.is_some()
+        || s.crop_drag.is_some()
+        || s.property_drag.is_some()
+        || s.video_drag.is_some()
+        || s.timeline_drag.is_some()
+        || s.canvas_drag.is_some()
+    {
+        return;
+    }
+    s.finish_wheel_edit();
+    let control = match command {
+        262 => {
+            let anchor = s
+                .control_layout(client_rect(hwnd))
+                .control_rect(ControlId::Menu)
+                .0;
+            s.media_effects(hwnd, anchor);
+            return;
+        }
+        263 => ControlId::PreviewFit,
+        264 => ControlId::InspectorToggle,
+        265 => ControlId::Menu,
+        266 => ControlId::Location,
+        260 | 261 => {
+            if let Err(e) = crate::platform::media_panel::open(hwnd, usize::from(command == 261)) {
+                s.note_problem("媒体面板未打开", e);
+            }
+            return;
+        }
+        202 => ControlId::Save,
+        207 => ControlId::Undo,
+        208 => ControlId::Redo,
+        211 => ControlId::Export,
+        240 => ControlId::Delete,
+        241 => ControlId::Play,
+        242 => ControlId::Split,
+        243 => ControlId::Home,
+        244 => ControlId::Reset,
+        246 => ControlId::PreviousFrame,
+        247 => ControlId::NextFrame,
+        248..=251 => {
+            if s.control_enabled(ControlId::Play) {
+                match command {
+                    248 => s.seek_clip_boundary(false),
+                    249 => s.seek_clip_boundary(true),
+                    250 => s.seek_relative(-SEEK_STEP.0),
+                    _ => s.seek_relative(SEEK_STEP.0),
+                }
+                s.refresh(hwnd, true);
+            }
+            return;
+        }
+        _ => return,
+    };
+    if s.control_enabled(control) {
+        s.activate_control(hwnd, control);
+        s.refresh(hwnd, true);
+    }
+}
+
+pub(crate) fn workspace_project_key(hwnd: HWND) -> String {
+    unsafe { state_mut(hwnd) }.map_or(String::new(), |s| {
+        s.editor.project_root().to_string_lossy().into_owned()
+    })
+}
+
+pub(crate) fn keyboard_key_is_control(hwnd: HWND, key: u32) -> bool {
+    unsafe { state_mut(hwnd) }.is_some_and(|s| {
+        s.keyboard_focus
+            && s.focused_control.is_some_and(|control| {
+                key == 0x20 || (matches!(key, 0x25 | 0x27) && s.widget_range(control).is_some())
+            })
+    })
+}
+
+pub(crate) fn media_revision(hwnd: HWND) -> Option<(usize, u64)> {
+    let s = unsafe { state_mut(hwnd) }?;
+    Some((s.generation, s.editor.change_revision()))
+}
+
+pub(crate) fn media_canvas_height(hwnd: HWND)->Option<u32>{unsafe{state_mut(hwnd)}.map(|s|s.canvas_size().height)}
+pub(crate) fn media_snapshot(
+    hwnd: HWND,
+) -> Result<
+    (
+        std::path::PathBuf,
+        panzo_core::WorkbenchSettings,
+        panzo_core::VideoEdit,
+        TimeTick,
+    ),
+    String,
+> {
+    let s = unsafe { state_mut(hwnd) }.ok_or("请先打开视频工程")?;
+    Ok((
+        s.editor.project_root().into(),
+        s.editor.settings().clone(),
+        s.editor.video_edit(),
+        s.session.project_playhead(),
+    ))
+}
+pub(crate) fn media_seek(hwnd: HWND, tick: TimeTick) -> Result<(), String> {
+    let s = unsafe { state_mut(hwnd) }.ok_or("视频工程已关闭")?;
+    s.select_preview_source(false).map_err(|e|e.to_string())?;
+    s.session.pause();
+    s.session
+        .seek(
+            tick.min(TimeTick(s.editor.project_duration().0 - 1))
+                .max(TimeTick::ZERO),
+        )
+        .map_err(|e| e.to_string())?;
+    s.refresh(hwnd, true);
+    Ok(())
+}
+
+#[path = "media_timeline.rs"]
+mod media_timeline;
+
+#[path = "preview_view.rs"]
+mod preview_view;
+
+#[path = "inspector_host.rs"]
+mod inspector_host;
+#[cfg(test)]
+pub(crate) use inspector_host::inspector_panel;
+pub(crate) use inspector_host::{attach_inspector_panel, hide_inspector_panel};
+
+#[cfg(test)]
+#[path = "workbench_v12_review.rs"]
+mod workbench_v12_review;
+
+/// Share the timeline selection without reopening a panel or changing the playhead.
+pub(crate) fn select_workspace_media(hwnd: HWND, subtitle: bool, id: Option<&str>) {
+    if let Some(s) = unsafe { state_mut(hwnd) } {
+        s.media_selected = id.map(|id| (subtitle, id.to_owned()));
+        if let Some(id) = id {
+            let track_id=if subtitle{s.editor.settings().subtitle_track(id)}else{s.editor.settings().audio_clips.iter().find(|c|c.id==id).map_or("narration",|c|s.editor.settings().audio_track(c))};
+            let row=(0..35).find(|row|s.row_track(*row).is_some_and(|t|t.id==track_id)).unwrap_or(0);
+            let layout = s.control_layout(client_rect(hwnd));
+            let track = layout.media_tracks[row];
+            if track.top < layout.track_area.top {
+                s.track_scroll += track.top - layout.track_area.top;
+            } else if track.bottom > layout.track_area.bottom {
+                s.track_scroll += track.bottom - layout.track_area.bottom;
+            }
+            s.track_scroll = s.track_scroll.clamp(0, layout.track_scroll_max);
+        }
+        if id.is_some() {
+            s.selected_video = None;
+            s.selected_segment = None;
+        }
+        s.refresh(hwnd, true);
+    }
+}
+
+#[cfg(test)]
+#[path = "media_panel_review.rs"]
+mod media_panel_review;
+
+#[cfg(test)]
+#[path = "inspector_review.rs"]
+mod inspector_review;
+
+#[path = "project_bin.rs"]
+mod project_bin;
+fn select_project_video(hwnd: HWND) {
+    if let Some(s) = unsafe { state_mut(hwnd) } {
+        s.selected_video = s.editor.video_edit().clips.first().map(|c| c.id.clone());
+        s.selected_segment = None;
+        s.media_selected = None;
+        s.inspector_video_tab = true;
+        s.clear_inspector_panel();
+        s.inspector_scroll = 0;
+        s.refresh(hwnd, true);
+    }
+}
+
+#[cfg(test)]
+#[path = "workbench_v14_review.rs"]
+mod workbench_v14_review;
+
+#[cfg(test)]
+#[path="font_review.rs"]
+mod font_review;
+
+pub(crate) fn update_recording_preview(hwnd:HWND, root:&Path, start:TimeTick, frames:u64, peaks:&[f32]) {
+    let Some(s)=(unsafe{state_mut(hwnd)}) else {return;};
+    if s.editor.project_root()!=root {return;}
+    let first=s.recording_preview.is_none();
+    s.recording_preview=Some(media_timeline::RecordingPreview{start,frames,peaks:peaks.to_vec()});
+    let c=s.control_layout(client_rect(hwnd));
+    if first {
+        let row=c.media_tracks[0];
+        if row.bottom>c.track_area.bottom {s.track_scroll=(s.track_scroll+row.bottom-c.track_area.bottom).clamp(0,c.track_scroll_max);}
+    }
+    let c=s.control_layout(client_rect(hwnd));
+    unsafe {let _=InvalidateRect(Some(hwnd),Some(if first {&c.timeline_panel}else{&c.media_tracks[0].0}),false);}
+}
+pub(crate) fn clear_recording_preview(hwnd:HWND,root:&Path) {
+    let Some(s)=(unsafe{state_mut(hwnd)}) else {return;};
+    if s.editor.project_root()!=root || s.recording_preview.take().is_none() {return;}
+    let c=s.control_layout(client_rect(hwnd));
+    unsafe {let _=InvalidateRect(Some(hwnd),Some(&c.media_tracks[0].0),false);}
+}
+
+pub(crate) fn remove_project_audio_asset(hwnd:HWND, id:&str)->Result<(),String> {
+    if crate::platform::media_panel::active_task().is_some() {
+        return Err("请先结束当前声音或字幕任务，再删除素材".into());
+    }
+    let (root,expected,_,_)=media_snapshot(hwnd)?;
+    let mut next=expected.clone();
+    if id=="__source__" {
+        if next.source_video_enabled || next.visual_clips.iter().any(|c|c.asset_id==id){return Err("素材正在使用，请先删除轨道中引用它的所有片段".into());}next.source_asset_removed=true;
+    }
+    else if next.subtitle_assets.iter().any(|a|a.id==id){
+        if next.subtitles.iter().any(|c|next.subtitle_links.get(&c.id).is_some_and(|a|a==id)){return Err("素材正在使用，请先删除轨道中引用它的所有片段".into());}next.subtitle_assets.retain(|a|a.id!=id);
+    }
+    else if next.audio_assets.iter().any(|a|a.id==id){next.remove_unused_audio_asset(id)?;}
+    else {if next.visual_clips.iter().any(|c|c.asset_id==id){return Err("素材正在使用，请先删除轨道中引用它的所有片段".into());}let i=next.visual_assets.iter().position(|a|a.id==id).ok_or("素材已删除")?;next.visual_assets.remove(i);}
+    apply_workspace_media(hwnd,&root,&expected,next)?;
+    crate::platform::workspace::notice("素材已移除 · 可撤销");
+    Ok(())
+}
+
+pub(crate) fn drop_project_asset(hwnd:HWND,id:&str,mut point:POINT)->Result<(),String>{
+    let s=unsafe{state_mut(hwnd)}.ok_or("工程已关闭")?;unsafe{let _=ScreenToClient(hwnd,&mut point);}let c=s.control_layout(client_rect(hwnd));
+    if point.y<c.track_area.top||point.y>=c.track_area.bottom||point.x<c.ruler.left||point.x>=c.ruler.right{return Err("请将素材拖入兼容轨道".into());}
+    let track=if c.video_track.contains(point.x,point.y){Some("video".to_owned())}else{c.media_tracks.iter().enumerate().find(|(_,r)|r.bottom>r.top&&r.contains(point.x,point.y)).and_then(|(i,_)|s.row_track(i).map(|t|t.id.clone()))}.ok_or("请将素材拖入兼容轨道")?;
+    let mut at=TimeTick((s.timeline.visible_start().0+s.timeline.pixel_delta_to_tick(point.x-c.ruler.left,c.ruler.right-c.ruler.left).0).max(0));
+    if unsafe{GetKeyState(0x12)}>=0{let tolerance=s.timeline.pixel_delta_to_tick(s.theme.scale(8),c.ruler.right-c.ruler.left).0.unsigned_abs();if let Some(n)=s.media_snap_points("").into_iter().filter(|p|p.abs_diff(at.0)<=tolerance).min_by_key(|p|p.abs_diff(at.0)){at=TimeTick(n);}}
+    let mut next=s.editor.settings().clone();
+    if id=="__source__"{ensure_source_asset(s.editor.project_root(),&mut next)?;}
+    let subtitle=next.subtitle_assets.iter().any(|a|a.id==id);
+    let id=if subtitle{next.insert_subtitle_asset(id,&track,at)?}else if next.audio_assets.iter().any(|a|a.id==id){next.insert_audio_asset(id,&track,at)?}else{next.insert_visual_asset(id,&track,at)?};
+    s.editor.replace_media_settings(next).map_err(|e|e.to_string())?;s.apply_editor_state().map_err(|e|e.to_string())?;s.media_selected=Some((subtitle,id));s.selected_video=None;s.selected_segment=None;if let Some(bin)=&s.project_bin{project_bin::select_preview(bin,false);}s.refresh(hwnd,true);Ok(())
+}
+
+/// Route every material import to the project bin, independently of inspector selection.
+pub(crate) fn import_project_asset(hwnd:HWND)->Result<(),String>{
+ let s=unsafe{state_mut(hwnd)}.ok_or("工作台已关闭")?;
+ let bin=s.project_bin.as_ref().ok_or("项目素材面板未就绪")?;
+ unsafe{PostMessageW(Some(bin.hwnd),WM_APP+61,WPARAM(0),LPARAM(0)).map_err(|e|e.to_string())?;}Ok(())
+}
+
+fn ensure_source_asset(root:&Path,next:&mut panzo_core::WorkbenchSettings)->Result<(),String>{if !next.visual_assets.iter().any(|a|a.id=="__source__"){        let m:panzo_core::ProjectManifest=serde_json::from_slice(&std::fs::read(root.join("project.json")).map_err(|e|e.to_string())?).map_err(|e|e.to_string())?;
+        let audio=crate::platform::audio::AudioManifest::load(root)?.tracks.into_iter().map(|t|(t.path,t.frames)).collect();
+        next.visual_assets.push(panzo_core::timeline::VisualAsset{id:"__source__".into(),name:"项目源视频".into(),path:m.media.screen,kind:panzo_core::timeline::VisualKind::Video,duration:TimeTick(m.media.duration_tick),width:m.capture.content_size_px.width,height:m.capture.content_size_px.height,audio_path:None,audio_frames:0,source_audio:audio});
+}Ok(())}
+
+pub(crate) fn import_project_asset_path(hwnd:HWND,path:std::path::PathBuf)->Result<(),String>{let s=unsafe{state_mut(hwnd)}.ok_or("工作台已关闭")?;let bin=s.project_bin.as_ref().ok_or("素材面板未就绪")?;project_bin::import_path(bin,path)}
+
+pub(crate) fn preview_area(hwnd:HWND)->Option<RECT> {
+    unsafe{state_mut(hwnd)}.map(|s|s.preview_clip_rect(client_rect(hwnd)))
+}
+
+impl WindowState {
+    fn select_preview_source(&mut self,source:bool)->Result<(),PreviewWindowError> {
+        let old=self.session.preview_asset_id().map(str::to_owned);
+        if source {
+            let id=self.project_bin.as_ref().and_then(project_bin::selected_preview_asset);
+            let Some(id)=id else {return Ok(());};
+            self.session.preview_asset(&id,self.editor.settings())?;
+        } else {self.session.leave_asset_preview()?;}
+        if let Some(bin)=&self.project_bin {project_bin::select_preview(bin,self.session.is_asset_preview());}
+        if old.as_deref()!=self.session.preview_asset_id() {
+            self.deferred_playback.cancel();self.scrub_preview.cancel();self.scrub_gate.reset();
+            self.timeline_scrub=None;self.preview_view=Default::default();
+            if self.crop_editing {self.crop_editing=false;self.session.set_crop_editing(false);}
+            let start=Instant::now();
+            if let Some(frame)=self.session.begin_interactive_prepare()? {self.accept_prepared(frame,start.elapsed().as_micros() as u64)?;}
+            self.schedule_interactive_poll();
+        }
+        Ok(())
+    }
+}
+
+impl WindowState {
+    fn preview_seek_rect(&self,client:RECT)->HitRect {
+        let r=self.control_layout(client).transport;
+        HitRect(RECT{bottom:r.top+self.theme.scale(6),..r})
+    }
+    fn seek_preview_at(&mut self,hwnd:HWND,x:i32) {
+        let r=self.preview_seek_rect(client_rect(hwnd));
+        let fraction=f64::from((x-r.left).clamp(0,(r.right-r.left).max(1)))/f64::from((r.right-r.left).max(1));
+        let tick=TimeTick((fraction*self.session.snapshot().duration_tick.0 as f64).round() as i64);
+        if self.session.snapshot().project_tick!=tick {self.seek_absolute(tick);}
+        let c=self.control_layout(client_rect(hwnd));
+        unsafe{let _=InvalidateRect(Some(hwnd),Some(&c.transport),false);}
+    }
+}
+
+pub(crate) fn selected_subtitle(hwnd:HWND)->Option<String>{
+    unsafe{state_mut(hwnd)}.and_then(|s|s.media_selected.as_ref().filter(|(sub,id)|*sub&&s.editor.settings().subtitles.iter().any(|c|&c.id==id)).map(|(_,id)|id.clone()))
+}
+
+impl WindowState {
+    fn change_preview_quality(&mut self,quality:crate::platform::preview_quality::PreviewQuality) {
+        if self.session.preview_quality()==quality{return;}
+        let playing=self.session.snapshot().playback==PlaybackState::Playing || self.deferred_playback.is_requested();
+        self.session.pause();self.scrub_preview.cancel();self.scrub_gate.reset();self.timeline_scrub=None;
+        self.session.set_preview_quality(quality);self.scrub_preview.set_preview_limit(self.session.preview_source_limit());
+        if playing{self.deferred_playback.request();}
+        let result=self.render().map_err(PreviewWindowError::from);self.record_result(result);
+        if let Err(e)=crate::platform::ui_preferences::set_preview_quality(quality){self.note_problem("预览清晰度偏好未保存",e);}
     }
 }

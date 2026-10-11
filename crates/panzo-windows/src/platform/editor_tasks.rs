@@ -77,10 +77,11 @@ impl From<crate::platform::export::ExportError> for ExportTaskError {
 }
 
 impl ExportTask {
-    pub fn start(
+    pub fn start_with_options(
         request: ExportRequest,
         snapshot: ExportSnapshot,
         preset: ExportPreset,
+        options: super::export::ExportOptions,
     ) -> std::io::Result<Self> {
         let cancel = Arc::new(AtomicBool::new(false));
         let progress = Arc::new(AtomicU32::new(0));
@@ -90,10 +91,11 @@ impl ExportTask {
         std::thread::Builder::new()
             .name("panzo-export".into())
             .spawn(move || {
-                let result = ProjectExporter::export_snapshot(
+                let result = ProjectExporter::export_snapshot_with_options(
                     &request,
                     &snapshot,
                     preset,
+                    options,
                     &worker_cancel,
                     |done, total| {
                         worker_progress.store(

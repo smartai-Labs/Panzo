@@ -4,25 +4,55 @@ Panzo 是面向 Windows 的录制与基础编辑应用，当前沿用 Windows 11
 
 RE-MVP 候选已接通录制、视频裁剪 / 分割 / 删除闭合、镜头与背景、统一撤销、原子保存和编辑器内原始尺寸 / 1080p60 导出。**候选实现不等于整体验收通过**；最新结论见 [统一验收报告](Acceptance-Report.md)。旧技术规范保留为历史基线。
 
-## 打开当前候选
+## 当前候选与启动
 
-双击 [9 月 27 日当前候选](target/editor-feedback/release/panzo.exe)。该版本包含统一窗口、菜单与设置样式、灰色标题栏、字体调整和编辑器操作反馈修复，详见[修改与验证说明](docs/UI-Editor-Feedback-2026-09-27.md)。
+2026-10-11 已清理历史构建，`target` 仅保留当前版本 `desktop-v14-library-popup-fix`、`debug` 和 `release`。历史验收文档中的旧构建路径仅作记录，程序统一通过下方入口启动。
 
-旧候选构建与打包文件已清理；历史文档中的旧 EXE、压缩包和临时日志路径仅作为当时的记录。目录保留规则和本次清理明细见[项目整理记录](docs/Project-Cleanup-2026-09-27.md)。
+最新 [桌面 UI 商业化就绪审查](docs/UI-Commercial-Readiness-Audit-2026-10-09.md) 已完成：基于 v12.6 的真实窗口、流程回归和响应测量，列明性能、组件、布局、动效与验收缺口，以及整改顺序。该 UI 审查的测量基线为 v12.6。
 
-录制器选择来源后开始录制；停止收尾完成后进入编辑器。已有工程通过“打开工程”选择其中的 `project.json`。详细操作见 [使用说明](docs/RE-MVP-User-Guide.md)。
+双击 [Start-Panzo.cmd](Start-Panzo.cmd) 启动当前版本，或直接打开 [桌面工作台 v14 · 素材库弹窗修正版](target/desktop-v14-library-popup-fix/release/panzo.exe)。素材先导入，通过中央标签切换预览，再拖入时间轴；录音结束只加入素材库。支持新增／删除轨道、片段自由移动、同类型跨轨拖动、边缘吸附（Alt 暂停）、Esc 取消和边缘自动滚动。播放及导出时长取时间轴片段的最晚结束位置，空画面区为黑屏，音频继续播放。素材被引用时禁止删除。右侧页签为画面、视频、声音、字幕。面板标题为与正文同字体的 14 px 普通字重，正文 13 px。视频页精简重复片段信息与入出点输入，增加片段缩放；同组按钮采用深色分段样式，背景类型回归背景分组并正确作用于预览及导出。像素为整数，百分比与速度为一位小数，详见 [设置面板与背景修复](docs/Inspector-Settings-2026-10-10.md)。按钮首次点击即可执行，移除按钮焦点下划线；视频“自由”直接进入预览裁剪，可拖动边角和取景范围。详见 [本轮修复与验证记录](docs/Interaction-Crop-Fixes-2026-10-10.md) 与 [此前录制视频修复](docs/Recording-Video-Fixes-2026-10-10.md)。保留此前的 [面板拖动绘制修复](docs/Panel-Drag-Rendering-2026-10-10.md) 和 [空白工作台调整](docs/Panels-And-Empty-Workspace-2026-10-10.md)。
+
+播放按钮左侧新增“1/4、1/2、原画”预览清晰度，默认原画并记忆选择，视频和素材共用此设置；预览质量不改变导出质量。导出面板按名称、输出位置、分辨率、帧率、格式排列，高级设置在面板内展开。详见 [预览清晰度与导出面板验证](docs/Preview-Quality-And-Export-2026-10-10.md)。
+
+此前合并完成时间轴选框、素材拖动卡片、旁白倒计时、声音／字幕面板对齐、即时修改、同轨重叠约束和波形显示。视频与素材预览现在共用一个播放器，切换按钮与播放控件同一行，使用统一深色分段容器；字幕样式只在选中字幕后直接显示，并逐条保存。详见 [修复与共享播放器验证](docs/Media-Polish-And-Shared-Preview-2026-10-10.md)。
+
+此前的 [颜色面板修复](docs/Image-Color-Popup-Fix-2026-10-09.md) 与 [图片页原型对齐](docs/Image-Workspace-v14-2026-10-09.md) 保留：数值框悬浮或聚焦显示增减箭头，数字、箭头和单位垂直居中；颜色选择即时修改，点击面板外关闭后更新最近使用颜色；多显示器定位修复保留。
+
+本轮按 v14 原型完成原生工作台布局：统一三层顶部、项目素材栏、片段属性、声音与字幕、固定高度轨道、图片工具属性和三栏素材库。详见 [原生改造与验证记录](docs/Workbench-v14-Native-2026-10-09.md)。v13 的重绘、任务状态、插件隔离及辅助功能基础继续保留。
+
+正式目标仍为 Windows 11；当前机器的 Windows 10 回归不能替代目标系统、混合 DPI、输入法和 Narrator 实机验收。商业发布门槛及复现入口见 [UI 发布验收矩阵](docs/UI-Release-Gates.md)。录音与 AI 字幕继续通过插件执行，四个属性标签共用一个面板，轨道始终保持全宽。预览支持 Ctrl＋滚轮缩放、拖动平移和居中适配。独立插件的任务隔离与兼容性见 [v12.7 插件生命周期修复](docs/Plugin-Lifecycle-v12.7-2026-10-09.md)。
+
+已安装的插件无需重装。首次使用录音与 AI 字幕时，在顶部「插件」安装同目录的 [媒体插件包](target/desktop-v14-library-popup-fix/release/panzo-media-tools.panzoplugin)，然后在「设置 → AI 字幕」配置自己的 API 地址、语音模型和 API Key。字幕面板提供“添加字幕”和“AI 自动字幕”，普通字幕也可导入 / 导出 SRT。保留 v11.1 的 [插件列表刷新修复](docs/Plugin-List-Refresh-2026-10-09.md) 与 v11.2 的 [轨道高度限制](docs/Timeline-Track-Height-2026-10-09.md)；录音与模型通信仍由插件承担。
+
+v10 快捷键设置功能已合入当前版本。快捷键仍在「设置 → 快捷键」长期保存；默认全局截图 Ctrl+Alt+Shift+F9，区域录屏 / 停止 Ctrl+Alt+Shift+F10。新声音、字幕入口默认不占用快捷键。详见 [快捷键说明](docs/Custom-Shortcuts-2026-10-09.md)。
+
+顶部「插件」弹窗支持内置 OCR / 多模态 / 批处理的启停，以及本地独立插件安装、更新、回退和卸载。可以导入 [灰度与反色示例插件](dist/plugins/panzo-image-filters-0.1.0-windows-x64.panzoplugin)，然后在图片工具栏的插件入口运行。详见 [本阶段说明](docs/Plugin-Stage-A-2026-10-08.md) 和 [插件开发文档](docs/Plugin-Development.md)。OCR、录屏等尚随主程序打包，精简版 / 全功能组合包将在后续拆包后提供。
+
+[多模态识图配置说明](docs/Multimodal-Vision-2026-10-08.md)、[区域选择闪屏修复](docs/Selection-Flicker-Fix-2026-10-08.md) 和 [第四阶段功能说明](docs/Integrated-Capture-Stage-D-2026-10-08.md) 中的底层能力均保留；历史说明里的独立窗口入口已逐步迁入当前工作区。API Key 继续由用户配置并在本机加密保存。
+
+[第三阶段说明](docs/Integrated-Capture-Stage-C-2026-10-08.md)、[第二阶段说明](docs/Integrated-Capture-Stage-B-2026-10-08.md)、[第一阶段说明](docs/Integrated-Capture-Stage-A-2026-10-08.md) 保留作对照。
+
+开发启动：`cargo run -p panzo-app --bin panzo`。
+
+9 月 27 日候选的改动保留在 [历史说明](docs/UI-Editor-Feedback-2026-09-27.md)。
+
+## 新工作区 UI 设计
+
+**工作台布局 v14 设计基线**：[交互原型](docs/prototypes/workbench-v14/index.html) · [问题、布局规格与实施方案](docs/UI-Layout-Review-v14-2026-10-09.md) · [使用说明与截图](docs/prototypes/workbench-v14/README.md)。保留现有主题，重排任务层级、上下文工具、统一属性栏、轨道和素材接入；原型已用于当前 v14 原生开发，原型中的模拟流程与实际应用须分别验证；原生结果见上方改造记录。预览：`powershell -ExecutionPolicy Bypass -File scripts/open-workbench-v14-preview.ps1`。
+
+历史设计基线为 **桌面工作台 v3**：[可点击设计稿](docs/prototypes/desktop-v3/index.html) · [设计与原生改造规格](docs/UI-Workspace-Redesign-2026-10-08.md)。采用顶部工作区、窄工具栏、文档标签、画布和可收起属性面板，覆盖图片、录制、素材、插件和设置。v2 因过于接近网页应用已弃用。当前原生界面已按 2026-10-09 的问题筛查继续修正，以本页顶部列出的当前原生候选为准；此 HTML 入口仅保留作设计对照。独立窗口预览：`powershell -ExecutionPolicy Bypass -File scripts/open-desktop-v3-preview.ps1`。
 
 ## 当前开发安排
 
 按用户要求连续实施，不再逐阶段暂停；以下任务已进入候选统一回归，详见 [实现说明](docs/RE-MVP-Implementation.md)。
 
-1. 原型视觉 / 布局已获确认；原生 UI 的真实视觉验收尚未完成。
+1. 桌面工作台 v3 已接入原生候选，已检查真实窗口的深浅主题、960×720 布局和持久工作流；多显示器 DPI 与完整读屏矩阵仍待专项验收。
 2. 已接入后台解码、短 GOP 代理、播放预读和有界调度；完整物理输入矩阵待验收。
-3. 已按确认原型重排三区布局、预览播放条、内联参数、色块/滑杆/开关、录制卡和导出面板；中文 SVG 与 UI Automation 已接通；桌面授权已成功，但截图接口错误仍阻断真实视觉 / 坐标拖动检查，不能用几何测试或读树替代视觉验收。
+3. 已按设计重排工作区、图片工具、录制准备、素材列表、插件和偏好设置；视频画布、时间线及属性区沿用实际 GPU 预览与编辑后端。当前已取得真实窗口截图，完整物理输入矩阵仍待专项验收。
 4. 已补齐视频裁头尾、分割、删除闭合、效果映射及统一撤销。
 5. 已接通编辑器原始尺寸 / 1080p 导出与录后衔接；完整 GUI 任务评审待完成。
 
-规范入口：[UI/UX 重设计](docs/Recording-Editing-UI-UX-Spec.md)、[验收计划](docs/Recording-Editing-Acceptance-Plan.md)、[已知问题](Known-Issues.md)。本轮维持无音频；自动镜头自然度专项后移；跨 GPU 测试继续延期，不记通过。以下功能/探针说明保留现有实现信息，新范围与开发顺序以上述计划为准。
+规范入口：[UI/UX 重设计](docs/Recording-Editing-UI-UX-Spec.md)、[验收计划](docs/Recording-Editing-Acceptance-Plan.md)、[已知问题](Known-Issues.md)。历史 RE-MVP 的无音频范围已由集成 C 阶段扩展；自动镜头真人舒适度及跨 GPU 专项仍待验收，不记通过。以下功能/探针说明保留现有实现信息，新范围与开发顺序以上述计划为准。
 
 R0 首轮已交付：[界面交互原型](docs/prototypes/re-mvp/index.html)（本地双击打开，不是新版EXE）、[评审说明](docs/prototypes/re-mvp/README.md)、[性能基线与交付报告](docs/RE-MVP-R0-Report.md)。原型不录屏、不写工程、不导出文件；原型视觉 / 布局已确认，不能替代真实窗口与性能验收。
 

@@ -1,0 +1,1 @@
+PASS: material/inspector/timeline splitters; 80 mouse moves coalesced into one layout commit (3.4519ms); unrelated panel geometry/title/revision unchanged; final release commit; cancellation restores width.

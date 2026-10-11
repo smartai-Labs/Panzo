@@ -1,0 +1,11 @@
+{
+  "batchCompleted": 2,
+  "closedPinRestored": true,
+  "freshProcessRestore": true,
+  "gifDurationMs": 400,
+  "gifFrames": 2,
+  "groupRestored": "演示参考",
+  "pauseAndHideVerified": true,
+  "restoredWithoutOriginalGif": true,
+  "scroll": "scroll-proof.json"
+}

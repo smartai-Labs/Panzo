@@ -1,0 +1,179 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-recent-colors\\release\\panzo.exe",
+  "sha256": "f8b407ab424187ab98c384e2ff4a20e4a1a1d81e1a6366a0e691d3c91e561b35",
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\recent-release-1d3e5091-b998-459a-960c-c5064d2fd1b4",
+  "cases": [
+    {
+      "monitor": {
+        "work": [
+          2560,
+          0,
+          5120,
+          1440
+        ],
+        "primary": false
+      },
+      "popup": [
+        3326,
+        295,
+        3618,
+        773
+      ],
+      "root": [
+        2572,
+        12,
+        3752,
+        862
+      ],
+      "rootEnabled": true,
+      "ownedByRoot": true,
+      "insideRoot": true,
+      "noApplyCancel": true,
+      "dragSamples": 111,
+      "dragBackgroundColors": [
+        3486256
+      ],
+      "liveSwatch": 15233818,
+      "liveUpdated": true,
+      "historyFrozenWhileOpen": true,
+      "outsideClickClosedAndReachedTool": false,
+      "historyFinalOnly": true,
+      "closedColorKept": true,
+      "circleColorAndAlignment": true,
+      "invalidHexKeepsLast": true,
+      "opacityDoesNotDuplicate": true,
+      "standardIsLive": true,
+      "standardRecorded": true,
+      "quickRecentPromoted": true,
+      "stillResponsive": true,
+      "styleButtonRects": [
+        [
+          3464,
+          385,
+          3492,
+          413
+        ],
+        [
+          3500,
+          385,
+          3528,
+          413
+        ],
+        [
+          3536,
+          385,
+          3564,
+          413
+        ],
+        [
+          3636,
+          385,
+          3664,
+          413
+        ],
+        [
+          3672,
+          385,
+          3700,
+          413
+        ],
+        [
+          3708,
+          385,
+          3736,
+          413
+        ]
+      ],
+      "styleLayoutConsistent": true,
+      "passed": false
+    },
+    {
+      "monitor": {
+        "work": [
+          0,
+          0,
+          2560,
+          1440
+        ],
+        "primary": true
+      },
+      "popup": [
+        766,
+        295,
+        1058,
+        773
+      ],
+      "root": [
+        12,
+        12,
+        1192,
+        862
+      ],
+      "rootEnabled": true,
+      "ownedByRoot": true,
+      "insideRoot": true,
+      "noApplyCancel": true,
+      "dragSamples": 138,
+      "dragBackgroundColors": [
+        3486256
+      ],
+      "liveSwatch": 15233818,
+      "liveUpdated": true,
+      "historyFrozenWhileOpen": true,
+      "outsideClickClosedAndReachedTool": false,
+      "historyFinalOnly": true,
+      "closedColorKept": true,
+      "circleColorAndAlignment": true,
+      "invalidHexKeepsLast": true,
+      "opacityDoesNotDuplicate": true,
+      "standardIsLive": true,
+      "standardRecorded": true,
+      "quickRecentPromoted": true,
+      "stillResponsive": true,
+      "styleButtonRects": [
+        [
+          904,
+          385,
+          932,
+          413
+        ],
+        [
+          940,
+          385,
+          968,
+          413
+        ],
+        [
+          976,
+          385,
+          1004,
+          413
+        ],
+        [
+          1076,
+          385,
+          1104,
+          413
+        ],
+        [
+          1112,
+          385,
+          1140,
+          413
+        ],
+        [
+          1148,
+          385,
+          1176,
+          413
+        ]
+      ],
+      "styleLayoutConsistent": true,
+      "passed": false
+    }
+  ],
+  "passed": false,
+  "isolatedPid": 63052,
+  "restartHistoryPreserved": true,
+  "popupRecentSelection": true
+}

@@ -1,0 +1,17 @@
+﻿{
+    "directory":  "D:\\ChatGPT\\Panzo\\target\\desktop-v14-media-polish\\release",
+    "sourceSha256":  "6CAD753D25A2A482C2DDCB2F57331C3D768E9D819097BF35F8EAA9CBF87C1CC6",
+    "binaries":  [
+                     {
+                         "name":  "panzo.exe",
+                         "sha256":  "AEAD9631DCFF503BFE4794F5A1ED114621130DFD8EAE39E538FA9F2CAAF90CE9",
+                         "bytes":  10507776
+                     },
+                     {
+                         "name":  "panzo-cli.exe",
+                         "sha256":  "4ABD6D5304DFEF221808768F36F4BDBDEA5FF5FF01800CA8CA4BA88599C5FC07",
+                         "bytes":  12035584
+                     }
+                 ],
+    "manifestPath":  "D:\\ChatGPT\\Panzo\\target\\desktop-v14-media-polish\\release\\candidate-build.json"
+}

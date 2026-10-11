@@ -45,6 +45,10 @@ impl TimelineViewport {
         self.visible_start == TimeTick::ZERO && self.visible_duration == self.project_duration
     }
 
+    pub fn can_pan(self) -> bool {
+        self.visible_duration < self.project_duration
+    }
+
     pub fn contains(self, tick: TimeTick) -> bool {
         self.visible_start <= tick && tick <= self.visible_end()
     }
@@ -69,7 +73,7 @@ impl TimelineViewport {
                         / i128::from(width),
                 )
                 .unwrap_or(self.visible_duration.as_i64()),
-        )
+        ).min(self.project_duration)
     }
 
     pub fn pixel_delta_to_tick(self, pixels: i32, pixel_width: i32) -> TimeTick {
@@ -89,7 +93,7 @@ impl TimelineViewport {
         let minimum = MIN_VISIBLE_TICKS.min(self.project_duration.as_i64());
         let old_duration = self.visible_duration.as_i64();
         let new_duration = ((old_duration as f64 / factor).round() as i64)
-            .clamp(minimum, self.project_duration.as_i64());
+            .clamp(minimum, self.project_duration.as_i64().saturating_mul(2));
         let anchor = anchor
             .as_i64()
             .clamp(self.visible_start.as_i64(), self.visible_end().as_i64());
@@ -99,6 +103,24 @@ impl TimelineViewport {
         self.visible_start = TimeTick(start);
         self.clamp_start();
     }
+
+    /// Slider covers half-width project overview through the existing fine zoom limit.
+    pub fn zoom_fraction(self) -> f64 {
+        let maximum = self.project_duration.0.saturating_mul(2) as f64;
+        let minimum = MIN_VISIBLE_TICKS.min(self.project_duration.0) as f64;
+        ((maximum / self.visible_duration.0 as f64).ln() / (maximum / minimum).ln()).clamp(0.0, 1.0)
+    }
+
+    pub fn set_zoom_fraction(&mut self, anchor: TimeTick, fraction: f64) {
+        if !fraction.is_finite() { return; }
+        let maximum = self.project_duration.0.saturating_mul(2) as f64;
+        let minimum = MIN_VISIBLE_TICKS.min(self.project_duration.0) as f64;
+        let wanted = maximum / (maximum / minimum).powf(fraction.clamp(0.0, 1.0));
+        self.zoom_at(anchor, self.visible_duration.0 as f64 / wanted);
+    }
+
+    /// Dragging may create empty project time beyond the last placed clip.
+    pub fn pan_for_drop(&mut self,delta:TimeTick){self.visible_start=TimeTick(self.visible_start.0.saturating_add(delta.0).clamp(0,(panzo_core::media_edit::MAX_MEDIA_TICK-self.visible_duration.0).max(0)));}
 
     pub fn pan_by(&mut self, delta: TimeTick) {
         self.visible_start = TimeTick(self.visible_start.as_i64().saturating_add(delta.as_i64()));
@@ -132,7 +154,7 @@ impl TimelineViewport {
         if was_fit {
             self.reset();
         } else {
-            self.visible_duration = self.visible_duration.min(duration);
+            self.visible_duration = self.visible_duration.min(TimeTick(duration.0.saturating_mul(2)));
             self.clamp_start();
         }
     }
@@ -187,5 +209,23 @@ mod tests {
         assert_eq!(viewport.visible_end(), TimeTick(10 * TICKS_PER_SECOND));
         viewport.ensure_visible(TimeTick::ZERO);
         assert_eq!(viewport.visible_start(), TimeTick::ZERO);
+    }
+}
+
+#[cfg(test)]
+mod overview_tests {
+    use super::*;
+    #[test]
+    fn half_width_overview_and_empty_space_seek() {
+        let end=TimeTick(60*TICKS_PER_SECOND);let mut v=TimelineViewport::fit(end);
+        v.zoom_at(TimeTick(20*TICKS_PER_SECOND),0.5);
+        assert_eq!(v.tick_to_offset(end,1000),500);
+        assert_eq!(v.offset_to_tick(950,1000),end);
+        assert_eq!(v.zoom_fraction(),0.0);
+        v.zoom_at(end,0.5);assert_eq!(v.tick_to_offset(end,1000),500);
+        v.set_duration(TimeTick(50*TICKS_PER_SECOND));assert_eq!(v.visible_duration(),TimeTick(100*TICKS_PER_SECOND));
+        v.set_zoom_fraction(TimeTick::ZERO,1.0);assert_eq!(v.visible_duration(),TimeTick(MIN_VISIBLE_TICKS));
+        v.set_zoom_fraction(TimeTick::ZERO,0.0);assert_eq!(v.tick_to_offset(TimeTick(50*TICKS_PER_SECOND),1000),500);
+        v.reset();assert!(v.is_fit());
     }
 }

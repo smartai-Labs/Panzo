@@ -1,0 +1,381 @@
+{
+  "method": "sRGB linearized relative luminance; (Lmax+0.05)/(Lmin+0.05). Palette values read from source. Text usage must be checked separately; inactive controls are not automatically failures.",
+  "source": "crates/panzo-windows/src/platform/editor_ui.rs",
+  "contrast": [
+    {
+      "theme": "light",
+      "foreground": "text",
+      "background": "panel",
+      "foregroundRgb": [
+        35,
+        39,
+        45
+      ],
+      "backgroundRgb": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 15.005,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text",
+      "background": "raised",
+      "foregroundRgb": [
+        35,
+        39,
+        45
+      ],
+      "backgroundRgb": [
+        244,
+        245,
+        247
+      ],
+      "ratio": 13.755,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text_secondary",
+      "background": "panel",
+      "foregroundRgb": [
+        91,
+        98,
+        108
+      ],
+      "backgroundRgb": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.161,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text_secondary",
+      "background": "raised",
+      "foregroundRgb": [
+        91,
+        98,
+        108
+      ],
+      "backgroundRgb": [
+        244,
+        245,
+        247
+      ],
+      "ratio": 5.648,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text_muted",
+      "background": "panel",
+      "foregroundRgb": [
+        116,
+        122,
+        133
+      ],
+      "backgroundRgb": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 4.316,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "light",
+      "foreground": "text_muted",
+      "background": "raised",
+      "foregroundRgb": [
+        116,
+        122,
+        133
+      ],
+      "backgroundRgb": [
+        244,
+        245,
+        247
+      ],
+      "ratio": 3.957,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "light",
+      "foreground": "danger",
+      "background": "panel",
+      "foregroundRgb": [
+        255,
+        69,
+        58
+      ],
+      "backgroundRgb": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 3.407,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "light",
+      "foreground": "danger",
+      "background": "raised",
+      "foregroundRgb": [
+        255,
+        69,
+        58
+      ],
+      "backgroundRgb": [
+        244,
+        245,
+        247
+      ],
+      "ratio": 3.123,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "light",
+      "foreground": "warning",
+      "background": "panel",
+      "foregroundRgb": [
+        255,
+        159,
+        10
+      ],
+      "backgroundRgb": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 2.056,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "light",
+      "foreground": "warning",
+      "background": "raised",
+      "foregroundRgb": [
+        255,
+        159,
+        10
+      ],
+      "backgroundRgb": [
+        244,
+        245,
+        247
+      ],
+      "ratio": 1.884,
+      "meetsNormalText4_5": false
+    },
+    {
+      "theme": "dark",
+      "foreground": "text",
+      "background": "panel",
+      "foregroundRgb": [
+        229,
+        231,
+        235
+      ],
+      "backgroundRgb": [
+        48,
+        50,
+        53
+      ],
+      "ratio": 10.385,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text",
+      "background": "raised",
+      "foregroundRgb": [
+        229,
+        231,
+        235
+      ],
+      "backgroundRgb": [
+        37,
+        40,
+        44
+      ],
+      "ratio": 11.957,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text_secondary",
+      "background": "panel",
+      "foregroundRgb": [
+        186,
+        193,
+        204
+      ],
+      "backgroundRgb": [
+        48,
+        50,
+        53
+      ],
+      "ratio": 7.095,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text_secondary",
+      "background": "raised",
+      "foregroundRgb": [
+        186,
+        193,
+        204
+      ],
+      "backgroundRgb": [
+        37,
+        40,
+        44
+      ],
+      "ratio": 8.169,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text_muted",
+      "background": "panel",
+      "foregroundRgb": [
+        159,
+        166,
+        177
+      ],
+      "backgroundRgb": [
+        48,
+        50,
+        53
+      ],
+      "ratio": 5.243,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text_muted",
+      "background": "raised",
+      "foregroundRgb": [
+        159,
+        166,
+        177
+      ],
+      "backgroundRgb": [
+        37,
+        40,
+        44
+      ],
+      "ratio": 6.037,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "danger",
+      "background": "panel",
+      "foregroundRgb": [
+        255,
+        129,
+        126
+      ],
+      "backgroundRgb": [
+        48,
+        50,
+        53
+      ],
+      "ratio": 5.323,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "danger",
+      "background": "raised",
+      "foregroundRgb": [
+        255,
+        129,
+        126
+      ],
+      "backgroundRgb": [
+        37,
+        40,
+        44
+      ],
+      "ratio": 6.128,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "warning",
+      "background": "panel",
+      "foregroundRgb": [
+        255,
+        192,
+        103
+      ],
+      "backgroundRgb": [
+        48,
+        50,
+        53
+      ],
+      "ratio": 7.952,
+      "meetsNormalText4_5": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "warning",
+      "background": "raised",
+      "foregroundRgb": [
+        255,
+        192,
+        103
+      ],
+      "backgroundRgb": [
+        37,
+        40,
+        44
+      ],
+      "ratio": 9.156,
+      "meetsNormalText4_5": true
+    }
+  ],
+  "sourceSize": {
+    "preview_window.rs": {
+      "totalLinesIncludingTests": 7512
+    },
+    "picture_window.rs": {
+      "totalLinesIncludingTests": 2255
+    },
+    "desktop_ui.rs": {
+      "totalLinesIncludingTests": 1104
+    },
+    "editor_ui.rs": {
+      "totalLinesIncludingTests": 2045
+    },
+    "editor_layout.rs": {
+      "totalLinesIncludingTests": 1452
+    },
+    "editor_chrome.rs": {
+      "totalLinesIncludingTests": 1309
+    },
+    "media_panel.rs": {
+      "totalLinesIncludingTests": 1212
+    },
+    "workspace.rs": {
+      "totalLinesIncludingTests": 1010
+    },
+    "workspace_form.rs": {
+      "totalLinesIncludingTests": 404
+    },
+    "inspector_host.rs": {
+      "totalLinesIncludingTests": 80
+    },
+    "plugin_manager.rs": {
+      "totalLinesIncludingTests": 330
+    }
+  }
+}

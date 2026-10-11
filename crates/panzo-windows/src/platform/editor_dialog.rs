@@ -38,8 +38,22 @@ pub fn form_with_description(
     options: &[(usize, &[&str])],
     accept: &str,
 ) -> windows::core::Result<Option<Vec<String>>> {
+    form_with_password_fields(owner, title, description, fields, options, &[], accept)
+}
+
+#[allow(clippy::too_many_lines)]
+pub fn form_with_password_fields(
+    owner: HWND,
+    title: &str,
+    description: &str,
+    fields: &[(&str, String)],
+    options: &[(usize, &[&str])],
+    password_fields: &[usize],
+    accept: &str,
+) -> windows::core::Result<Option<Vec<String>>> {
     use windows::Win32::UI::WindowsAndMessaging::{
-        CB_ADDSTRING, CB_GETCURSEL, CB_SETCURSEL, CBS_DROPDOWNLIST, CBS_HASSTRINGS, WS_VSCROLL,
+        CB_ADDSTRING, CB_GETCURSEL, CB_SETCURSEL, CBS_DROPDOWNLIST, CBS_HASSTRINGS, ES_PASSWORD,
+        WS_VSCROLL,
     };
     let instance = unsafe { GetModuleHandleW(None)? };
     let class = w!("PanzoProperties");
@@ -79,6 +93,7 @@ pub fn form_with_description(
         )?
     };
     crate::platform::editor_ui::apply_window_chrome(hwnd);
+    super::desktop_ui::install(hwnd);
     let controls = (|| -> windows::core::Result<Vec<HWND>> {
         if !description.is_empty() {
             let description = wide(description);
@@ -111,6 +126,7 @@ pub fn form_with_description(
         }
         let mut inputs = Vec::new();
         for (index, (label, value)) in fields.iter().enumerate() {
+            let is_folder = label.contains("文件夹") || *label == "素材库目录";
             let y = 20 + description_height + i32::try_from(index).unwrap_or(0) * 44;
             let choice = options
                 .iter()
@@ -131,33 +147,58 @@ pub fn form_with_description(
                     if choice.is_some() {
                         WS_TABSTOP
                             | WS_VSCROLL
-                            | WINDOW_STYLE((CBS_DROPDOWNLIST | CBS_HASSTRINGS) as u32)
+                            | WINDOW_STYLE((CBS_DROPDOWNLIST | CBS_HASSTRINGS | windows::Win32::UI::WindowsAndMessaging::CBS_OWNERDRAWFIXED) as u32)
                     } else {
-                        WS_BORDER | WS_TABSTOP | WINDOW_STYLE(ES_AUTOHSCROLL as u32)
+                        WS_BORDER
+                            | WS_TABSTOP
+                            | WINDOW_STYLE(
+                                (ES_AUTOHSCROLL
+                                    | if password_fields.contains(&index) {
+                                        ES_PASSWORD
+                                    } else {
+                                        0
+                                    })
+                                .cast_unsigned(),
+                            )
                     },
                 ),
             ] {
                 let text = wide(&text);
-                let child = unsafe {
-                    CreateWindowExW(
-                        WINDOW_EX_STYLE::default(),
-                        class,
-                        PCWSTR(text.as_ptr()),
-                        WS_CHILD | WS_VISIBLE | style,
-                        scale(x),
-                        scale(y),
-                        scale(w),
-                        scale(if id >= 100 && choice.is_some() {
-                            180
-                        } else {
-                            30
-                        }),
-                        Some(hwnd),
-                        Some(HMENU(id as *mut _)),
-                        Some(instance.into()),
-                        None,
-                    )?
+                let child = if is_folder && id >= 100 {
+                    let h = super::path_field::create(hwnd, value, id).map_err(|e| {
+                        windows::core::Error::new(windows::core::HRESULT(0x80004005u32 as i32), e)
+                    })?;
+                    super::workspace_ui::place(h, scale(x), scale(y), scale(w), scale(30));
+                    h
+                } else {
+                    unsafe {
+                        CreateWindowExW(
+                            WINDOW_EX_STYLE::default(),
+                            class,
+                            PCWSTR(text.as_ptr()),
+                            WS_CHILD | WS_VISIBLE | style,
+                            scale(x),
+                            scale(y),
+                            scale(w),
+                            scale(if id >= 100 && choice.is_some() {
+                                180
+                            } else {
+                                30
+                            }),
+                            Some(hwnd),
+                            Some(HMENU(id as *mut _)),
+                            Some(instance.into()),
+                            None,
+                        )?
+                    }
                 };
+                if id >= 100 && !is_folder {
+                    if choice.is_some() {
+                        super::desktop_ui::combo(child);
+                    } else {
+                        super::desktop_ui::edit(child);
+                    }
+                }
                 unsafe {
                     SendMessageW(
                         child,
@@ -211,6 +252,8 @@ pub fn form_with_description(
                     None,
                 )?
             };
+            super::desktop_ui::button(child);
+            super::desktop_ui::style(child, None, false, id == 1, false);
             unsafe {
                 SendMessageW(
                     child,

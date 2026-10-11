@@ -1,0 +1,19 @@
+﻿{
+  "passed": true,
+  "testsPassed": 4,
+  "testModule": "platform::workspace_form::review",
+  "commands": [
+    "cargo test -p panzo-windows --lib workspace_form::review --offline -- --test-threads=1",
+    "cargo test -p panzo-windows --lib settings_draft_and_form_job_survive_close_reopen_and_complete_while_hidden --offline -- --ignored --test-threads=1"
+  ],
+  "checks": [
+    "Reopening the cached form inside its callback retains the executing closure until return and uses its replacement on the next command",
+    "Same title with different open_scoped context keeps distinct handles and unsaved field values",
+    "Refreshed combo options preserve an existing valid selection; removed selection falls back to new default or first item",
+    "Production settings close/reopen keeps drafts and same window/form; Target::Form job completes while hidden without reopening a window; result remains when settings reopened"
+  ],
+  "desktopReview": "form-state/workspace-form-review.json",
+  "networkRequests": 0,
+  "savedSecrets": 0,
+  "productionFilesModifiedForThisTestTask": []
+}

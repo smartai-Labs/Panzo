@@ -1,0 +1,52 @@
+{
+  "binary": "target/desktop-v5/release/panzo.exe",
+  "sha256": "8e8e33370a9f60ddabdd3aeb15fd62cf1a6b81092e02e5ad21438a2da8c12a8d",
+  "unitTests": {
+    "passed": 302,
+    "failed": 0,
+    "ignored": 38
+  },
+  "nativeInteractionPassed": true,
+  "existingWorkflowsPassed": true,
+  "resize": {
+    "resizeSteps": 100,
+    "measurement": "screen pixel samples, not display frames",
+    "samples": 44,
+    "missingCaptionTextFrames": 0,
+    "firstFailures": []
+  },
+  "tooltipRegistrationVerified": true,
+  "tooltipHoverVisualVerified": false,
+  "drawingSampling": {
+    "passed": false,
+    "valid": false,
+    "reason": "Window geometry changed during sampling; measurement is invalid",
+    "geometryChange": {
+      "beforeRoot": [
+        50,
+        50,
+        1150,
+        850
+      ],
+      "afterRoot": [
+        204,
+        104,
+        1849,
+        1200
+      ],
+      "beforePicture": [
+        50,
+        206,
+        800,
+        548
+      ],
+      "afterPicture": [
+        204,
+        260,
+        1345,
+        844
+      ]
+    }
+  },
+  "reference": "C:/Users/Administrator/Documents/Codex/2026-09-09/vpn/work/collage (read only; function and interaction reference)"
+}

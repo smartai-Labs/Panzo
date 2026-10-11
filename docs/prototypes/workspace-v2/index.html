@@ -1,0 +1,26 @@
+﻿<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panzo · 新工作区设计</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="preview-note"><span><b>Panzo UI · 设计预览</b><span class="note-detail">可切换页面与主题；截图、识别、录制和插件安装为演示，不调用真实服务。</span></span><button id="tour" class="note-link">查看交互说明</button></div>
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">p<span></span></span><span>Panzo<span class="brand-caption">捕捉 · 创作 · 分享</span></span></div>
+  <div class="nav-label">工作空间</div><nav id="main-nav" aria-label="功能导航"></nav>
+  <div class="sidebar-context"><div class="nav-label">当前会话 <span id="session-count">0</span></div><div id="session-items"></div><p id="session-empty">截图和导入的内容<br>会保留在这里</p></div>
+  <div class="sidebar-bottom"><nav id="utility-nav" aria-label="应用管理"></nav><button class="profile-card" id="privacy"><span class="local-icon" data-icon="shield"></span><span>本地工作空间<small>素材保存在你的设备</small></span></button></div>
+</aside>
+<main class="main">
+  <header class="page-header"><div><div class="eyebrow" id="page-eyebrow">工作空间</div><h1 id="page-title">图片工具</h1></div><div class="header-actions"><button class="search-command" id="command-search"><span data-icon="search"></span><span>搜索功能</span><kbd>Ctrl K</kbd></button><button class="icon-button" id="theme-toggle" title="切换浅色 / 深色" aria-label="切换浅色 / 深色"><span data-icon="moon"></span></button><button class="icon-button" id="help" title="设计说明" aria-label="设计说明"><span data-icon="help"></span></button></div></header>
+  <div id="view" class="view"></div>
+  <footer class="status-bar"><div><span class="status-dot"></span><span id="app-status" role="status">就绪</span></div><span id="footer-hint">你的创作，都在一个工作空间里。</span><button id="task-toggle"><span data-icon="activity"></span><span id="task-count">后台任务 0</span></button></footer>
+</main>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<div id="overlay" class="overlay" hidden><section id="dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"></section></div>
+<input id="file-input" type="file" accept="image/*" hidden multiple><input id="plugin-input" type="file" accept=".panzoplugin" hidden>
+<script src="app.js"></script>
+</body></html>

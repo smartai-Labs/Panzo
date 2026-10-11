@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "binary": "target/desktop-v10/release/panzo.exe",
+  "checks": [
+    "all actions visible in Settings; native key recording; duplicate bindings reject save without writing",
+    "Save applies immediately; Escape cancels recording; Revert discards draft; custom F8 switches workspace",
+    "clearing global shortcut releases Windows registration; external owner blocks rebind; failed apply preserves persisted bindings and existing hotkeys",
+    "image crop respects custom F6 and old C no longer triggers; text input keeps native typing behavior",
+    "fresh process reloads disabled and modified shortcuts; persisted F8 still dispatches",
+    "global registration reloads and mapped native hotkey command restores the hidden application",
+    "custom next-frame, split, save and undo operate on a real isolated video project; old B binding stays inactive"
+  ],
+  "processIds": [
+    72868,
+    34700,
+    66020,
+    25684
+  ],
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\ui-release-73ebd0f6-068f-47a0-a866-df0e52053b2e",
+  "actions": 67,
+  "crashDumps": []
+}

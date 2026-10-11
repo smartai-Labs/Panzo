@@ -1,0 +1,29 @@
+﻿{
+  "date": "2026-10-09",
+  "component": "asset library and read-only preview",
+  "testsPassed": 8,
+  "checks": [
+    "Recursive nested output discovery includes JPEG/GIF/MP4 and excludes project internals",
+    "Durable external registration deduplicates paths and retains missing-file entries",
+    "Discovery returns more than 500 assets",
+    "Pointer-centred zoom preserves image coordinates",
+    "Asynchronous PNG and GIF decoding and animation pause",
+    "Missing/corrupt-file error state",
+    "145-item native history list: selection/scroll retained across categories and refresh; thumbnail at index 130; preview creates no editor document; native scrollbar remains removed",
+    "MediaFoundation synthetic MP4 poster, duration and random seeks at middle, start and final frame"
+  ],
+  "visualEvidence": "assets-preview-dark-v2.png",
+  "visualNote": "Isolated test host uses a standard STATIC top-level window; its white title bar and bottom margin are not the Panzo workspace chrome. The final list scrollbar is themed and the native white strip is gone.",
+  "videoFixture": "../crop-titlebar-20260919/color-chart-c3bd601a-03de-48c8-b216-66ee6400f13b.mp4",
+  "behavior": {
+    "selection": "inline preview only",
+    "space": "expand inline quick preview while list focused",
+    "doubleClick": "open image/GIF or project for editing; MP4 enters import pipeline",
+    "images": "zoom around pointer, pan, fit, 100 percent",
+    "gif": "play/pause; hidden pages suspend animation",
+    "video": "muted poster/playback/seek; double-click enters editor for audio and edits",
+    "projects": "preview explicitly labelled original recording",
+    "thumbnailCache": "visible rows requested on demand, keyed by path/modified/size, bounded LRU eviction",
+    "previewWorkers": "generation-tagged results; file changes and selection changes invalidate stale results"
+  }
+}

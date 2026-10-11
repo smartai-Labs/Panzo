@@ -1,0 +1,1 @@
+PASS: real tray-command popup from a hidden workspace in dark/light themes; cancel preserves hidden state and tray preference; exit requested through normal shell command 12; no recording or user documents opened.

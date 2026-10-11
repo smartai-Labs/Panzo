@@ -1,0 +1,19 @@
+{
+  "atomicOverlapRejection": true,
+  "gpuReadbacksDuringSwitch": 0,
+  "liveAudio": true,
+  "passed": true,
+  "perCueStylePersistence": true,
+  "singleGpuWindow": true,
+  "sourceSwitches": 8,
+  "switchWith350msPumpUs": [
+    352641,
+    352373,
+    350438,
+    355194,
+    354860,
+    352518,
+    352077,
+    353706
+  ]
+}

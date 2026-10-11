@@ -1,0 +1,1 @@
+PASS: async image background appears in GPU output; solid/image switch on first click, undo/redo and save; image picker independent of advanced group; removed hidden trim hit areas; integer px input; decimal clip scale input and drag, undo, saved scale and scaled crop handles; light/dark screenshots. Isolated fixture only.

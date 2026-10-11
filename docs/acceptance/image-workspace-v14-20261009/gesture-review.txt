@@ -1,0 +1,9 @@
+
+running 1 test
+test platform::capture_tools::picture_window::picture_review::native_picture_gestures_crop_text_and_buffered_preview ... isolated native image review evidence: D:\ChatGPT\Panzo\crates\panzo-windows\.tmp\image-gesture-review-f833abde-72a5-4bb4-bc5e-5814e8cd138f
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.75s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running unittests src\lib.rs (target\debug\deps\panzo_windows-9b54cdddb84279c6.exe)

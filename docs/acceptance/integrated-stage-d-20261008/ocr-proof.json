@@ -1,0 +1,13 @@
+{
+  "chineseExactMatch": false,
+  "expectedChinese": "截图识别文字",
+  "languages": [
+    {
+      "name": "中文(中华人民共和国)",
+      "tag": "zh-Hans-CN"
+    }
+  ],
+  "repeatCount": 3,
+  "text": "Panzo OCR 2026\r\nScreenshot to text\r\n截图识另刂文字",
+  "workerThreads": true
+}

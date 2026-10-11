@@ -55,3 +55,15 @@ pub use time::{
     VideoFrameRateDecision, VideoFrameRateLimiter, VideoTimestampDecision,
     VideoTimestampNormalizer,
 };
+
+pub mod camera_policy;
+pub mod recording_time;
+
+pub mod annotations;
+pub use annotations::{AnnotationAnchor, AnnotationKind, VideoAnnotation};
+
+pub mod media_edit;
+
+pub mod text_style;
+
+pub mod timeline;

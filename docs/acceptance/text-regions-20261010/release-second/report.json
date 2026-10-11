@@ -1,0 +1,87 @@
+{
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v14-text-regions\\release\\panzo.exe",
+  "sha256": "452e7030e25aa5e1492305dde385077fd3c97449ead6cfd7d306426139c1f4d0",
+  "passed": false,
+  "isolatedPid": 37288,
+  "emptyDraft": true,
+  "emptyFocus": {
+    "edit": 46400990,
+    "focus": 46400990,
+    "caret": 46400990,
+    "caretRect": [
+      4,
+      4,
+      5,
+      39
+    ],
+    "selection": 0
+  },
+  "emptyCaretVisible": true,
+  "fontPreviewHidden": true,
+  "sizePresets": 21,
+  "selectedFamily": "Arial",
+  "selectedWeight": "粗体",
+  "keyboardSynchronized": true,
+  "canvasToInspector": true,
+  "inspectorToCanvas": true,
+  "transparentPixels": 763,
+  "backgroundPixels": 768,
+  "transparentBackground": true,
+  "opacitySamplePixels": 581,
+  "opacityChanged": true,
+  "resizeExpanded": true,
+  "resizeKeptFontSize": true,
+  "draftMoved": true,
+  "committedOnToolChange": true,
+  "reopenedText": "右侧同步修改",
+  "styleRoundtripGhostFree": true,
+  "escapeClosed": true,
+  "cancelRestored": true,
+  "editPersisted": true,
+  "selectedInspectorVisible": true,
+  "selectedInspectorPersisted": false,
+  "selectedInspectorReopenedValue": "最终文字",
+  "savedTextPixels": 1078,
+  "gdiBefore": 180,
+  "repaintChecks": 270,
+  "whiteBlocks": [],
+  "wrongBackgrounds": [],
+  "gdiAfter": 180,
+  "hung": false,
+  "numberFields": [
+    {
+      "value": "4",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true,
+      "visibleInkPixels": 21
+    },
+    {
+      "value": "24",
+      "outer": [
+        1152,
+        249,
+        1218,
+        277
+      ],
+      "client": [
+        1152,
+        253,
+        52,
+        19
+      ],
+      "visible": true,
+      "visibleInkPixels": 40
+    }
+  ]
+}

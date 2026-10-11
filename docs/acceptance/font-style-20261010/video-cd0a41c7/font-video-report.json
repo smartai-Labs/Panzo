@@ -1,0 +1,20 @@
+{
+  "encodedPixelDifference": 13143,
+  "framesPerExport": 30,
+  "passed": true,
+  "style": {
+    "background": true,
+    "bottom": 0.08,
+    "color": "#32A0E0",
+    "enabled": true,
+    "font": {
+      "alignment": "right",
+      "family": "Arial",
+      "italic": true,
+      "underline": true,
+      "weight": 700
+    },
+    "fontSize": 0.08,
+    "opacity": 179
+  }
+}

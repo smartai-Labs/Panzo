@@ -1,4 +1,4 @@
-//! Finalize our single-video fMP4 exports with explicit fragment decode times.
+//! Finalize our video/audio fMP4 exports with explicit fragment decode times.
 //! MF's implicit-time fragments can lose their final partial GOP in the Windows reader.
 //! Copy encoded payloads unchanged; recording/recovery never passes through this module.
 use super::{
@@ -116,46 +116,50 @@ fn explicit_fragment_time(
         .into_iter()
         .filter(|header| &header.kind == b"traf")
         .collect();
-    if tracks.len() != 1 {
-        return Err(Fmp4ProbeError::InvalidMediaTiming);
+    let mut edits = Vec::new();
+    for traf in tracks {
+        let children = child_boxes(bytes, traf.payload_start, traf.end)?;
+        let tfhd = *children
+            .iter()
+            .find(|b| &b.kind == b"tfhd")
+            .ok_or(Fmp4ProbeError::InvalidMediaTiming)?;
+        let payload = &bytes[tfhd.payload_start..tfhd.end];
+        if read_full_box_flags(payload)? & 1 == 0 {
+            return Err(Fmp4ProbeError::InvalidMediaTiming);
+        }
+        let track = read_u32(payload, 4)?;
+        let start = decode_times
+            .iter()
+            .find_map(|(id, time)| (*id == track).then_some(*time))
+            .unwrap_or(0);
+        let insert = !children.iter().any(|b| &b.kind == b"tfdt");
+        edits.push((traf, tfhd, start, insert));
     }
-    let traf = tracks[0];
-    let children = child_boxes(bytes, traf.payload_start, traf.end)?;
-    let tfhd = children
-        .iter()
-        .find(|header| &header.kind == b"tfhd")
-        .ok_or(Fmp4ProbeError::InvalidMediaTiming)?;
-    let payload = &bytes[tfhd.payload_start..tfhd.end];
-    // This helper only accepts the absolute-offset form written by our MF sink.
-    if read_full_box_flags(payload)? & 1 == 0 {
-        return Err(Fmp4ProbeError::InvalidMediaTiming);
-    }
-    let track = read_u32(payload, 4)?;
-    let base = read_u64(payload, 8)?;
-    let start = decode_times
-        .iter()
-        .find_map(|(id, time)| (*id == track).then_some(*time))
-        .unwrap_or(0);
-    let insert = !children.iter().any(|header| &header.kind == b"tfdt");
+    let added = edits.iter().filter(|(_, _, _, insert)| *insert).count() * 20;
     inspect_moof_timing(bytes, 8, bytes.len(), defaults, decode_times)?;
-    let added = if insert { 20 } else { 0 };
-    let base = u64::try_from(i128::from(base) + shift + added)
-        .map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
-    bytes[tfhd.payload_start + 8..tfhd.payload_start + 16].copy_from_slice(&base.to_be_bytes());
-    if insert {
-        let time = u64::try_from(start).map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
-        let mut tfdt = Vec::from(20_u32.to_be_bytes());
-        tfdt.extend_from_slice(b"tfdt");
-        tfdt.extend_from_slice(&[1, 0, 0, 0]);
-        tfdt.extend_from_slice(&time.to_be_bytes());
-        let traf_start = traf.payload_start - 8;
-        let traf_size = u32::try_from(traf.end - traf_start + 20)
+    let moof_size =
+        u32::try_from(bytes.len() + added).map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
+    bytes[..4].copy_from_slice(&moof_size.to_be_bytes());
+    for (traf, tfhd, start, insert) in edits.into_iter().rev() {
+        let base = read_u64(bytes, tfhd.payload_start + 8)?;
+        let base = u64::try_from(i128::from(base) + shift + added as i128)
             .map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
-        let moof_size =
-            u32::try_from(bytes.len() + 20).map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
-        bytes[..4].copy_from_slice(&moof_size.to_be_bytes());
-        bytes[traf_start..traf_start + 4].copy_from_slice(&traf_size.to_be_bytes());
-        bytes.splice(tfhd.end..tfhd.end, tfdt);
+        bytes[tfhd.payload_start + 8..tfhd.payload_start + 16].copy_from_slice(&base.to_be_bytes());
+        if insert {
+            let mut tfdt = Vec::from(20u32.to_be_bytes());
+            tfdt.extend_from_slice(b"tfdt");
+            tfdt.extend_from_slice(&[1, 0, 0, 0]);
+            tfdt.extend_from_slice(
+                &u64::try_from(start)
+                    .map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?
+                    .to_be_bytes(),
+            );
+            let start = traf.payload_start - 8;
+            let size = u32::try_from(traf.end - start + 20)
+                .map_err(|_| Fmp4ProbeError::InvalidMediaTiming)?;
+            bytes[start..start + 4].copy_from_slice(&size.to_be_bytes());
+            bytes.splice(tfhd.end..tfhd.end, tfdt);
+        }
     }
     Ok(())
 }

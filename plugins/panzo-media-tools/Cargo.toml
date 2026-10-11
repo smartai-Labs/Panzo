@@ -1,0 +1,11 @@
+﻿[package]
+name = "panzo-media-tools"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+panzo-plugin-api = { path = "../../crates/panzo-plugin-api" }
+panzo-core = { path = "../../crates/panzo-core" }
+panzo-windows = { path = "../../crates/panzo-windows" }
+serde_json.workspace = true
+reqwest.workspace = true
+tokio.workspace = true

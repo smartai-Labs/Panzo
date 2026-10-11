@@ -1,0 +1,387 @@
+{
+  "mode": "quick",
+  "dimension_id": "d1",
+  "headline": "Windows 捕获与 GIF 编码已有成熟技术构件，区域持久化边界、帧率时基和产品范围决定 Panzo 的增量实施复杂度",
+  "key_findings": [
+    {
+      "finding": "截图、区域录制与 GIF 在 ShareX 和 Windows/FFmpeg 官方能力中均有直接技术依据，Panzo 可沿已有采集与导出架构增量扩展。",
+      "claim_ids": [
+        "d1.c1",
+        "d1.c4",
+        "d1.c5",
+        "d1.c9"
+      ]
+    },
+    {
+      "finding": "区域录制的关键边界是应用在持久化前裁剪及正确处理多显示器 DPI；后期裁剪不能证明区外内容从未进入原素材。",
+      "claim_ids": [
+        "d1.c5",
+        "d1.c6",
+        "d1.c7"
+      ]
+    },
+    {
+      "finding": "GIF 输出有调色板与厘秒时间粒度限制，帧率、循环和颜色处理需要分别设计，不能只更改文件扩展名。",
+      "claim_ids": [
+        "d1.c9",
+        "d1.c10",
+        "d1.c11",
+        "d1.c12"
+      ]
+    },
+    {
+      "finding": "完整 ShareX 功能集显著超出局部截图与短演示需求，直接移植源码还涉及与独立实现不同的许可选择。",
+      "claim_ids": [
+        "d1.c2",
+        "d1.c3",
+        "d1.c13"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "d1.c1",
+      "text": "ShareX 的现有功能覆盖全屏、窗口、显示器、区域截图，视频/GIF 录制、滚动截图，以及保存、复制、标注和上传等后续任务。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "product_scope",
+      "answers_key_question": "kq1",
+      "evidence": [
+        {
+          "source_id": "sharex_features",
+          "snippet": "官网 Capture 列出 fullscreen、active window/monitor、region、screen recording、screen recording (GIF)、scrolling capture；后续任务包括 copy、save、image editor 和 upload。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c2",
+      "text": "ShareX 区域截图支持复用上次区域、快捷键入口和完成后立即继续复制或保存；这套交互适用于按钮、错误消息、代码片段等局部沟通内容。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "product_scope",
+      "answers_key_question": "kq1",
+      "evidence": [
+        {
+          "source_id": "sharex_region",
+          "snippet": "官方文档列举按钮、对话框、菜单、错误、表单与代码等用途；可从热键及 Last region 启动，选区完成后接 configured after-capture tasks。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c3",
+      "text": "ShareX 的产品范围还包括 OCR、上传目的地、二维码、取色和大量图像/视频工具；复制完整产品会超过截图与短演示的需求边界。",
+      "kind": "interpretive",
+      "polarity": "refute",
+      "topic_tag": "product_scope",
+      "answers_key_question": "kq1",
+      "evidence": [
+        {
+          "source_id": "sharex_features",
+          "snippet": "官网把 Upload 与 Productivity tools 分成独立大类，包含 OCR、QR、color、image/video 工具。",
+          "quote_type": "paraphrase"
+        },
+        {
+          "source_id": "sharex_repository",
+          "snippet": "官方 README 将 ShareX 描述为 screen capture、recording、image editing、file uploading 与 automation 的组合。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c4",
+      "text": "Windows.Graphics.Capture 可从显示器或应用窗口取得帧，并用于视频流或单张 PNG 截图。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "capture_feasibility",
+      "answers_key_question": "kq2",
+      "evidence": [
+        {
+          "source_id": "microsoft_capture",
+          "snippet": "官方文档描述 display/window frames、video streams or snapshots，并展示从 capture frame 保存 PNG 的流程。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c5",
+      "text": "D3D11 CopySubresourceRegion 能在 GPU 上拷贝源纹理子矩形；它要求源框与目标偏移合法，只做复制，不做缩放或混合。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "capture_feasibility",
+      "answers_key_question": "kq2",
+      "evidence": [
+        {
+          "source_id": "microsoft_d3d_copy",
+          "snippet": "pSrcBox 定义被复制部分；纹理坐标用 texels；GPU 执行 copy；越界行为未定义，函数不支持 stretch、color key 或 blend。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c6",
+      "text": "基于 WGC 帧加 GPU 子矩形复制，区域内容可以在应用编码和持久化之前缩减；这一设计不等于底层捕获会话从未取得整显示器帧。",
+      "kind": "interpretive",
+      "polarity": "support",
+      "topic_tag": "capture_feasibility",
+      "answers_key_question": "kq2",
+      "evidence": [
+        {
+          "source_id": "microsoft_capture",
+          "snippet": "WGC 捕获对象为显示器/窗口，帧 Surface 尺寸由 frame pool 决定，文档讨论从内容尺寸拷贝子矩形。",
+          "quote_type": "paraphrase"
+        },
+        {
+          "source_id": "microsoft_d3d_copy",
+          "snippet": "源纹理子矩形可以复制到较小目标纹理，提供编码前裁剪构件。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c7",
+      "text": "Win32 多显示器 DPI 需要显式处理：不同显示器可能使用不同缩放比例，Per-Monitor awareness 与 DPI change 消息会影响 UI 和坐标理解。",
+      "kind": "factual",
+      "polarity": "refute",
+      "topic_tag": "capture_feasibility",
+      "answers_key_question": "kq2",
+      "evidence": [
+        {
+          "source_id": "microsoft_dpi",
+          "snippet": "官方说明跨不同 DPI 显示器、连接/断开外接屏、改变缩放等场景；Per-Monitor 能看到物理像素，UI 布局仍需随 WM_DPICHANGED 更新。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c8",
+      "text": "FFmpeg 的 fps 滤镜通过必要的重复帧或丢帧把视频变为指定恒定输出帧率；提高输出 fps 本身不会补回原先未采集的运动信息。",
+      "kind": "factual",
+      "polarity": "neutral",
+      "topic_tag": "frame_rate",
+      "answers_key_question": "kq3",
+      "evidence": [
+        {
+          "source_id": "ffmpeg_filters",
+          "snippet": "fps 文档说明 convert to specified constant frame rate by duplicating or dropping frames as necessary。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c9",
+      "text": "FFmpeg 提供 palettegen 和 paletteuse，可为视频生成调色板并设置颜色数量、统计模式和抖动方式，能够作为 GIF 导出后端的现成构件。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "gif_export",
+      "answers_key_question": "kq3",
+      "evidence": [
+        {
+          "source_id": "ffmpeg_filters",
+          "snippet": "palettegen 可生成整段视频调色板，max_colors 控制量化颜色，reserve_transparent 默认预留透明项；paletteuse 应用调色板并提供 dithering mode。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c10",
+      "text": "GIF 帧延时采用百分之一秒粒度，15 fps 或 30 fps 不能用恒定整数延时精确表达；目标总时长可以通过不同延时的累计分配近似。",
+      "kind": "interpretive",
+      "polarity": "refute",
+      "topic_tag": "gif_export",
+      "answers_key_question": "kq3",
+      "evidence": [
+        {
+          "source_id": "gif_specification",
+          "snippet": "Graphic Control Extension 的 Delay Time 指定处理下一段数据前等待的 1/100 秒数量。",
+          "quote_type": "paraphrase"
+        },
+        {
+          "source_id": "ffmpeg_formats",
+          "snippet": "GIF muxer 文档强调两帧延时不能小于一厘秒；据这一时间粒度，100/15 和 100/30 都不是整数。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c11",
+      "text": "FFmpeg GIF 输出可指定循环次数与末帧延时，其中 -1 表示不循环、0 表示无限循环，末帧延时以厘秒计。",
+      "kind": "factual",
+      "polarity": "support",
+      "topic_tag": "gif_export",
+      "answers_key_question": "kq3",
+      "evidence": [
+        {
+          "source_id": "ffmpeg_formats",
+          "snippet": "GIF muxer 的 loop 与 final_delay 选项分别控制循环与最后一帧等待；示例 loop 10、final_delay 500。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c12",
+      "text": "FFmpeg 的常见 GIF 调色板为最多 256 项，预留透明色时最多 255 个不透明颜色；从全彩编辑结果转换时需要颜色量化取舍。",
+      "kind": "factual",
+      "polarity": "refute",
+      "topic_tag": "gif_export",
+      "answers_key_question": "kq3",
+      "evidence": [
+        {
+          "source_id": "ffmpeg_filters",
+          "snippet": "palettegen 文档说明保留 256 色 palette；reserve_transparent 开启时创建最多 255 色并留最后一项给透明。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    },
+    {
+      "id": "d1.c13",
+      "text": "ShareX 官方仓库标注 GPL-3.0；FFmpeg 官方说明主体 LGPL-2.1-or-later，启用部分 GPL 组件会改变 FFmpeg 许可适用范围。",
+      "kind": "factual",
+      "polarity": "neutral",
+      "topic_tag": "implementation_boundary",
+      "answers_key_question": "kq4",
+      "evidence": [
+        {
+          "source_id": "sharex_repository",
+          "snippet": "官方仓库 License 栏为 GPL-3.0。",
+          "quote_type": "paraphrase"
+        },
+        {
+          "source_id": "ffmpeg_license",
+          "snippet": "官方许可页说明 LGPL 2.1 or later，以及 optional GPL parts 被使用时 GPL applies to all of FFmpeg。",
+          "quote_type": "paraphrase"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "sharex_features",
+      "url": "https://getsharex.com/",
+      "title": "ShareX — capture, recording and productivity features",
+      "quality": "primary"
+    },
+    {
+      "id": "sharex_region",
+      "url": "https://getsharex.com/docs/region-capture",
+      "title": "Region Capture — ShareX",
+      "quality": "primary"
+    },
+    {
+      "id": "sharex_repository",
+      "url": "https://github.com/ShareX/ShareX",
+      "title": "ShareX/ShareX — official repository and GPL-3.0 license",
+      "quality": "primary"
+    },
+    {
+      "id": "microsoft_capture",
+      "url": "https://learn.microsoft.com/en-us/windows/apps/develop/media-authoring-processing/screen-capture",
+      "title": "Screen capture — Microsoft Learn",
+      "quality": "primary",
+      "published_at": "2026-08-23"
+    },
+    {
+      "id": "microsoft_d3d_copy",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-copysubresourceregion",
+      "title": "ID3D11DeviceContext::CopySubresourceRegion",
+      "quality": "primary",
+      "published_at": "2024-11-18"
+    },
+    {
+      "id": "microsoft_dpi",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows",
+      "title": "High DPI Desktop Application Development on Windows",
+      "quality": "primary",
+      "published_at": "2025-07-14"
+    },
+    {
+      "id": "ffmpeg_filters",
+      "url": "https://www.ffmpeg.org/ffmpeg-filters.html",
+      "title": "FFmpeg Filters Documentation — fps, palettegen, paletteuse",
+      "quality": "primary"
+    },
+    {
+      "id": "gif_specification",
+      "url": "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+      "title": "Graphics Interchange Format Version 89a",
+      "quality": "primary",
+      "published_at": "1990"
+    },
+    {
+      "id": "ffmpeg_formats",
+      "url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "title": "FFmpeg Formats Documentation — GIF muxer",
+      "quality": "primary"
+    },
+    {
+      "id": "ffmpeg_license",
+      "url": "https://www.ffmpeg.org/legal.html",
+      "title": "FFmpeg License and Legal Considerations",
+      "quality": "primary"
+    }
+  ],
+  "writing_context": [
+    {
+      "id": "d1.w1",
+      "kind": "methodology",
+      "text": "快速研究关键问题：kq1=产品必要性及边界；kq2=截图与区域录制工程可行性；kq3=MP4/GIF/帧率方案；kq4=独立实现与依赖许可。官方网页均在 2026-10-08 打开原文核验；未披露原文日期的网页不伪填发布日期。",
+      "source_ids": [],
+      "applies_to": [
+        "kq1",
+        "kq2",
+        "kq3",
+        "kq4"
+      ],
+      "use": "将日期视为核验日，事实随软件更新可能变化；不引用版本号、下载数等与决策无关数据。"
+    },
+    {
+      "id": "d1.w2",
+      "kind": "scope_boundary",
+      "text": "本地代码一手审阅在同目录 d1.local-review.md，包括准确路径/行号、当前功能、固定 60 fps、20 Mbps 码率下限、区域外事件仍会落盘及许可证元数据不一致。schema 只允许 HTTP 来源，本文件不伪造本地 source URL。",
+      "source_ids": [],
+      "applies_to": [
+        "kq1",
+        "kq2",
+        "kq3",
+        "kq4"
+      ],
+      "use": "成稿必须结合 d1.local-review.md 并引用真实本地文件，不能只写泛化可行性。"
+    },
+    {
+      "id": "d1.w3",
+      "kind": "scope_boundary",
+      "text": "用户“导入为 MP4/GIF”暂按录后导出理解；默认场景为工作沟通和短操作演示，外部文件导入是另一能力。",
+      "source_ids": [],
+      "applies_to": [
+        "kq1",
+        "kq3"
+      ],
+      "use": "开头明确这一解释，若用途是带解说教程则提高音频优先级。"
+    },
+    {
+      "id": "d1.w4",
+      "kind": "unresolved_gap",
+      "text": "尚未测试 Panzo 新区域管线、FFmpeg 二进制或 Rust GIF encoder；未测目标聊天客户端播放、实际 GIF 体积/耗时/色彩、混合 DPI/GPU。",
+      "source_ids": [],
+      "applies_to": [
+        "kq2",
+        "kq3"
+      ],
+      "use": "建议是基于架构的工程判断，不宣称性能或兼容已验证，不承诺排期。"
+    },
+    {
+      "id": "d1.w5",
+      "kind": "scope_boundary",
+      "text": "许可证据仅标识现有文件与依赖许可；没有判断具体分发方式的最终法律效果。",
+      "source_ids": [
+        "sharex_repository",
+        "ffmpeg_license"
+      ],
+      "applies_to": [
+        "kq4"
+      ],
+      "use": "建议借鉴交互和独立实现，选择具体分发构建时核对许可，不直接断言闭源不可用。"
+    }
+  ]
+}

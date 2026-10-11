@@ -62,7 +62,6 @@ const CAPTURE_QUEUE_CAPACITY: usize = 4;
 const CAPTURE_TEXTURE_COUNT: usize = CAPTURE_QUEUE_CAPACITY + 1;
 const MINIMUM_FREE_BYTES: u64 = 2 * 1_024 * 1_024 * 1_024;
 const DEFAULT_LAST_FRAME_DURATION_TICK: i64 = 166_667;
-const TARGET_CAPTURE_FPS: u32 = 60;
 const CAPTURE_MUTEX_KEY: u64 = 0;
 const PROCESSING_MUTEX_KEY: u64 = 1;
 const SHARED_TEXTURE_WAIT_MS: u32 = 2_000;
@@ -149,40 +148,22 @@ pub struct CaptureRecorder;
 pub enum RecordingSource {
     PrimaryMonitor,
     Window(WindowCaptureTarget),
+    Region(PhysicalRect),
 }
 
 impl RecordingSource {
     pub fn label(&self) -> String {
         match self {
             Self::PrimaryMonitor => "主显示器".into(),
+            Self::Region(r) => format!("选定区域：{} × {}", r.width, r.height),
             Self::Window(target) => format!("窗口：{}", target.title),
         }
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct RecordingControl {
-    stop_requested: Arc<AtomicBool>,
-    recording_started: Arc<AtomicBool>,
-}
-
-impl RecordingControl {
-    pub fn request_stop(&self) {
-        self.stop_requested.store(true, Ordering::Release);
-    }
-
-    pub fn stop_requested(&self) -> bool {
-        self.stop_requested.load(Ordering::Acquire)
-    }
-
-    pub fn recording_started(&self) -> bool {
-        self.recording_started.load(Ordering::Acquire)
-    }
-
-    fn mark_recording_started(&self) {
-        self.recording_started.store(true, Ordering::Release);
-    }
-}
+#[path = "recording_control.rs"]
+mod recording_control;
+pub use recording_control::{RecordingControl, RecordingOptions};
 
 impl PrimaryMonitorRecorder {
     pub fn record(
@@ -223,6 +204,9 @@ impl CaptureRecorder {
         control: &RecordingControl,
         source: &RecordingSource,
     ) -> Result<RecordingReport, RecorderError> {
+        if !matches!(control.options.fps, 30 | 60) || !control.options.camera.valid() {
+            return Err(RecorderError::InvalidDuration);
+        }
         if maximum_duration < Duration::from_millis(250) {
             return Err(RecorderError::InvalidDuration);
         }
@@ -241,10 +225,12 @@ impl CaptureRecorder {
         let prepared = prepare_capture_source(source)?;
         let item = prepared.item;
         let size = prepared.capture_size;
-        let capture_width =
+        let source_width =
             u32::try_from(size.Width).map_err(|_| RecorderError::InvalidCaptureSize)?;
-        let capture_height =
+        let source_height =
             u32::try_from(size.Height).map_err(|_| RecorderError::InvalidCaptureSize)?;
+        let capture_width = prepared.crop.map_or(source_width, |region| region[2]);
+        let capture_height = prepared.crop.map_or(source_height, |region| region[3]);
         if capture_width < 2 || capture_height < 2 {
             return Err(RecorderError::InvalidCaptureSize);
         }
@@ -262,6 +248,8 @@ impl CaptureRecorder {
             &processing_d3d,
             capture_width,
             capture_height,
+            (source_width, source_height),
+            prepared.crop,
         )?);
 
         let desktop_rect = PhysicalRect {
@@ -290,7 +278,7 @@ impl CaptureRecorder {
                     width: desktop_rect.width,
                     height: desktop_rect.height,
                 },
-                target_fps: 60,
+                target_fps: control.options.fps,
                 pixel_format: "BGRA8".into(),
                 color_mode: "sdr-srgb".into(),
                 cursor_captured_in_video: false,
@@ -321,7 +309,9 @@ impl CaptureRecorder {
         // deadlock when encoder activation and an active capture session compete for the GPU.
         session_log.stage("media-writer-create-begin")?;
         let part_media_path = project_root.join("media/screen.part.mp4");
-        let encoding = Nv12VideoConfig::native_screen_60(width, height)?;
+        let mut encoding = Nv12VideoConfig::native_screen_60(width, height)?;
+        encoding.frames_per_second = control.options.fps;
+        encoding.gop_frames = control.options.fps;
         let mut media_writer = Nv12Fmp4Writer::create_with_config(&part_media_path, encoding)?;
         session_log.stage_with_detail(
             "media-writer-create-complete",
@@ -337,6 +327,9 @@ impl CaptureRecorder {
             return Err(RecorderError::HardwareEncoderRequired);
         }
 
+        let audio_capture =
+            crate::platform::audio_capture::AudioCaptureService::start(project_root, control)
+                .map_err(RecorderError::Audio)?;
         session_log.stage("input-capture-start-begin")?;
         let mut input_service = InputCaptureService::start()?;
         session_log.stage("input-capture-start-complete")?;
@@ -346,6 +339,7 @@ impl CaptureRecorder {
         session_log.stage("first-frame-wait-begin")?;
         let first_task = wait_for_first_frame(&shared, Duration::from_secs(5))?;
         let clock = SessionClock::establish(qpc.frequency(), first_task.system_relative_tick)?;
+        control.start_session(clock);
         manifest.timebase.session_start_qpc = clock.session_start_qpc;
         store.persist(&manifest)?;
         project_writer.append_journal(
@@ -360,8 +354,9 @@ impl CaptureRecorder {
 
         let mut metrics = ProjectMetrics::default();
         let mut input_normalizer = InputEventNormalizer::new(clock, desktop_rect, 0)?;
+        input_normalizer.set_restrict_to_capture(matches!(source, RecordingSource::Region(_)));
         let mut timestamp_normalizer = VideoTimestampNormalizer::default();
-        let mut frame_rate_limiter = VideoFrameRateLimiter::new(TARGET_CAPTURE_FPS)?;
+        let mut frame_rate_limiter = VideoFrameRateLimiter::new(control.options.fps)?;
         let mut capture_gap_tracker = CaptureGapTracker::new(TimeTick::ZERO);
         let mut pending_frame = Some(PendingFrame {
             task: first_task,
@@ -392,6 +387,7 @@ impl CaptureRecorder {
                 &shared,
                 &processor,
                 &clock,
+                control,
                 &mut timestamp_normalizer,
                 &mut frame_rate_limiter,
                 &mut capture_gap_tracker,
@@ -422,9 +418,15 @@ impl CaptureRecorder {
                 &mut click_events,
                 &mut metrics,
                 Some(qpc.now()?.saturating_sub(qpc.frequency() / 20)),
+                control,
             )?;
             let now_qpc = qpc.now()?;
-            let now_tick = clock.recording_tick(now_qpc)?;
+            let now_tick = control
+                .session
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .timeline
+                .elapsed(clock.recording_tick(now_qpc)?);
             let service = project_writer.service_due(now_tick)?;
             if service.flushed {
                 diagnostic_writer.flush()?;
@@ -493,6 +495,7 @@ impl CaptureRecorder {
             &shared,
             &processor,
             &clock,
+            control,
             &mut timestamp_normalizer,
             &mut frame_rate_limiter,
             &mut capture_gap_tracker,
@@ -511,6 +514,7 @@ impl CaptureRecorder {
             &mut click_events,
             &mut metrics,
             None,
+            control,
         )?;
         if let Some(pending) = pending_frame.take() {
             let duration = stop_tick
@@ -543,6 +547,19 @@ impl CaptureRecorder {
                 media_report.inspection.last_video_end_tick
             ),
         )?;
+        let audio_warnings = audio_capture
+            .finish(
+                project_root,
+                TimeTick(media_report.inspection.last_video_end_tick),
+            )
+            .map_err(RecorderError::Audio)?;
+        if !audio_warnings.is_empty() {
+            persist_json_atomically(
+                project_root.join("diagnostics/audio-warnings.json"),
+                &audio_warnings,
+            )?;
+            session_log.stage_with_detail("audio-warning", &audio_warnings.join("; "))?;
+        }
         metrics.capture.frames_received = shared.frames_received.load(Ordering::Acquire);
         metrics.capture.dropped_by_backpressure =
             shared.dropped_by_backpressure.load(Ordering::Acquire);
@@ -570,6 +587,21 @@ impl CaptureRecorder {
             &click_events,
             TimeTick(media_report.inspection.last_video_end_tick),
             desktop_rect,
+        )?;
+        let path = layout.root().join("edit/workbench.json");
+        let mut settings: panzo_core::WorkbenchSettings = read_recording_json(&path)?;
+        settings.camera_enabled = true;
+        settings.automatic_camera =
+            Some(control.camera_settings(TimeTick(media_report.inspection.last_video_end_tick)));
+        settings.cursor.visible = control.options.cursor_visible;
+        persist_json_atomically(&path, &settings)?;
+        persist_json_atomically(
+            layout.root().join("events/recording-control.json"),
+            &control
+                .session
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .timeline,
         )?;
         metrics.camera.trigger_clicks = click_events
             .iter()
@@ -645,6 +677,7 @@ struct CaptureShared {
     geometry_changed: AtomicBool,
     width: u32,
     height: u32,
+    crop: Option<[u32; 4]>,
 }
 
 impl CaptureShared {
@@ -653,6 +686,8 @@ impl CaptureShared {
         processing_device: &D3d11Device,
         width: u32,
         height: u32,
+        source_size: (u32, u32),
+        crop: Option<[u32; 4]>,
     ) -> Result<Self, RecorderError> {
         let mut textures = Vec::with_capacity(CAPTURE_TEXTURE_COUNT);
         let free_textures = ArrayQueue::new(CAPTURE_TEXTURE_COUNT);
@@ -678,8 +713,9 @@ impl CaptureShared {
             capture_queue_peak: AtomicU64::new(0),
             callback_failed: AtomicBool::new(false),
             geometry_changed: AtomicBool::new(false),
-            width,
-            height,
+            width: source_size.0,
+            height: source_size.1,
+            crop,
         })
     }
 
@@ -839,9 +875,30 @@ fn capture_frame(
         return Err(source);
     }
     unsafe {
-        shared
-            .immediate_context
-            .CopyResource(&texture.capture_texture, &source);
+        if let Some([x, y, width, height]) = shared.crop {
+            let area = windows::Win32::Graphics::Direct3D11::D3D11_BOX {
+                left: x,
+                top: y,
+                front: 0,
+                right: x + width,
+                bottom: y + height,
+                back: 1,
+            };
+            shared.immediate_context.CopySubresourceRegion(
+                &texture.capture_texture,
+                0,
+                0,
+                0,
+                0,
+                &source,
+                0,
+                Some(&raw const area),
+            );
+        } else {
+            shared
+                .immediate_context
+                .CopyResource(&texture.capture_texture, &source);
+        }
         shared.immediate_context.Flush();
     }
     unsafe {
@@ -997,6 +1054,7 @@ fn drain_capture_queue(
     shared: &CaptureShared,
     processor: &Nv12VideoProcessor,
     clock: &SessionClock,
+    control: &RecordingControl,
     timestamp_normalizer: &mut VideoTimestampNormalizer,
     frame_rate_limiter: &mut VideoFrameRateLimiter,
     capture_gap_tracker: &mut CaptureGapTracker,
@@ -1015,7 +1073,10 @@ fn drain_capture_queue(
         let Some(task) = shared.queue.pop() else {
             break;
         };
-        let tick = clock.frame_tick(task.system_relative_tick)?;
+        let Some(tick) = control.map_tick(clock.frame_tick(task.system_relative_tick)?) else {
+            shared.discard_captured_texture(task.texture_index)?;
+            continue;
+        };
         capture_gap_tracker.observe(tick);
         diagnostic_writer.append(&CaptureFrameDiagnostic {
             system_relative_tick: task.system_relative_tick,
@@ -1171,6 +1232,7 @@ fn drain_input(
     click_events: &mut Vec<panzo_core::ClickEvent>,
     metrics: &mut ProjectMetrics,
     cutoff_qpc: Option<i64>,
+    control: &RecordingControl,
 ) -> Result<(), RecorderError> {
     let drained = service.drain();
     metrics.input.cursor_events_raw += drained
@@ -1193,7 +1255,29 @@ fn drain_input(
     } else {
         std::mem::take(buffer)
     };
-    for event in normalizer.normalize_batch(ready)? {
+    let session = control
+        .session
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .clone();
+    let ready = ready
+        .into_iter()
+        .filter(|event| {
+            session
+                .clock
+                .and_then(|clock| clock.event_tick(event.qpc).ok())
+                .is_some_and(|tick| session.timeline.map(tick).is_some())
+        })
+        .collect();
+    for mut event in normalizer.normalize_batch(ready)? {
+        let tick = match &mut event {
+            PersistedInputEvent::Cursor(e) => &mut e.time_tick,
+            PersistedInputEvent::Click(e) => &mut e.time_tick,
+        };
+        let Some(mapped) = session.timeline.map(*tick) else {
+            continue;
+        };
+        *tick = mapped;
         match &event {
             PersistedInputEvent::Cursor(_) => metrics.input.cursor_events_persisted += 1,
             PersistedInputEvent::Click(click) => {
@@ -1405,7 +1489,7 @@ fn duration_to_tick(duration: Duration) -> Result<TimeTick, RecorderError> {
         .map_err(|_| RecorderError::DurationOverflow)
 }
 
-fn utc_now() -> String {
+pub(crate) fn utc_now() -> String {
     let time: SYSTEMTIME = unsafe { GetSystemTime() };
     format!(
         "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z",
@@ -1441,6 +1525,7 @@ fn preflight_destination(project_root: &Path) -> Result<(), RecorderError> {
 }
 
 struct PreparedCaptureSource {
+    crop: Option<[u32; 4]>,
     item: GraphicsCaptureItem,
     capture_size: windows::Graphics::SizeInt32,
     desktop_rect: PhysicalRect,
@@ -1454,6 +1539,62 @@ fn prepare_capture_source(
     source: &RecordingSource,
 ) -> Result<PreparedCaptureSource, RecorderError> {
     match source {
+        RecordingSource::Region(rect) => {
+            use windows::Win32::Foundation::POINT;
+            use windows::Win32::Graphics::Gdi::{
+                GetMonitorInfoW, MONITOR_DEFAULTTONULL, MONITORINFO, MonitorFromPoint,
+            };
+            let handle = unsafe {
+                MonitorFromPoint(
+                    POINT {
+                        x: rect.x,
+                        y: rect.y,
+                    },
+                    MONITOR_DEFAULTTONULL,
+                )
+            };
+            let mut info = MONITORINFO {
+                cbSize: size_of::<MONITORINFO>() as u32,
+                ..Default::default()
+            };
+            if handle.is_invalid() || !unsafe { GetMonitorInfoW(handle, &raw mut info) }.as_bool() {
+                return Err(RecorderError::InvalidCaptureSize);
+            }
+            let bounds = PhysicalRect {
+                x: info.rcMonitor.left,
+                y: info.rcMonitor.top,
+                width: info.rcMonitor.right.abs_diff(info.rcMonitor.left),
+                height: info.rcMonitor.bottom.abs_diff(info.rcMonitor.top),
+            };
+            let area = panzo_core::geometry::recording_region(*rect, bounds)
+                .ok_or(RecorderError::InvalidCaptureSize)?;
+            let monitor = crate::platform::capture_probe::PrimaryMonitor {
+                handle,
+                rect: [
+                    info.rcMonitor.left,
+                    info.rcMonitor.top,
+                    info.rcMonitor.right,
+                    info.rcMonitor.bottom,
+                ],
+            };
+            let item = primary_monitor_item(monitor)?;
+            let capture_size = item.Size().map_err(RecorderError::Windows)?;
+            Ok(PreparedCaptureSource {
+                crop: Some([
+                    area.x.abs_diff(bounds.x),
+                    area.y.abs_diff(bounds.y),
+                    area.width,
+                    area.height,
+                ]),
+                item,
+                capture_size,
+                desktop_rect: area,
+                kind: CaptureKind::Region,
+                monitor_id: format!("region-{}-{}", bounds.x, bounds.y),
+                window_id: None,
+                window_title: None,
+            })
+        }
         RecordingSource::PrimaryMonitor => {
             let monitor = primary_monitor().map_err(RecorderError::Windows)?;
             let item = primary_monitor_item(monitor)?;
@@ -1467,6 +1608,7 @@ fn prepare_capture_source(
                     .map_err(|_| RecorderError::InvalidCaptureSize)?,
             };
             Ok(PreparedCaptureSource {
+                crop: None,
                 item,
                 capture_size,
                 desktop_rect,
@@ -1480,6 +1622,7 @@ fn prepare_capture_source(
             let item = window_capture_item(target)?;
             let capture_size = item.Size().map_err(RecorderError::Windows)?;
             Ok(PreparedCaptureSource {
+                crop: None,
                 item,
                 capture_size,
                 desktop_rect: target.current_desktop_rect()?,
@@ -1494,6 +1637,8 @@ fn prepare_capture_source(
 
 #[derive(Debug, Error)]
 pub enum RecorderError {
+    #[error("音频：{0}")]
+    Audio(String),
     #[error("invalid saved edit file {path}: {source}")]
     InvalidEditFile {
         path: PathBuf,

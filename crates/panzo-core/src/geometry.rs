@@ -190,3 +190,66 @@ mod tests {
         ));
     }
 }
+
+/// A recording region never expands beyond what the user selected or crosses a monitor.
+pub fn recording_region(rect: PhysicalRect, monitor: PhysicalRect) -> Option<PhysicalRect> {
+    if rect.width < 2
+        || rect.height < 2
+        || !monitor.contains(PhysicalPoint {
+            x: rect.x,
+            y: rect.y,
+        })
+    {
+        return None;
+    }
+    let right = i64::from(rect.x) + i64::from(rect.width);
+    let bottom = i64::from(rect.y) + i64::from(rect.height);
+    if right > i64::from(monitor.x) + i64::from(monitor.width)
+        || bottom > i64::from(monitor.y) + i64::from(monitor.height)
+    {
+        return None;
+    }
+    Some(PhysicalRect {
+        width: rect.width & !1,
+        height: rect.height & !1,
+        ..rect
+    })
+}
+#[cfg(test)]
+mod region_tests {
+    use super::*;
+    #[test]
+    fn region_stays_inside_selection_on_negative_coordinate_monitor() {
+        let monitor = PhysicalRect {
+            x: -1920,
+            y: -200,
+            width: 1920,
+            height: 1080,
+        };
+        let input = PhysicalRect {
+            x: -900,
+            y: -150,
+            width: 301,
+            height: 201,
+        };
+        assert_eq!(
+            recording_region(input, monitor),
+            Some(PhysicalRect {
+                width: 300,
+                height: 200,
+                ..input
+            })
+        );
+        assert!(
+            recording_region(
+                PhysicalRect {
+                    width: 1000,
+                    ..input
+                },
+                monitor
+            )
+            .is_none()
+        );
+        assert!(recording_region(PhysicalRect { width: 1, ..input }, monitor).is_none());
+    }
+}

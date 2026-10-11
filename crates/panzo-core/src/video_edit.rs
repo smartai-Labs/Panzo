@@ -14,6 +14,9 @@ pub struct VideoClip {
     pub speed_percent: u16,
     #[serde(default)]
     pub crop: VideoCrop,
+    /// Frame scale in thousandths; 1000 is the fitted size (100%).
+    #[serde(default = "normal_scale")]
+    pub scale_per_mille: u16,
 }
 
 /// Margins removed from the source image, in thousandths. At least 5% remains.
@@ -62,6 +65,8 @@ impl VideoCrop {
         crop
     }
 }
+
+const fn normal_scale() -> u16 { 1000 }
 
 const fn normal_speed() -> u16 {
     100
@@ -112,6 +117,7 @@ impl VideoEdit {
                 source_out_tick: duration,
                 speed_percent: normal_speed(),
                 crop: VideoCrop::default(),
+                scale_per_mille: normal_scale(),
             }],
         };
         edit.validate()?;
@@ -139,6 +145,7 @@ impl VideoEdit {
                 return Err(VideoEditError::InvalidSpeed);
             }
             clip.crop.validate()?;
+            if !(50..=4000).contains(&clip.scale_per_mille) { return Err(VideoEditError::InvalidScale); }
             let speed = i128::from(clip.speed_percent);
             duration += (i128::from(clip.source_out_tick.0 - clip.source_in_tick.0) * 100 + speed
                 - 1)
@@ -202,6 +209,7 @@ impl VideoEdit {
             source_out_tick: candidate.clips[index].source_out_tick,
             speed_percent: candidate.clips[index].speed_percent,
             crop: candidate.clips[index].crop,
+            scale_per_mille: candidate.clips[index].scale_per_mille,
         };
         candidate.clips[index].source_out_tick = source_tick;
         candidate.clips.insert(index + 1, right);
@@ -247,6 +255,14 @@ impl VideoEdit {
         clip.speed_percent = speed_percent;
         candidate.validate()?;
         *self = candidate;
+        Ok(())
+    }
+
+    pub fn set_scale(&mut self, id: &str, scale_per_mille: u16) -> Result<(), VideoEditError> {
+        let mut next = self.clone();
+        next.clips.iter_mut().find(|c| c.id == id).ok_or(VideoEditError::MissingClip)?.scale_per_mille = scale_per_mille;
+        next.validate()?;
+        *self = next;
         Ok(())
     }
 
@@ -346,6 +362,8 @@ impl TimeMapping for VideoEdit {
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum VideoEditError {
+    #[error("video scale must be between 5% and 400%")]
+    InvalidScale,
     #[error("裁剪后宽度和高度至少保留原画面的 5%")]
     InvalidCrop,
     #[error("必须保留至少一个非空视频片段")]
@@ -367,6 +385,23 @@ pub enum VideoEditError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn scale_defaults_for_old_projects_and_survives_split() {
+        let mut edit = VideoEdit::full(TimeTick(1000)).unwrap();
+        let mut old = serde_json::to_value(&edit).unwrap();
+        old["clips"][0].as_object_mut().unwrap().remove("scalePerMille");
+        let restored: VideoEdit = serde_json::from_value(old).unwrap();
+        assert_eq!(restored.clips[0].scale_per_mille, 1000);
+        edit.set_scale("source-0", 1255).unwrap();
+        edit.split(TimeTick(500), "right".into()).unwrap();
+        assert_eq!(edit.clips[1].scale_per_mille, 1255);
+        edit.set_scale("right", 750).unwrap();
+        assert_eq!(edit.clips[0].scale_per_mille, 1255);
+        assert_eq!(edit.duration(), TimeTick(1000));
+        for invalid in [0, 49, 4001, u16::MAX] { assert!(edit.set_scale("right", invalid).is_err()); }
+        assert_eq!(edit.clips[1].scale_per_mille, 750);
+    }
 
     #[test]
     fn crop_is_per_clip_preserves_time_and_split_inherits_it() {

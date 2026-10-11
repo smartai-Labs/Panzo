@@ -3,6 +3,7 @@ use super::{
     CameraState, ControlId, DRAG_REFRESH_INTERVAL, EditorTheme, HWND, Instant, RECT, SetCapture,
     SetFocus, TICKS_PER_SECOND, TimeTick, WindowState,
 };
+#[cfg(test)]
 pub(super) const SWATCHES: [ControlId; 6] = [
     ControlId::SwatchMist,
     ControlId::SwatchPeach,
@@ -58,45 +59,49 @@ pub(super) fn value_rect(mut r: RECT, theme: EditorTheme, id: ControlId) -> RECT
 
     if matches!(
         id,
-        ControlId::Inset | ControlId::Radius | ControlId::Shadow | ControlId::VideoSpeed
+        ControlId::Inset | ControlId::Radius | ControlId::Shadow | ControlId::VideoScale | ControlId::VideoSpeed
     ) || id.is_crop_edge()
     {
-        r.left = r.right - theme.scale(58);
-        r.bottom = r.top + theme.scale(24);
+        r.left = r.right - theme.scale(100);
+        r.bottom = r.top + theme.scale(28);
     }
     r
 }
 impl WindowState {
-    pub(super) fn selected_crop(&self) -> Option<panzo_core::VideoCrop> {
-        self.editor
-            .video_edit()
-            .clips
-            .iter()
-            .find(|clip| Some(&clip.id) == self.selected_video.as_ref())
-            .map(|clip| clip.crop)
+    fn canvas_pixel_basis(&self) -> f64 {
+        let size=self.canvas_size(); f64::from(size.width.min(size.height))
     }
-
+    pub(super) fn selected_video_clip(&self) -> Option<panzo_core::VideoClip> {
+        let id = self.selected_video.as_ref()?;
+        if let Some(c)=self.editor.settings().visual_clips.iter().find(|c| &c.id==id) {
+            return Some(panzo_core::VideoClip { id:c.id.clone(), source_in_tick:c.source_in, source_out_tick:c.source_out, speed_percent:c.speed_percent, crop:c.crop, scale_per_mille:(c.scale*1000.0).round() as u16 });
+        }
+        self.editor.video_edit().clips.iter().find(|c| &c.id==id).cloned()
+    }
+    pub(super) fn selected_video_size(&self)->(u32,u32) {
+        self.selected_video.as_ref().and_then(|id|self.editor.settings().visual_clips.iter().find(|c|&c.id==id)).and_then(|c|self.editor.settings().visual_assets.iter().find(|a|a.id==c.asset_id)).map_or(self.frame.source_size(),|a|(a.width,a.height))
+    }
+    fn selected_video_duration(&self)->TimeTick {
+        self.selected_video.as_ref().and_then(|id|self.editor.settings().visual_clips.iter().find(|c|&c.id==id)).and_then(|c|self.editor.settings().visual_assets.iter().find(|a|a.id==c.asset_id)).map_or(self.editor.duration(),|a|a.duration)
+    }
+    pub(super) fn selected_crop(&self) -> Option<panzo_core::VideoCrop> {
+        self.selected_video_clip().map(|c|c.crop)
+    }
     pub(super) fn set_selected_crop(&mut self, crop: panzo_core::VideoCrop) -> Result<(), String> {
+        self.select_preview_source(false).map_err(|e|e.to_string())?;
         let id = self.selected_video.clone().ok_or("请先选择视频片段")?;
         self.editor
             .set_video_crop(&id, crop)
             .map_err(|error| self.edit_error(&error))?;
         let video = self.editor.video_edit();
-        if let Some(span) = video.spans().find(|span| span.clip.id == id) {
-            let tick = self.session.snapshot().project_tick;
-            if tick < span.project_in || tick >= span.project_out {
-                self.session.seek(span.project_in).map_err(|error| {
-                    self.feedback
-                        .remember("裁剪已修改，预览定位未完成", &error.to_string());
-                    "裁剪已修改，预览定位未完成；请重新定位时间线".to_owned()
-                })?;
-            }
-        }
+        let range = self.editor.settings().visual_clips.iter().find(|c|c.id==id).map(|c|(c.start,c.end())).or_else(||video.spans().find(|span|span.clip.id==id).map(|s|(s.project_in,s.project_out)));
+        if let Some((a,b))=range {let tick=self.session.snapshot().project_tick;if tick<a||tick>=b {self.session.seek(a).map_err(|e|e.to_string())?;}}
         Ok(())
     }
 
     pub(super) fn apply_crop_preset(&mut self, hwnd: HWND, id: ControlId) {
-        let size = self.frame.source_size();
+        self.crop_locked = id != ControlId::CropReset;
+        let size = self.selected_video_size();
         let crop = CROP_PRESETS
             .iter()
             .find(|(control, _, _)| *control == id)
@@ -105,8 +110,12 @@ impl WindowState {
             });
         match self.set_selected_crop(crop) {
             Ok(()) => {
-                let result = self.apply_editor_state();
-                self.record_editor_result(result, "画面裁剪已更新 · Ctrl+Z 撤销");
+                if id != ControlId::CropReset {
+                    self.set_crop_editing(true);
+                } else {
+                    let result = self.apply_editor_state();
+                    self.record_editor_result(result, "画面裁剪已重置 · 可撤销");
+                }
             }
             Err(error) => {
                 self.set_status(crate::platform::editor_ui::StatusSeverity::Warning, error);
@@ -115,6 +124,15 @@ impl WindowState {
         self.refresh(hwnd, true);
     }
     pub(super) fn select_video_properties(&mut self) {
+        let visual = self.media_selected.as_ref().filter(|(sub,id)| !sub && self.editor.settings().visual_clips.iter().any(|c|&c.id==id)).map(|(_,id)|id.clone());
+        if let Some(id) = visual {
+            self.clear_inspector_panel(); self.selected_video=Some(id); self.selected_segment=None;
+            self.inspector_video_tab=true; self.inspector_scroll=0; return;
+        }
+
+        self.clear_inspector_panel();
+        self.media_selected = None;
+        if !self.editor.settings().source_video_enabled{self.selected_video=None;self.selected_segment=None;self.inspector_video_tab=true;return;}
         if self.crop_editing {
             self.toggle_crop_editing();
         }
@@ -148,18 +166,14 @@ impl WindowState {
             return Some((self.widget_value(id)?, f64::from(950 - opposite) / 10.0));
         }
         if id == ControlId::ZoomSlider {
-            let max = (self.editor.project_duration().0 as f64 / (TICKS_PER_SECOND as f64 / 2.0))
-                .max(1.0);
-            let value = (self.editor.project_duration().0 as f64
-                / self.timeline.visible_duration().0 as f64)
-                .ln()
-                / max.ln().max(f64::EPSILON)
-                * 100.0;
+            let value = self.timeline.zoom_fraction() * 100.0;
             return Some((value, 100.0));
         }
         let maximum = match id {
             ControlId::VideoSpeed => 4.0,
-            ControlId::Inset => 25.0,
+            ControlId::VideoScale => 400.0,
+            ControlId::Inset => self.canvas_pixel_basis() * 0.25,
+            ControlId::FollowZoom => 3.0,
             ControlId::Radius => {
                 f64::from(
                     self.frame
@@ -183,6 +197,8 @@ impl WindowState {
         };
         let minimum = if id == ControlId::VideoSpeed {
             0.25
+        } else if id == ControlId::VideoScale {
+            5.0
         } else {
             0.0
         };
@@ -190,20 +206,13 @@ impl WindowState {
             return;
         }
         if id == ControlId::ZoomSlider {
-            let max = (self.editor.project_duration().0 as f64 / (TICKS_PER_SECOND as f64 / 2.0))
-                .max(1.0);
-            let current =
-                self.editor.project_duration().0 as f64 / self.timeline.visible_duration().0 as f64;
-            self.timeline.zoom_at(
-                self.session.snapshot().project_tick,
-                max.powf(value / 100.0) / current,
-            );
+            self.timeline.set_zoom_fraction(self.session.project_playhead(), value / 100.0);
             self.follow_playhead = false;
         } else {
             match self.apply_widget_value(id, value) {
                 Ok(()) => {
                     let result = self.apply_editor_state();
-                    self.record_editor_result(result, "参数已更新 · Ctrl+Z 撤销");
+                    self.record_editor_result(result, "参数已更新 · 可撤销");
                 }
                 Err(error) => self.set_status(
                     crate::platform::editor_ui::StatusSeverity::Warning,
@@ -230,14 +239,10 @@ impl WindowState {
                     _ => crop.bottom,
                 }) / 10.0
             }),
-            ControlId::VideoSpeed => self
-                .editor
-                .video_edit()
-                .clips
-                .iter()
-                .find(|clip| Some(&clip.id) == self.selected_video.as_ref())
-                .map(|clip| f64::from(clip.speed_percent) / 100.0),
-            ControlId::Inset => Some(settings.canvas.inset * 100.0),
+            ControlId::VideoScale => self.selected_video_clip().map(|c| f64::from(c.scale_per_mille)/10.0),
+            ControlId::VideoSpeed => self.selected_video_clip().map(|c| f64::from(c.speed_percent)/100.0),
+            ControlId::Inset => Some(settings.canvas.inset * self.canvas_pixel_basis()),
+            ControlId::FollowZoom => Some(settings.automatic_camera.as_ref().map_or(1.5, |c| c.default.zoom)),
             // Display radius in source pixels without changing the normalized saved schema.
             ControlId::Radius => Some(
                 settings.canvas.corner_radius
@@ -254,13 +259,9 @@ impl WindowState {
             ControlId::StartValue | ControlId::EndValue => {
                 let start = id == ControlId::StartValue;
                 self.selected_segment()
-                    .map(|s| if start { s.start_tick } else { s.end_tick })
+                    .map(|s| {let (a,b)=settings.follow_positions.get(&s.id).copied().unwrap_or((s.start_tick,s.end_tick));if start {a}else{b}})
                     .or_else(|| {
-                        self.editor
-                            .video_edit()
-                            .clips
-                            .iter()
-                            .find(|c| Some(&c.id) == self.selected_video.as_ref())
+                        self.selected_video_clip()
                             .map(|c| {
                                 if start {
                                     c.source_in_tick
@@ -274,6 +275,17 @@ impl WindowState {
             _ => None,
         }
     }
+    pub(super) fn step_widget_at(&mut self, hwnd: HWND, x:i32,y:i32)->bool {
+        let c=self.control_layout(super::client_rect(hwnd));
+        let Some(id)=c.hit_control(x,y) else {return false;};
+        let Some(value)=self.widget_value(id) else {return false;};
+        let r=value_rect(c.raw_control_rect(id).0,self.theme,id);
+        if x<r.right-self.theme.scale(40)||x>=r.right-self.theme.scale(26)||y<r.top||y>=r.bottom {return false;}
+        let step=if matches!(id,ControlId::Inset|ControlId::Radius|ControlId::CanvasWidth|ControlId::CanvasHeight){1.0}else{0.1};
+        let next=value+if y<(r.top+r.bottom)/2 {step}else{-step};
+        if self.apply_widget_value(id,next).is_ok() {let result=self.apply_editor_state();self.record_editor_result(result,"参数已更新 · 可撤销");}
+        self.refresh(hwnd,true); true
+    }
     pub(super) fn begin_inline_input(&mut self, hwnd: HWND, id: ControlId) {
         if !self.finish_inline_input(hwnd, true) {
             return;
@@ -286,12 +298,24 @@ impl WindowState {
         self.session.pause();
         self.deferred_playback.cancel();
         let layout = self.control_layout(super::client_rect(hwnd));
-        let rect = value_rect(layout.raw_control_rect(id).0, self.theme, id);
+        let mut rect = value_rect(layout.raw_control_rect(id).0, self.theme, id);
+        rect.right -= self.theme.scale(26);
         if rect.right <= rect.left {
             return;
         }
-        match crate::platform::inline_input::InlineInput::open(hwnd, rect, &format!("{value:.3}")) {
+        match crate::platform::inline_input::InlineInput::open(hwnd, rect, &format_widget_value(id,value)) {
             Ok(input) => {
+                let (min,max,step)=match id {
+                    ControlId::VideoSpeed => (0.25,4.0,0.1),
+                    ControlId::VideoScale => (5.0,400.0,0.1),
+                    ControlId::Shadow | ControlId::CropLeft | ControlId::CropRight | ControlId::CropTop | ControlId::CropBottom => (0.0,self.widget_range(id).map_or(100.0,|(_,m)|m),0.1),
+                    ControlId::FollowZoom => (1.0,3.0,0.1),
+                    ControlId::ScaleValue => (1.0,8.0,0.1),
+                    ControlId::CanvasWidth | ControlId::CanvasHeight => (64.0,8192.0,2.0),
+                    ControlId::StartValue | ControlId::EndValue => (0.0,self.selected_video_duration().0 as f64 / TICKS_PER_SECOND as f64,0.1),
+                    _ => (0.0,self.widget_range(id).map_or(8192.0,|(_,m)|m),1.0),
+                };
+                input.numeric(min,max,step);
                 self.inline_control = Some(id);
                 self.inline_input = Some(input);
             }
@@ -344,7 +368,7 @@ impl WindowState {
         self.inline_validation = None;
         if apply {
             let result = self.apply_editor_state();
-            self.record_editor_result(result, "参数已更新 · Ctrl+Z 撤销");
+            self.record_editor_result(result, "参数已更新 · 可撤销");
         }
         self.refresh(hwnd, true);
         true
@@ -423,9 +447,20 @@ impl WindowState {
                     u16::try_from((v * 100.0).round() as i32).map_err(|e| e.to_string())?,
                 )
             }
-            ControlId::Inset => self.editor.set_canvas_inset(v / 100.0),
+            ControlId::VideoScale => {
+                if !(5.0..=400.0).contains(&v) { return Err("画面缩放范围为 5.0–400.0%".into()); }
+                let id=self.selected_video.as_ref().ok_or("请先选择视频片段")?;
+                self.editor.set_video_scale(id,(v*10.0).round() as u16)
+            }
+            ControlId::Inset => self.editor.set_canvas_inset(v.round() / self.canvas_pixel_basis()),
+            ControlId::FollowZoom => {
+                if !(1.0..=3.0).contains(&v) {return Err("放大倍数范围为 1–3".into());}
+                let mut settings = self.editor.settings().clone();
+                settings.automatic_camera.get_or_insert_with(Default::default).default.zoom = v;
+                self.editor.replace_media_settings(settings)
+            },
             ControlId::Radius => self.editor.set_corner_radius(
-                v / f64::from(
+                v.round() / f64::from(
                     self.frame
                         .evaluation
                         .output
@@ -436,6 +471,13 @@ impl WindowState {
             ControlId::Shadow => self.editor.set_shadow(v / 100.0),
             ControlId::StartValue | ControlId::EndValue | ControlId::ScaleValue => {
                 if let Some(s) = self.selected_segment() {
+                    if id != ControlId::ScaleValue {
+                        if let Some((a,b))=self.editor.settings().follow_positions.get(&s.id).copied() {
+                            let mut next=self.editor.settings().clone();let tick=checked_seconds(v)?;
+                            next.follow_positions.insert(s.id.clone(),if id==ControlId::StartValue{(tick,b)}else{(a,tick)});
+                            return self.editor.replace_media_settings(next).map_err(|e|e.to_string());
+                        }
+                    }
                     let tick = checked_seconds(v)?;
                     let start = if id == ControlId::StartValue {
                         tick
@@ -457,12 +499,7 @@ impl WindowState {
                     };
                     self.editor.update_segment(&s.id, start, end, target)
                 } else {
-                    let video = self.editor.video_edit();
-                    let clip = video
-                        .clips
-                        .iter()
-                        .find(|c| Some(&c.id) == self.selected_video.as_ref())
-                        .ok_or("请先选择片段")?;
+                    let clip = self.selected_video_clip().ok_or("请先选择片段")?;
                     self.editor.trim_video(
                         &clip.id,
                         if id == ControlId::StartValue {
@@ -495,7 +532,7 @@ impl WindowState {
                 | ControlId::Radius
                 | ControlId::Shadow
                 | ControlId::ZoomSlider
-                | ControlId::VideoSpeed
+                | ControlId::VideoScale | ControlId::VideoSpeed
         ) && !id.is_crop_edge()
             || !self.control_enabled(id)
         {
@@ -526,21 +563,17 @@ impl WindowState {
             / f64::from((rect.right - rect.left - self.theme.scale(10)).max(1));
         let t = t.clamp(0.0, 1.0);
         if id == ControlId::ZoomSlider {
-            let max = (self.editor.project_duration().0 as f64 / (TICKS_PER_SECOND as f64 / 2.0))
-                .max(1.0);
-            let wanted = max.powf(t);
-            let current =
-                self.editor.project_duration().0 as f64 / self.timeline.visible_duration().0 as f64;
-            self.timeline
-                .zoom_at(self.session.snapshot().project_tick, wanted / current);
+            self.timeline.set_zoom_fraction(self.session.project_playhead(), t);
             self.follow_playhead = false;
         } else {
             let Some((_, max)) = self.widget_range(id) else {
                 return;
             };
             let value = if id == ControlId::VideoSpeed {
-                2.0_f64.powf(t * 4.0 - 2.0)
-            } else if id.is_crop_edge() {
+                (2.0_f64.powf(t * 4.0 - 2.0)*10.0).round().clamp(2.5,40.0)/10.0
+            } else if id == ControlId::VideoScale {
+                ( (5.0+t*395.0)*10.0).round()/10.0
+            } else if id.is_crop_edge() || id==ControlId::Shadow {
                 (t * max * 10.0).round() / 10.0
             } else {
                 (t * max).round()
@@ -558,6 +591,13 @@ impl WindowState {
             self.refresh(hwnd, true);
             self.last_drag_refresh = Instant::now();
         }
+    }
+}
+pub(super) fn format_widget_value(id: ControlId, value: f64) -> String {
+    match id {
+        ControlId::Inset | ControlId::Radius | ControlId::CanvasWidth | ControlId::CanvasHeight => format!("{value:.0}"),
+        ControlId::StartValue | ControlId::EndValue => format!("{value:.3}"),
+        _ => format!("{value:.1}"),
     }
 }
 fn checked_seconds(v: f64) -> Result<TimeTick, String> {

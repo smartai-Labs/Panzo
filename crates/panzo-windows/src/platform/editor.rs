@@ -207,7 +207,7 @@ fn apply_atomic_probe_edit(
         video.split(TimeTick(duration / 3), "atomic-probe-middle".into())?;
         video.split(TimeTick(duration * 2 / 3), "atomic-probe-tail".into())?;
         video.delete("atomic-probe-middle")?;
-        session.replace_video(video);
+        session.replace_video(video)?;
     }
     session.set_camera_enabled(false);
     session.set_cursor_style(false, 1.5)?;
@@ -312,6 +312,7 @@ impl EditorAcceptanceProbe {
 
 #[derive(Clone)]
 pub struct ProjectEditorSession {
+    change_revision: u64,
     project_root: PathBuf,
     camera_path: PathBuf,
     auto_camera_path: PathBuf,
@@ -359,16 +360,18 @@ impl ProjectEditorSession {
         auto_draft.validate()?;
 
         let workbench_path = layout.root().join(WORKBENCH_FILE);
-        let settings = if workbench_path.is_file() {
+        let mut settings: WorkbenchSettings = if workbench_path.is_file() {
             read_json(&workbench_path)?
         } else {
             WorkbenchSettings::default()
         };
         settings.validate()?;
+        let saved_settings = settings.clone();
+        settings.retain_audio_assets();
         saved_camera.validate()?;
         let mut stabilized = saved_camera.clone();
         stabilized.stabilize_auto_pans();
-        let editor = CameraTrackEditor::new(stabilized, duration)?.without_history();
+        let editor = CameraTrackEditor::new(stabilized, TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))?.without_history();
         settings.video_edit(duration)?;
         let click_path = layout.root().join(&manifest.tracks.clicks);
         let click_ticks = if click_path.is_file() {
@@ -388,11 +391,12 @@ impl ProjectEditorSession {
             auto_draft,
             saved_camera,
             editor,
-            saved_settings: settings.clone(),
+            saved_settings,
             settings,
             undo_stack: Vec::new(),
             redo_stack: Vec::new(),
             edit_group_before: None,
+            change_revision: 0,
         })
     }
 
@@ -414,7 +418,7 @@ impl ProjectEditorSession {
             click_ticks: vec![],
             auto_draft: self.auto_draft.clone(),
             saved_camera: self.saved_camera.clone(),
-            editor: CameraTrackEditor::new(self.camera().clone(), self.duration)
+            editor: CameraTrackEditor::new(self.camera().clone(), TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))
                 .expect("validated track")
                 .without_history(),
             saved_settings: self.saved_settings.clone(),
@@ -422,11 +426,16 @@ impl ProjectEditorSession {
             undo_stack: vec![],
             redo_stack: vec![],
             edit_group_before: None,
+            change_revision: 0,
         }
     }
 
     pub const fn camera(&self) -> &CameraTrack {
         self.editor.track()
+    }
+
+    pub const fn change_revision(&self) -> u64 {
+        self.change_revision
     }
 
     pub const fn settings(&self) -> &WorkbenchSettings {
@@ -450,21 +459,25 @@ impl ProjectEditorSession {
     }
 
     pub fn project_duration(&self) -> TimeTick {
-        self.video_edit().duration()
+        self.settings.project_duration(self.duration)
     }
 
     pub fn split_video(&mut self, at: TimeTick) -> Result<String, EditorSessionError> {
         let id = uuid::Uuid::new_v4().to_string();
         let mut video = self.video_edit();
         video.split(at, id.clone())?;
-        self.replace_video(video);
+        self.replace_video(video)?;
         Ok(id)
     }
 
     pub fn delete_video(&mut self, id: &str) -> Result<(), EditorSessionError> {
         let mut video = self.video_edit();
+        if video.clips.len()==1 && video.clips[0].id==id {
+            let mut next=self.settings.clone();next.source_video_enabled=false;next.audio.source_muted=true;
+            return self.replace_media_settings(next);
+        }
         video.delete(id)?;
-        self.replace_video(video);
+        self.replace_video(video)?;
         Ok(())
     }
 
@@ -474,9 +487,15 @@ impl ProjectEditorSession {
         start: TimeTick,
         end: TimeTick,
     ) -> Result<(), EditorSessionError> {
+        let mut next=self.settings.clone();
+        if let Some(c)=next.visual_clips.iter_mut().find(|c|c.id==id) {
+            c.source_in=start;c.source_out=end;
+            c.fade_in=c.fade_in.min(c.duration()); c.fade_out=c.fade_out.min(c.duration());
+            return self.replace_media_settings(next);
+        }
         let mut video = self.video_edit();
         video.trim(id, start, end)?;
-        self.replace_video(video);
+        self.replace_video(video)?;
         Ok(())
     }
 
@@ -485,9 +504,28 @@ impl ProjectEditorSession {
         id: &str,
         crop: panzo_core::VideoCrop,
     ) -> Result<(), EditorSessionError> {
+        let mut next=self.settings.clone();
+        if let Some(c)=next.visual_clips.iter_mut().find(|c|c.id==id) {
+            c.crop=crop;
+            c.fade_in=c.fade_in.min(c.duration()); c.fade_out=c.fade_out.min(c.duration());
+            return self.replace_media_settings(next);
+        }
         let mut video = self.video_edit();
         video.set_crop(id, crop)?;
-        self.replace_video(video);
+        self.replace_video(video)?;
+        Ok(())
+    }
+
+    pub fn set_video_scale(&mut self, id: &str, scale_per_mille: u16) -> Result<(), EditorSessionError> {
+        if !(50..=4000).contains(&scale_per_mille) { return Err(panzo_core::VideoEditError::InvalidScale.into()); }
+        let mut next = self.settings.clone();
+        if let Some(c) = next.visual_clips.iter_mut().find(|c| c.id == id) {
+            c.scale = f64::from(scale_per_mille) / 1000.0;
+            return self.replace_media_settings(next);
+        }
+        let mut video = self.video_edit();
+        video.set_scale(id, scale_per_mille)?;
+        self.replace_video(video)?;
         Ok(())
     }
 
@@ -496,17 +534,36 @@ impl ProjectEditorSession {
         id: &str,
         speed_percent: u16,
     ) -> Result<(), EditorSessionError> {
+        let mut next=self.settings.clone();
+        if let Some(c)=next.visual_clips.iter_mut().find(|c|c.id==id) {
+            c.speed_percent=speed_percent;
+            c.fade_in=c.fade_in.min(c.duration()); c.fade_out=c.fade_out.min(c.duration());
+            return self.replace_media_settings(next);
+        }
         let mut video = self.video_edit();
         video.set_speed_percent(id, speed_percent)?;
-        self.replace_video(video);
+        self.replace_video(video)?;
         Ok(())
     }
 
-    fn replace_video(&mut self, video: panzo_core::VideoEdit) {
+    fn replace_video(&mut self, video: panzo_core::VideoEdit) -> Result<(), EditorSessionError> {
+        let mut next = self.settings.clone();
+        next.video = Some(video);
+        self.replace_media_settings(next)
+    }
+
+    pub fn replace_media_settings(
+        &mut self,
+        mut settings: WorkbenchSettings,
+    ) -> Result<(), EditorSessionError> {
+        settings.schema_version = panzo_core::WORKBENCH_SCHEMA_VERSION;
+        settings.retain_audio_assets();
+        settings.validate()?;
+        settings.ensure_timeline_edit_with_camera(&self.settings, self.duration,self.camera()).map_err(EditorSessionError::TimelineOverlap)?;
         let before = self.snapshot();
-        self.settings.schema_version = panzo_core::WORKBENCH_SCHEMA_VERSION;
-        self.settings.video = Some(video);
+        self.settings = settings;
         self.commit_undo(before);
+        Ok(())
     }
 
     pub fn set_camera_enabled(&mut self, enabled: bool) {
@@ -546,6 +603,7 @@ impl ProjectEditorSession {
     fn settings_content_equal(&self, left: &WorkbenchSettings, right: &WorkbenchSettings) -> bool {
         let normalize = |settings: &WorkbenchSettings| {
             let mut normalized = settings.clone();
+            normalized.retain_audio_assets();
             normalized.revision = 0;
             normalized.schema_version = panzo_core::WORKBENCH_SCHEMA_VERSION;
             normalized.video = Some(
@@ -599,8 +657,12 @@ impl ProjectEditorSession {
         target: CameraState,
     ) -> Result<(), EditorSessionError> {
         let before = self.snapshot();
-        self.editor
-            .update_segment(id, start_tick, end_tick, target)?;
+        if self.settings.follow_positions.contains_key(id){
+            let mut settings=self.settings.clone();settings.follow_positions.insert(id.into(),(start_tick,end_tick));settings.validate()?;
+            settings.ensure_timeline_edit_with_camera(&self.settings,self.duration,self.camera()).map_err(EditorSessionError::TimelineOverlap)?;
+            if let Some(c)=self.camera().segments.iter().find(|c|c.id==id).cloned(){self.editor.update_segment(id,c.start_tick,c.end_tick,target)?;}
+            self.settings=settings;
+        }else{self.editor.update_segment(id, start_tick, end_tick, target)?;}
         self.commit_undo(before);
         Ok(())
     }
@@ -667,7 +729,7 @@ impl ProjectEditorSession {
             track.segments.clear();
             track.base_state = CameraState::BASE;
         }
-        let mut candidate = CameraTrackEditor::new(track, self.duration)?.without_history();
+        let mut candidate = CameraTrackEditor::new(track, TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))?.without_history();
         let id = candidate.add_segment(id, kind, start_tick, end_tick, target)?;
         self.editor = candidate;
         self.settings.camera_enabled = true;
@@ -676,9 +738,24 @@ impl ProjectEditorSession {
         Ok(id)
     }
 
+    /// Project-anchored follow clips do not require an original-source frame at the playhead.
+    pub fn add_project_follow(&mut self, id: String, start: TimeTick, end: TimeTick, target: CameraState) -> Result<String, EditorSessionError> {
+        let before=self.snapshot();
+        let track=self.camera().clone();
+        let storage_start=track.segments.iter().map(|s|s.end_tick).fold(self.duration,TimeTick::max);
+        let storage_end=TimeTick(storage_start.0.saturating_add(end.0-start.0));
+        let mut candidate=CameraTrackEditor::new(track,TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))?.without_history();
+        candidate.add_segment(id.clone(),CameraSegmentKind::ZoomIn,storage_start,storage_end,target)?;
+        let mut next=self.settings.clone();next.follow_positions.insert(id.clone(),(start,end));
+        next.camera_enabled=true;next.validate()?;
+        next.ensure_timeline_edit_with_camera(&self.settings,self.duration,self.camera()).map_err(EditorSessionError::TimelineOverlap)?;
+        self.editor=candidate;self.settings=next;self.commit_undo(before);Ok(id)
+    }
+
     pub fn delete_segment(&mut self, id: &str) -> Result<(), EditorSessionError> {
         let before = self.snapshot();
         self.editor.delete_segment(id)?;
+        self.settings.follow_positions.remove(id);self.settings.clip_tracks.remove(id);
         self.commit_undo(before);
         Ok(())
     }
@@ -713,7 +790,6 @@ impl ProjectEditorSession {
         let mut settings = self.settings.clone();
         settings.background.kind = BackgroundKind::Solid;
         settings.background.color = color.into();
-        settings.background.image = None;
         settings.validate()?;
         self.settings = settings;
         self.commit_undo(before);
@@ -816,7 +892,7 @@ impl ProjectEditorSession {
         let before = self.snapshot();
         let mut stabilized = self.auto_draft.clone();
         stabilized.stabilize_auto_pans();
-        self.editor = CameraTrackEditor::new(stabilized, self.duration)?.without_history();
+        self.editor = CameraTrackEditor::new(stabilized, TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))?.without_history();
         self.settings.camera_enabled = true;
         self.settings.schema_version = panzo_core::WORKBENCH_SCHEMA_VERSION;
         self.commit_undo(before);
@@ -928,10 +1004,12 @@ impl ProjectEditorSession {
     }
 
     fn restore(&mut self, snapshot: EditorSnapshot) {
-        self.editor = CameraTrackEditor::new(snapshot.camera, self.duration)
+        self.change_revision = self.change_revision.wrapping_add(1);
+        self.editor = CameraTrackEditor::new(snapshot.camera, TimeTick(panzo_core::media_edit::MAX_MEDIA_TICK))
             .expect("editor history only stores validated Camera Tracks")
             .without_history();
         self.settings = snapshot.settings;
+        self.settings.retain_audio_assets();
         self.settings.revision = self.saved_settings.revision;
     }
 
@@ -939,6 +1017,7 @@ impl ProjectEditorSession {
         if before.camera == *self.editor.track() && before.settings == self.settings {
             return;
         }
+        self.change_revision = self.change_revision.wrapping_add(1);
         if self.edit_group_before.is_some() {
             // A draft is not a committed command. Escape must preserve the redo branch.
             return;
@@ -962,12 +1041,13 @@ pub fn load_effective_edit_state(
     camera.validate()?;
     camera.stabilize_auto_pans();
     let workbench_path = layout.root().join(WORKBENCH_FILE);
-    let settings = if workbench_path.is_file() {
+    let mut settings: WorkbenchSettings = if workbench_path.is_file() {
         read_json(&workbench_path)?
     } else {
         WorkbenchSettings::default()
     };
     settings.validate()?;
+    settings.retain_audio_assets();
     settings.video_edit(TimeTick(manifest.media.duration_tick))?;
     Ok((camera, settings))
 }
@@ -1127,6 +1207,8 @@ fn sha256(bytes: &[u8]) -> String {
 
 #[derive(Debug, Error)]
 pub enum EditorSessionError {
+    #[error("{0}")]
+    TimelineOverlap(String),
     #[error(transparent)]
     Video(#[from] panzo_core::VideoEditError),
     #[error(transparent)]
@@ -1242,6 +1324,7 @@ pub(crate) fn user_edit_error(error: &EditorSessionError) -> String {
             },
             _ => "参数未应用，请检查输入或重新选择背景图片".into(),
         },
+        EditorSessionError::TimelineOverlap(message) => message.clone(),
         EditorSessionError::BackgroundImage(_) => "无法读取这张图片，请选择可正常打开的图片".into(),
         _ => "本次修改未完成，请保留当前工程并重试；仍失败时可查看设置中的诊断详情".into(),
     }
@@ -1368,6 +1451,62 @@ mod tests {
                 focus: None,
             }],
         }
+    }
+
+    #[test]
+    fn clip_scale_and_background_mode_round_trip_with_undo() {
+        let project=TestProject::new();
+        let mut session=ProjectEditorSession::open(&project.0).unwrap();
+        session.set_video_scale("source-0",1255).unwrap();
+        assert!(session.undo());assert_eq!(session.video_edit().clips[0].scale_per_mille,1000);
+        assert!(session.redo());
+        let path=project.0.join("test-background.png");
+        image::RgbaImage::from_pixel(32,24,image::Rgba([30,100,170,255])).save(&path).unwrap();
+        session.import_background_image(&path).unwrap();
+        let original=session.settings().background.clone();
+        session.set_solid_background("#123456").unwrap();
+        assert_eq!(session.settings().background.image,original.image);
+        assert!(load_effective_background(&project.0,session.settings()).unwrap().is_none());
+        session.save(CameraEditKind::Style,None).unwrap();
+        let mut reopened=ProjectEditorSession::open(&project.0).unwrap();
+        assert_eq!(reopened.video_edit().clips[0].scale_per_mille,1255);
+        assert_eq!(reopened.settings().background.image,original.image);
+        let mut style=reopened.settings().background.clone();style.kind=BackgroundKind::Image;
+        reopened.set_background_style(style).unwrap();
+        assert!(load_effective_background(&project.0,reopened.settings()).unwrap().is_some());
+        assert!(reopened.undo());assert_eq!(reopened.settings().background.kind,BackgroundKind::Solid);
+        assert!(reopened.redo());assert_eq!(reopened.settings().background.kind,BackgroundKind::Image);
+    }
+
+    #[test]
+    fn project_follow_after_source_survives_history_save_and_recovery() {
+        let project=TestProject::new();let mut session=ProjectEditorSession::open(&project.0).unwrap();
+        let before=session.settings().clone();let id="late-follow".to_owned();let a=TimeTick::from_millis(12000);let b=TimeTick::from_millis(13000);
+        session.add_project_follow(id.clone(),a,b,CameraState::focused(panzo_core::NormalizedPoint::new(0.5,0.5).unwrap(),1.6).unwrap()).unwrap();
+        assert_eq!(session.settings().follow_positions[&id],(a,b));assert!(session.project_duration()>=b);
+        session.undo();assert_eq!(session.settings(),&before);session.redo();
+        session.write_recovery_draft().unwrap();let mut recovered=ProjectEditorSession::open(&project.0).unwrap();assert!(recovered.restore_recovery_draft().unwrap());assert_eq!(recovered.settings().follow_positions[&id],(a,b));
+        session.clear_recovery_draft().unwrap();session.save(CameraEditKind::Update,None).unwrap();let reopened=ProjectEditorSession::open(&project.0).unwrap();assert_eq!(reopened.settings().follow_positions[&id],(a,b));
+    }
+
+    #[test]
+    fn ui_change_revision_advances_for_edit_undo_redo_and_live_groups() {
+        let project = TestProject::new();
+        let mut session = ProjectEditorSession::open(&project.0).unwrap();
+        let initial = session.change_revision();
+        session.set_solid_background("#112233").unwrap();
+        assert!(session.change_revision() > initial);
+        let edited = session.change_revision();
+        assert!(session.undo());
+        assert!(session.change_revision() > edited);
+        let undone = session.change_revision();
+        assert!(session.redo());
+        assert!(session.change_revision() > undone);
+        session.begin_edit_group();
+        let before = session.change_revision();
+        session.set_solid_background("#334455").unwrap();
+        assert!(session.change_revision() > before);
+        session.finish_edit_group();
     }
 
     #[test]

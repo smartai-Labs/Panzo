@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::path::{Component, Path};
 use thiserror::Error;
 
-pub const WORKBENCH_SCHEMA_VERSION: u32 = 5;
+pub const WORKBENCH_SCHEMA_VERSION: u32 = 10;
 const MAX_HISTORY: usize = 100;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -83,6 +83,34 @@ pub struct WorkbenchSettings {
     pub video: Option<crate::VideoEdit>,
     #[serde(default = "camera_enabled_default")]
     pub camera_enabled: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub automatic_camera: Option<crate::camera_policy::AutoCameraSettings>,
+    #[serde(default = "camera_enabled_default")]
+    pub manual_camera_enabled: bool,
+    #[serde(default)]
+    pub audio: crate::camera_policy::AudioSettings,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub annotations: Vec<crate::VideoAnnotation>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub audio_assets: Vec<crate::media_edit::AudioAsset>,
+    #[serde(default="crate::timeline::default_tracks")]
+    pub tracks: Vec<crate::timeline::Track>,
+    #[serde(default="camera_enabled_default")]pub source_video_enabled:bool,
+    #[serde(default)]pub source_asset_removed:bool,
+    #[serde(default, skip_serializing_if="std::collections::BTreeMap::is_empty")]
+    pub clip_tracks: crate::timeline::ClipTracks,
+    #[serde(default,skip_serializing_if="std::collections::BTreeMap::is_empty")]pub follow_positions:std::collections::BTreeMap<String,(TimeTick,TimeTick)>,
+    #[serde(default, skip_serializing_if="Vec::is_empty")]
+    pub visual_assets: Vec<crate::timeline::VisualAsset>,
+    #[serde(default,skip_serializing_if="Vec::is_empty")]pub subtitle_assets:Vec<crate::timeline::SubtitleAsset>,
+    #[serde(default,skip_serializing_if="std::collections::BTreeMap::is_empty")]pub subtitle_links:crate::timeline::ClipTracks,
+    #[serde(default, skip_serializing_if="Vec::is_empty")]
+    pub visual_clips: Vec<crate::timeline::VisualClip>,
+    #[serde(default)] pub audio_clips: Vec<crate::media_edit::AudioClip>,
+    #[serde(default)] pub subtitles: Vec<crate::media_edit::SubtitleCue>,
+    #[serde(default)] pub subtitle_style: crate::media_edit::SubtitleStyle,
+    #[serde(default, skip_serializing_if="std::collections::BTreeMap::is_empty")]
+    pub subtitle_styles: std::collections::BTreeMap<String, crate::media_edit::SubtitleStyle>,
 }
 
 fn camera_enabled_default() -> bool {
@@ -99,11 +127,36 @@ impl Default for WorkbenchSettings {
             cursor: CursorStyle::default(),
             video: None,
             camera_enabled: true,
+            automatic_camera: None,
+            manual_camera_enabled: true,
+            audio: crate::camera_policy::AudioSettings::default(),
+            annotations: Vec::new(),
+            audio_assets: Vec::new(),
+            tracks: crate::timeline::default_tracks(),source_video_enabled:true,source_asset_removed:false, clip_tracks: Default::default(),follow_positions:Default::default(), visual_assets: Vec::new(),subtitle_assets:Vec::new(),subtitle_links:Default::default(), visual_clips:Vec::new(),
+            audio_clips: Vec::new(), subtitles: Vec::new(), subtitle_style: Default::default(), subtitle_styles: Default::default(),
         }
     }
 }
 
 impl WorkbenchSettings {
+    /// Migrate legacy clips and retain imported metadata independently from timeline use.
+    pub fn retain_audio_assets(&mut self) {
+        let mut paths=self.audio_assets.iter().map(|a|a.path.clone()).collect::<std::collections::HashSet<_>>();
+        for clip in &self.audio_clips {
+            if paths.insert(clip.path.clone()) {self.audio_assets.push(crate::media_edit::AudioAsset::from_clip(clip));}
+        }
+        if !self.audio_assets.is_empty() {self.schema_version=WORKBENCH_SCHEMA_VERSION;}
+    }
+
+    pub fn remove_unused_audio_asset(&mut self,id:&str)->Result<(),String> {
+        let index=self.audio_assets.iter().position(|a|a.id==id).ok_or("素材已不在当前工程中")?;
+        let path=&self.audio_assets[index].path;
+        if self.audio_clips.iter().any(|c|&c.path==path) {
+            return Err("素材正在使用，请先删除轨道中引用它的所有片段".into());
+        }
+        self.audio_assets.remove(index);
+        Ok(())
+    }
     pub fn video_edit(
         &self,
         source_duration: TimeTick,
@@ -121,7 +174,7 @@ impl WorkbenchSettings {
     pub fn validate(&self) -> Result<(), WorkbenchValidationError> {
         if !matches!(
             self.schema_version,
-            1 | 2 | 3 | 4 | WORKBENCH_SCHEMA_VERSION
+            1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | WORKBENCH_SCHEMA_VERSION
         ) || (self.schema_version < 5 && self.canvas.size.is_some())
             || (self.schema_version == 1 && (self.video.is_some() || !self.camera_enabled))
             || (self.schema_version < 3
@@ -139,6 +192,27 @@ impl WorkbenchSettings {
                 self.schema_version,
             ));
         }
+        if self.automatic_camera.as_ref().is_some_and(|v| !v.valid()) || !self.audio.valid() {
+            return Err(WorkbenchValidationError::InvalidMediaSettings);
+        }
+        let mut ids = std::collections::HashSet::new();
+        if self.annotations.len() > 200
+            || (self.schema_version < 7 && !self.annotations.is_empty())
+            || self
+                .annotations
+                .iter()
+                .any(|a| !a.valid() || !ids.insert(&a.id))
+        {
+            return Err(WorkbenchValidationError::InvalidMediaSettings);
+        }
+        if !crate::media_edit::validate(&self.audio_clips, &self.subtitles, &self.subtitle_style) { return Err(WorkbenchValidationError::InvalidMediaSettings); }
+        let mut asset_ids=std::collections::HashSet::new();let mut paths=std::collections::HashSet::new();
+        if self.audio_assets.len()>crate::media_edit::MAX_MEDIA_ITEMS || self.audio_assets.iter().any(|a|
+            !a.valid() || !asset_ids.insert(&a.id) || !paths.insert(&a.path)) {
+            return Err(WorkbenchValidationError::InvalidMediaSettings);
+        }
+        if self.subtitle_styles.len() > 10000 || self.subtitle_styles.values().any(|s| !s.valid()) { return Err(WorkbenchValidationError::InvalidMediaSettings); }
+        if !self.validate_timeline() {return Err(WorkbenchValidationError::InvalidMediaSettings);}
         parse_hex_color(&self.background.color)?;
         if self.canvas.size.is_some_and(|size| !size.is_valid()) {
             return Err(WorkbenchValidationError::InvalidCanvasSize);
@@ -146,20 +220,10 @@ impl WorkbenchSettings {
         if let Some(video) = &self.video {
             video.validate()?;
         }
-        match self.background.kind {
-            BackgroundKind::Solid if self.background.image.is_some() => {
-                return Err(WorkbenchValidationError::UnexpectedBackgroundImage);
-            }
-            BackgroundKind::Image => {
-                let image = self
-                    .background
-                    .image
-                    .as_deref()
-                    .ok_or(WorkbenchValidationError::MissingBackgroundImage)?;
-                validate_project_relative_path(image)?;
-            }
-            BackgroundKind::Solid => {}
+        if self.background.kind == BackgroundKind::Image && self.background.image.is_none() {
+            return Err(WorkbenchValidationError::MissingBackgroundImage);
         }
+        if let Some(image) = &self.background.image { validate_project_relative_path(image)?; }
         validate_range("canvas.inset", self.canvas.inset, 0.0, 0.25)?;
         validate_range("canvas.cornerRadius", self.canvas.corner_radius, 0.0, 0.10)?;
         validate_range("canvas.shadow", self.canvas.shadow, 0.0, 1.0)?;
@@ -490,7 +554,7 @@ fn repair_continuity(track: &mut CameraTrack) {
     }
 }
 
-fn parse_hex_color(value: &str) -> Result<[u8; 3], WorkbenchValidationError> {
+pub(crate) fn parse_hex_color(value: &str) -> Result<[u8; 3], WorkbenchValidationError> {
     let bytes = value.as_bytes();
     if bytes.len() != 7 || bytes[0] != b'#' || !bytes[1..].iter().all(u8::is_ascii_hexdigit) {
         return Err(WorkbenchValidationError::InvalidColor(value.into()));
@@ -541,6 +605,8 @@ fn validate_project_relative_path(value: &str) -> Result<(), WorkbenchValidation
 
 #[derive(Debug, Error, Clone, PartialEq)]
 pub enum WorkbenchValidationError {
+    #[error("automatic camera or audio settings are invalid")]
+    InvalidMediaSettings,
     #[error("画布宽高须为 64–8192 的偶数，且总像素不超过 33554432")]
     InvalidCanvasSize,
     #[error(transparent)]
@@ -820,5 +886,25 @@ mod tests {
         assert!(editor.redo());
         assert_eq!(editor.track().segments.len(), 2);
         editor.track().validate().unwrap();
+    }
+}
+
+#[cfg(test)]
+mod project_asset_tests {
+    use super::*;
+    use crate::media_edit::{AudioClip,AudioRole};
+    #[test]
+    fn unused_assets_survive_track_deletion_and_serialization() {
+        let mut settings=WorkbenchSettings::default();settings.schema_version=8;
+        let clip=AudioClip{speed_percent:100,id:"first".into(),name:"voice".into(),path:"media/audio-clips/11111111-2222-4333-8444-555555555555.pcm".into(),asset_frames:48000,start:TimeTick::ZERO,source_in:TimeTick::ZERO,source_out:TimeTick(10_000_000),role:AudioRole::Narration,gain:1.0,muted:false,fade_in:TimeTick::ZERO,fade_out:TimeTick::ZERO,waveform:vec![0.5]};
+        settings.audio_clips.push(clip.clone());let mut second=clip;second.id="second".into();settings.audio_clips.push(second);
+        settings.validate().unwrap();settings.retain_audio_assets();assert_eq!(settings.audio_assets.len(),1);
+        let before=settings.clone();assert!(settings.remove_unused_audio_asset("first").is_err());assert_eq!(settings,before);
+        settings.audio_clips.remove(0);assert!(settings.remove_unused_audio_asset("first").is_err());
+        settings.audio_clips.clear();settings.retain_audio_assets();assert_eq!(settings.audio_assets.len(),1);
+        let mut decoded:WorkbenchSettings=serde_json::from_slice(&serde_json::to_vec(&settings).unwrap()).unwrap();
+        decoded.validate().unwrap();assert_eq!(decoded,settings);decoded.remove_unused_audio_asset("first").unwrap();assert!(decoded.audio_assets.is_empty());
+        assert!(decoded.remove_unused_audio_asset("first").is_err());
+        let mut bad=settings;bad.audio_assets[0].path="../outside.pcm".into();assert!(bad.validate().is_err());
     }
 }

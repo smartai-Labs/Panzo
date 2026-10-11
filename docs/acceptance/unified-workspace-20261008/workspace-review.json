@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "production host with four persistent tabs",
+    "image annotations and undo survive switches",
+    "A background result remains with A while B stays selected",
+    "editable results survive repeated tab switches",
+    "dirty video generation/playhead retained without navigation",
+    "tray restore preserves editor",
+    "history/settings/image/result have no auxiliary top-level windows"
+  ],
+  "editor_after": {
+    "dirty": true,
+    "generation": 1,
+    "tick": 0
+  },
+  "editor_before": {
+    "dirty": true,
+    "generation": 1,
+    "tick": 0
+  },
+  "passed": true,
+  "top_level_classes": [
+    "PanzoWorkspace",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "ComboLBox",
+    "MSCTFIME UI",
+    "IME"
+  ]
+}

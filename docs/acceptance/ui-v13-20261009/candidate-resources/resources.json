@@ -1,0 +1,423 @@
+{
+  "passed": true,
+  "binarySha256": "5bafa52dc84c2c9178b3c598b9883c2d77d7c97bed4b414aaaf4e8376b02cf3f",
+  "pid": 17928,
+  "profile": "D:\\ChatGPT\\Panzo\\.tmp\\ui-lifetime-a97840b1-a4f6-4b9e-bff8-e625d088d774",
+  "cycles": [
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 161
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    },
+    {
+      "gdi": 64,
+      "user": 160
+    }
+  ],
+  "baseline": {
+    "gdi": 64,
+    "user": 161
+  },
+  "final": {
+    "gdi": 64,
+    "user": 160
+  },
+  "idle": {
+    "seconds": 30.000223700073548,
+    "oneCorePercent": 0.0,
+    "note": "warm empty workspace, no recording, playback or background media preparation"
+  },
+  "exitCode": 0,
+  "newCrashDumps": []
+}

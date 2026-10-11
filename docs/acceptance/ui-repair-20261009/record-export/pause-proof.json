@@ -1,0 +1,73 @@
+{
+  "camera": {
+    "default": {
+      "enabled": true,
+      "mode": "smooth",
+      "responseMs": 250,
+      "zoom": 1.5
+    },
+    "ranges": [
+      {
+        "config": {
+          "enabled": true,
+          "mode": "smooth",
+          "responseMs": 250,
+          "zoom": 1.5
+        },
+        "end": 3109088,
+        "start": 0
+      },
+      {
+        "config": {
+          "enabled": false,
+          "mode": "smooth",
+          "responseMs": 250,
+          "zoom": 1.5
+        },
+        "end": 6614261,
+        "start": 3109088
+      },
+      {
+        "config": {
+          "enabled": true,
+          "mode": "smooth",
+          "responseMs": 250,
+          "zoom": 1.5
+        },
+        "end": 15174333,
+        "start": 6614261
+      }
+    ]
+  },
+  "durationTick": 15174333,
+  "frozenTick": 3109088,
+  "microphones": {
+    "Ok": [
+      [
+        "1 · 变音麦克风 (VB-Audio Virtual Cable)",
+        "{0.0.1.00000000}.{6dd22eb1-3c31-4b96-9d0d-6888ade2c8ad}"
+      ],
+      [
+        "2 · 麦克风 (Realtek High Definition Audio)",
+        "{0.0.1.00000000}.{9967913d-fe90-45d4-8dfa-c369c5f86e34}"
+      ],
+      [
+        "3 · 麦克风 (e2eSoft iVCam)",
+        "{0.0.1.00000000}.{ae03e829-5fae-48f8-9de6-1d6c743dcb7d}"
+      ],
+      [
+        "4 · 耳麦麦克风 (PD200X Podcast Microphone)",
+        "{0.0.1.00000000}.{b1ca9ecb-f5f8-4064-80f2-2f4adbb1794f}"
+      ],
+      [
+        "5 · Virtual Mic (Virtual Mic for AudioRelay)",
+        "{0.0.1.00000000}.{b580680c-e458-4630-80dd-1e711fdf3545}"
+      ]
+    ]
+  },
+  "pauseRemovedMs": 650,
+  "systemInitialization": {
+    "Ok": "所选音频设备可用：48 kHz 立体声"
+  },
+  "videoFrames": 46
+}

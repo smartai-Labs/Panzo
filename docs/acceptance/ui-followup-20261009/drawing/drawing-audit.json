@@ -1,0 +1,82 @@
+{
+  "test": "native synthetic image drawing stability",
+  "binary": "D:\\ChatGPT\\Panzo\\target\\desktop-v5\\release\\panzo.exe",
+  "binarySha256": "8e8e33370a9f60ddabdd3aeb15fd62cf1a6b81092e02e5ad21438a2da8c12a8d",
+  "imageSize": [
+    4000,
+    2500
+  ],
+  "sampled": false,
+  "passed": false,
+  "uniqueProfile": "D:\\ChatGPT\\Panzo\\.tmp\\drawing-stability-1d036f19-7301-408d-9a25-7c340110ff92",
+  "fixture": "D:\\ChatGPT\\Panzo\\.tmp\\drawing-stability-1d036f19-7301-408d-9a25-7c340110ff92\\Videos\\Panzo\\Screenshots\\synthetic-drawing.png",
+  "requestedMinimumSeconds": 14.0,
+  "requestedMoves": 750,
+  "samplingIntervalRequestedMilliseconds": 2,
+  "limit": "Pixel sampling only; counts are not display frame counts or FPS. Zero changed samples cannot exclude shorter flashes between samples. Desktop occlusion or movement invalidates the observation.",
+  "isolatedProcessId": 65428,
+  "readiness": {
+    "origin": [
+      50,
+      206
+    ],
+    "clientSize": [
+      800,
+      548
+    ],
+    "imageBoundsInClient": [
+      71,
+      60,
+      772,
+      498
+    ],
+    "sample": [
+      471,
+      412
+    ],
+    "strokeStart": [
+      246,
+      366
+    ],
+    "strokeWidth": 178,
+    "strokeHeight": 12,
+    "waitMilliseconds": 518.769
+  },
+  "unchangedPixel": [
+    471,
+    412
+  ],
+  "expectedColorRef": 15657704,
+  "actualMoves": 750,
+  "drawingMilliseconds": 13575.935,
+  "geometryChange": {
+    "beforeRoot": [
+      50,
+      50,
+      1150,
+      850
+    ],
+    "afterRoot": [
+      204,
+      104,
+      1849,
+      1200
+    ],
+    "beforePicture": [
+      50,
+      206,
+      800,
+      548
+    ],
+    "afterPicture": [
+      204,
+      260,
+      1345,
+      844
+    ]
+  },
+  "error": "Window geometry changed during sampling; measurement is invalid",
+  "samples": 1355,
+  "cleanup": "terminated only the isolated child after close grace period",
+  "processExitCode": 1
+}
