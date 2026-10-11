@@ -1,8 +1,0 @@
-info: syncing channel updates for 1.97.1-x86_64-pc-windows-msvc
-info: latest update on 2026-07-16 for version 1.97.1 (8bab26f4f 2026-07-14)
-info: downloading 5 components
-error: no matching package named `anyhow` found
-location searched: crates.io index
-required by package `panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)`
-note: offline mode (via `--offline`) can sometimes cause surprising resolution failures
-help: if this error is too confusing you may wish to retry without `--offline`

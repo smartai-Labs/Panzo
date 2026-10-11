@@ -1,2 +1,0 @@
-Candidate build: D:\ChatGPT\Panzo\target\multimodal-ocr\release
-Identity: D:\ChatGPT\Panzo\target\multimodal-ocr\release\candidate-build.json

@@ -1,9 +1,0 @@
-   Compiling panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
-error[E0432]: unresolved import `windows::Win32::UI::Input::KeyboardAndMouse::AttachThreadInput`
-   --> crates\panzo-windows\src\platform\workbench_v14_review.rs:169:123
-    |
-169 | ...use::{GetFocus,SetFocus,AttachThreadInput},WindowsAndMessaging::*}};
-    |                            ^^^^^^^^^^^^^^^^^ no `AttachThreadInput` in `Win32::UI::Input::KeyboardAndMouse`
-
-For more information about this error, try `rustc --explain E0432`.
-error: could not compile `panzo-windows` (lib test) due to 1 previous error

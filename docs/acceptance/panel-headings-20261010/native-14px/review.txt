@@ -1,1 +1,0 @@
-PASS: video panels, compact tracks, pixel inset/undo, live background colour/undo, subtitle pixel size, recording and export light/dark screenshots, material cards/overflow/hover/search. Disposable project; no microphone or network request.

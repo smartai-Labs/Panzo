@@ -1,2 +1,0 @@
-Candidate build: D:\ChatGPT\Panzo\target\selection-flicker-fix\release
-Identity: D:\ChatGPT\Panzo\target\selection-flicker-fix\release\candidate-build.json

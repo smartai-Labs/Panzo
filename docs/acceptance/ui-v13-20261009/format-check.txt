@@ -1,3 +1,0 @@
-Files: app_dialog.rs, capture_history.rs, capture_menu.rs, capture_tools.rs, desktop_ui.rs, editor.rs, editor_navigation.rs, editor_ui.rs, export_window.rs, form_schema.rs, image_workflows.rs, image_workspace.rs, inspector_review.rs, management_window.rs, media_panel.rs, media_settings.rs, media_timeline.rs, mod.rs, picture_review.rs, picture_window.rs, pin_manager.rs, plugins.rs, plugin_manager.rs, plugin_ui.rs, preview_window.rs, recorder_window.rs, scroll_capture.rs, speech_settings.rs, system_preferences.rs, ui_motion.rs, ui_preferences.rs, video_annotations.rs, vision_ui.rs, workbench_actions.rs, workspace.rs, workspace_form.rs, workspace_form_review.rs, workspace_image_tools.rs, workspace_settings.rs, workspace_ui.rs
-
-Exit code: 0

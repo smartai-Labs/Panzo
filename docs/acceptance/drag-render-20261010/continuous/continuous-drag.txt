@@ -1,4 +1,0 @@
-kind=0: frames=60 median=5409us p95=10474us max=11328us draws=118 unbuffered=0 height_sets=0 list_paints=59 extra_presentations=0
-kind=1: frames=60 median=5044us p95=15925us max=17325us draws=0 unbuffered=0 height_sets=0 list_paints=0 extra_presentations=0
-kind=2: frames=60 median=8797us p95=14760us max=20109us draws=0 unbuffered=0 height_sets=0 list_paints=0 extra_presentations=0
-kind=3: frames=60 median=15409us p95=24228us max=32460us draws=0 unbuffered=0 height_sets=0 list_paints=0 extra_presentations=0

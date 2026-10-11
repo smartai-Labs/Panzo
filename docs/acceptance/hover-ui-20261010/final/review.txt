@@ -1,1 +1,0 @@
-PASS: painted/native controls use the same popup, message-driven hover timer, above/side placement, full labels, light/dark, click-through, no focus change, leave hides, long labels wrap, owner destruction releases popup, collapsed inspector buttons have distinct hit targets.

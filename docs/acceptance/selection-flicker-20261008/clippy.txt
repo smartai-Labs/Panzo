@@ -1,9 +1,0 @@
-cargo :     Checking panzo-windows v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-windows)
-所在位置 行:6 字符: 1
-+ cargo clippy --locked --offline --workspace --all-targets -- -D warni ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (    Checking pa...\panzo-windows):String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-    Checking panzo-app v0.1.0 (D:\ChatGPT\Panzo\crates\panzo-app)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.01s

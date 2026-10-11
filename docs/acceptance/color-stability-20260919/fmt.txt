@@ -1,1 +1,0 @@
-Command completed successfully (exit 0), no output.

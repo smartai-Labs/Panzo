@@ -1,1 +1,0 @@
-PASS: native v14 contexts, project bin, single inspector, clip range, audio/subtitle pages, subtitle apply/undo, compact tracks preserve height and scroll, compact bin overlay, image/crop/OCR/collage/assets screenshots. Isolated generated fixture; no microphone or AI network request.

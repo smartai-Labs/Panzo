@@ -1,1 +1,0 @@
-PASS: direct toolbar audio/subtitle entry; manual caption insertion/edit; AI validation inline; native menu frames; Ctrl-wheel view zoom; preview drag; GPU region clipping; fit reset; divider resize; unchanged project settings/camera/output during view gestures.

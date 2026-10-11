@@ -1,9 +1,0 @@
-38 visible=true rect=RECT { left: -143, top: 286, right: -23, bottom: 316 }
-50 visible=true rect=RECT { left: 1352, top: 184, right: 1444, bottom: 220 }
-54 visible=true rect=RECT { left: 1364, top: 408, right: 1444, bottom: 444 }
-100 visible=true rect=RECT { left: -267, top: 366, right: -134, bottom: 393 }
-101 visible=true rect=RECT { left: -128, top: 366, right: 5, bottom: 393 }
-110 visible=true rect=RECT { left: -267, top: 288, right: -242, bottom: 315 }
-111 visible=true rect=RECT { left: -238, top: 288, right: -213, bottom: 315 }
-112 visible=true rect=RECT { left: -209, top: 288, right: -184, bottom: 315 }
-113 visible=true rect=RECT { left: -180, top: 288, right: -155, bottom: 315 }

@@ -1,5 +1,0 @@
-Before fix: embedded_color_popover_pumps_host_and_wakes_on_deactivation FAILED
-owner_root, root_disabled, host_pumped, cancel_woke = (true, false, false, true)
-Expected: (true, true, true, true)
-The original code disabled only the editor child and filtered GetMessage to the popup.
-Focus-loss wake stall was a code risk; this baseline run did return on deactivation.

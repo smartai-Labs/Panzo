@@ -1,1 +1,0 @@
-PASS: centered recent/new recording actions; no source card/start/footer on empty workspace; recent availability follows recent project; new recording opens source setup without recording; screen selection; cancel returns to empty state.

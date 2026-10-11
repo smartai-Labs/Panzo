@@ -1,1 +1,0 @@
-PASS: first native click from canvas/search/button focus issues exactly one command; capture retained; inline edit commits and first tab click executes; one-click import enters project; free crop opens video preview; edge resize/interior move/undo/re-entry/reset/locked ratio/zoom/changed canvas; drag does not refresh project bin. No microphone or network.

@@ -29,8 +29,8 @@ foreach ($name in @('panzo.exe','panzo-cli.exe')) {
     if ($name -eq 'panzo.exe' -and $subsystem -ne 2) { throw 'GUI candidate is not Windows subsystem' }
     $files += [ordered]@{name=$name;sha256=$hash;bytes=$bytes.Length;peSubsystem=$subsystem}
 }
-$guideName = (-join ([char[]](0x4F7F,0x7528,0x8BF4,0x660E))) + '.md'
-Copy-Item -LiteralPath (Join-Path $workspace 'docs/RE-MVP-User-Guide.md') -Destination (Join-Path $package $guideName)
+Copy-Item -LiteralPath (Join-Path $workspace 'README.md') -Destination (Join-Path $package 'SOURCE-README.md')
+Copy-Item -LiteralPath (Join-Path $workspace 'LICENSE') -Destination (Join-Path $package 'LICENSE')
 # The historical release description is not the identity of a new candidate.
 # Generate a neutral entry point bound to the evidence checked above.
 @"
@@ -42,9 +42,8 @@ This package passed the automated scope in [the exact-binary report](validation/
 It is not an overall release acceptance or a claim that manual visual checks passed.
 Source/configuration SHA256: $($candidate.sourceSha256)
 
-See [the user guide](docs/RE-MVP-User-Guide.md) and [known issues](Known-Issues.md).
-Other bundled implementation notes, screenshots and Acceptance-Report.md are historical context;
-their dates and feature claims do not replace this package's exact-binary validation.
+See [build and usage instructions](SOURCE-README.md).
+Only evidence for this candidate is bundled; local design history is not required.
 "@ | Set-Content -LiteralPath (Join-Path $package 'README.md') -Encoding UTF8
 Copy-Item -LiteralPath $candidate.manifestPath -Destination (Join-Path $package 'candidate-build.json')
 $validationRoot = Join-Path $package 'validation'
@@ -57,46 +56,6 @@ foreach ($entry in Get-ChildItem -LiteralPath $evidenceRoot -Recurse -File | Whe
     Copy-Item -LiteralPath $entry.FullName -Destination $destination
 }
 Copy-Item -LiteralPath $acceptedPath -Destination (Join-Path $validationRoot 'final-regression.json') -Force
-foreach ($relative in @('docs/RE-MVP-Prototype-UI-Implementation.md','docs/UI-Polish-2026-09-19.md','docs/UI-Detail-2026-09-19.md','docs/UI-Actions-2026-09-19.md','docs/UI-Theme-2026-09-19.md','docs/UI-Background-2026-09-19.md','docs/UI-Thumbnails-Low-2026-09-19.md','docs/Camera-Focus-Diagnosis-2026-09-19.md','docs/Camera-Focus-Fix-2026-09-19.md','docs/Camera-Crosshair-Fix-2026-09-19.md','docs/Editor-Cards-2026-09-19.md','docs/Editor-Titlebar-2026-09-19.md','docs/Timeline-Clean-2026-09-19.md','docs/Timeline-Labels-2026-09-19.md','docs/Video-Speed-2026-09-19.md','docs/Color-Stability-2026-09-19.md','docs/Crop-Titlebar-2026-09-19.md','docs/Editor-Workflow-2026-09-19.md','.stitch/DESIGN.md')) {
-    $destination = Join-Path $package $relative
-    $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)
-    Copy-Item -LiteralPath (Join-Path $workspace $relative) -Destination $destination
-}
-foreach ($relative in @('docs/acceptance/ui-polish-20260919','docs/acceptance/ui-detail-20260919','docs/acceptance/ui-actions-20260919','docs/acceptance/ui-theme-20260919','docs/acceptance/ui-background-20260919','docs/acceptance/ui-thumbnails-low-20260919','docs/acceptance/camera-focus-20260919','docs/acceptance/camera-focus-fix-20260919','docs/acceptance/camera-crosshair-20260919','docs/acceptance/editor-cards-20260919','docs/acceptance/titlebar-actions-20260919','docs/acceptance/timeline-clean-20260919','docs/acceptance/timeline-labels-20260919','docs/acceptance/video-speed-20260919','docs/acceptance/color-stability-20260919','docs/acceptance/crop-titlebar-20260919','docs/acceptance/workflow-20260919')) {
-    $uiEvidence = Join-Path $workspace $relative
-    if (-not (Test-Path -LiteralPath $uiEvidence)) { continue }
-    $destination = Join-Path $package $relative
-    $null = New-Item -ItemType Directory -Force -Path $destination
-    foreach ($file in Get-ChildItem -LiteralPath $uiEvidence -File | Where-Object { $_.Extension -in @('.json','.txt','.png') }) {
-        Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $destination $file.Name)
-    }
-}
-foreach ($relative in @('Known-Issues.md','PROJECT-PLAN.md','docs/RE-MVP-Implementation.md','docs/RE-MVP-Accessibility-Report.md','docs/RE-MVP-User-Guide.md','docs/RE-MVP-Desktop-Review.md','docs/Recording-Editing-Acceptance-Plan.md','docs/Recording-Editing-UI-UX-Spec.md','docs/ADR-0002-RE-MVP-UI-Candidates.md')) {
-    $destination = Join-Path $package $relative
-    $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)
-    Copy-Item -LiteralPath (Join-Path $workspace $relative) -Destination $destination
-}
-if (Test-Path -LiteralPath (Join-Path $workspace 'Acceptance-Report.md')) {
-    $historical = Get-Content -LiteralPath (Join-Path $workspace 'Acceptance-Report.md') -Raw -Encoding UTF8
-    ("> Historical context only. Current candidate evidence: [validation/final-regression.json](validation/final-regression.json).`r`n`r`n" + $historical) | Set-Content -LiteralPath (Join-Path $package 'Acceptance-Report.md') -Encoding UTF8
-    # Include only report-linked JSON evidence, never recordings, event tracks,
-    # project assets, or the whole temporary directory.
-    $reportText = Get-Content -LiteralPath (Join-Path $workspace 'Acceptance-Report.md') -Encoding UTF8 -Raw
-    $links = [regex]::Matches($reportText, '\]\(((?:\.tmp|docs/acceptance)/[^)]+\.json)\)')
-    $copiedEvidence = @{}
-    foreach ($link in $links) {
-        $relative = $link.Groups[1].Value
-        if ($copiedEvidence.ContainsKey($relative)) { continue }
-        $source = [IO.Path]::GetFullPath((Join-Path $workspace $relative))
-        $destination = [IO.Path]::GetFullPath((Join-Path $package $relative))
-        if (-not $source.StartsWith($workspace + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or
-            -not $destination.StartsWith($package + [IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'Evidence path leaves its declared directory' }
-        if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Missing linked JSON evidence: $relative" }
-        $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)
-        Copy-Item -LiteralPath $source -Destination $destination
-        $copiedEvidence[$relative] = $true
-    }
-}
 $metadataProcess = Invoke-PanzoProcess -Executable (Get-Command cargo -CommandType Application).Source -Arguments @('metadata','--locked','--offline','--filter-platform','x86_64-pc-windows-msvc','--format-version','1','--manifest-path',(Join-Path $workspace 'Cargo.toml')) -WorkingDirectory $workspace -StdoutPath (Join-Path $package 'dependency-metadata.json') -StderrPath (Join-Path $package 'dependency-metadata.stderr.txt')
 if ($metadataProcess.watchdogExpired -or $metadataProcess.exitCode -ne 0) { throw 'Dependency metadata failed' }
 $metadata = $metadataProcess.output | ConvertFrom-Json

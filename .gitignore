@@ -36,3 +36,20 @@ id_ed25519
 *.dll
 *.rlib
 *.rmeta
+
+# Local design history and generated acceptance evidence
+/docs/
+/outputs/
+/.stitch/
+/Acceptance-Report.md
+/Known-Issues.md
+/PROJECT-PLAN.md
+/Panzo.md
+/V0.1-Technical-Spec.md
+/V0.2-Editor-Workbench-Spec.md
+/scripts/open-desktop-v3-preview.ps1
+/scripts/open-workbench-v14-preview.ps1
+/scripts/test-desktop-v3-prototype.cjs
+/scripts/test-r0-prototype.cjs
+/scripts/test-workbench-v14-prototype.cjs
+/scripts/test-workspace-v2-prototype.cjs
